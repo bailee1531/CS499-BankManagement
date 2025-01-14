@@ -1,0 +1,7 @@
+= Bank Management System
+Braden Doty; Taiyo Hino; Bailee Segars; Sierra Yerges
+v1.0, 2025-01-14
+:doctitle: Bank Management
+:toc:
+:experimental:
+:icons: font
