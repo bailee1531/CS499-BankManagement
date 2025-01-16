@@ -1,8 +1,6 @@
-version: '3.9'
-
 services:
   db:
-    image: timescale/timescaledb-postgis:latest
+    image: timescale/timescaledb:latest-pg14
     container_name: banking_db
     environment:
       POSTGRES_USER: admin
@@ -25,7 +23,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@email.com
       PGADMIN_DEFAULT_PASSWORD: password
     volumes:
-      - ./pgadmin-data:/var/lib/pgadmin1
+      - ./pgadmin-data:/var/lib/pgadmin
 
   app:
     build:
@@ -45,4 +43,5 @@ services:
 
 volumes:
   db_data:
-
+  pgadmin-data:
+  
