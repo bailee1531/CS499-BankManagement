@@ -16,3 +16,6 @@ services:
 networks:
   banking-network:
     external: true
+
+volumes:
+  pgadmin-data:

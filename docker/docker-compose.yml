@@ -1,0 +1,38 @@
+services:
+  db:
+    image: timescale/timescaledb:latest-pg14
+    container_name: banking_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bankTest
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ../init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - banking-network
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    ports:
+      - '888:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@email.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - ../pgadmin-data:/var/lib/pgadmin1
+    networks:
+      - banking-network
+    restart: always
+
+networks:
+  banking-network:
+    external: true
+
+volumes:
+  db-data:
+  pgadmin-data:
