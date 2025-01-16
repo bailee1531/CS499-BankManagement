@@ -2,7 +2,7 @@
 
 
 # Docker
-docker start banking-container
-docker stop banking-container
+docker compose start
+docker compose stop
 # Go to
-http://localhost:8080
+http://localhost:888/
