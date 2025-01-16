@@ -44,3 +44,4 @@ services:
 volumes:
   db_data:
   pgadmin-data:
+
