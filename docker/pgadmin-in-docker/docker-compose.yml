@@ -1,0 +1,21 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    ports:
+      - '888:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@email.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - ../../pgadmin-data:/var/lib/pgadmin1
+    networks:
+      - banking-network
+    restart: always
+
+networks:
+  banking-network:
+    external: true
+
+volumes:
+  pgadmin-data:
