@@ -1,16 +1,177 @@
 = Bank Management System
 Braden Doty; Taiyo Hino; Bailee Segars; Sierra Yerges
 v1.0, 2025-01-14
-:doctitle: Bank Management
+:doctitle: Bank Management Utility (BANK)
 :toc:
 :experimental:
 :icons: font
 
 == Project Overview
+=== Project Description
+The Bank Management Utility (BANK) is a secure, web-based application that helps banks manage customer accounts. It supports three main user roles: *Customers*, *Tellers*, and *Administrators*, each with specific access and responsibilities. This system supports multiple account types, such as checking, savings, money market, home mortgage loans, and credit card accounts, incorporating features like deposit and withdrawal tracking, fund transfers, and online bill payments, all within a secure, user-friendly interface.
+
+Prioritizing security, the system includes robust authentication, encrypted data handling, and role-based access controls to ensure that sensitive customer information remains protected at all times. Error handling and transaction validation further enhance the security of the application.
+
+=== Project Objectives
+.*Secure User Access*
+* Use secure login credentials for all users (username and password).
+* Implement encrypted data storage and transfer to safeguard sensitive information.
+
+.*Support Key User Roles*
+* Customer: Create and manage personal accounts, view transaction reports, transfer funds, and pay bills.
+* Teller: Manage customer accounts, handle transactions, and review account data.
+* Administrator: Oversee teller accounts and access all system data for maintenance.
+
+.*Include Core Banking Features*
+* Support multiple account types with unique features like interest rates and monthly payments.
+* Facilitate deposits, withdrawals, and transfers while enforcing restrictions for certain account types.
+
+.*Ensure Usability*
+* Provide a simple, intuitive interface suitable for non-technical users.
+* Design the system to handle errors and recover from input mistakes.
+
+.*Enable Scalability*
+* Allow multiple users to access the system at the same time.
+* Support future updates, such as adding more account types or enhancing security.
+
+.*Use Reliable Data Management*
+* Store account data in a secure database or similar storage system for real-time access and updates.
 
 == Project Schedule
+=== SDP (1/14 - 1/26)
+- *First draft*: 1/21
+- *Final draft*: 1/25
+- *Submit*: 1/26
+- Use Asciidoc:
+  * Overview
+  * Schedule
+  * List of Personnel and Roles
+  * Software Development Tools
+  * Software Development Environment
+  * Risks, Issues, Opportunities
+  * Lessons Learned
+
+=== Database (1/14 - 1/31) ... (2/1 - 3/13)
+- *Initial functionality*: 1/31
+- *Completed functionality*: 3/13
+- Tasks:
+  * Install WSL 2
+  * Use Docker Compose:
+    ** Postgres image
+  * Init script
+  * Create roles with permissions
+  * Create a few users
+  * Use SHA-256 for security
+  * Use pgAdmin for a web interface
+  * Logic diagram
+
+=== Create API (2/2 - 2/13) ... (2/14 - 3/27)
+- *Initial functionality*: 2/13
+- *Completed functionality*: 3/27
+- Tasks:
+  * Determine necessary commands
+  * Map commands to actions
+  * Write command communication with the database
+
+=== GUI (1/14 - 2/20) ... (2/21 - 4/17)
+- *Initial functionality*: 2/20
+- *Completed functionality*: 4/17
+- Tasks:
+  * Research GUI designs
+  * Research HTML & CSS
+  * Research Go-app
+  * Determine whether to use pure Go with Go-app or HTML & CSS
+  * Create a list of all necessary pages
+    ** Separate login screen for employee vs. customer?
+  * Design each page (e.g., Figma or sketches)
+  * Create all pages
+  * Connect to the database incrementally
+  * Create buttons corresponding to API actions/commands
+  * Test functionality
+
+=== Presentation Dates
+- *1/26*: SDP Presentation
+- *2/23*: Architectural Design Presentation (mostly working)
+- *4/20*: Final Presentation
+
+=== Final Project
+- *Due Date*: 4/27
 
 == Personnel and Roles
+=== Braden Doty
+*Software Developer*
+
+.Braden
+image::CS499-BankManagement\docs\img\.jpg[]
+
+- Current Assignments:
+  * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
+  * AI-04 - Research Website Banking Design
+  * AI-05 - Research Frontend
+
+- Bio:
+  * 
+- Fun Fact:
+  * 
+
+=== Taiyo Hino
+*Software Developer*
+
+.Taiyo
+image::CS499-BankManagement\docs\img\.jpg[]
+
+- Current Assignments:
+  * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
+  * AI-04 - Research Website Banking Design
+  * AI-05 - Research Frontend
+
+- Bio:
+  * 
+- Fun Fact:
+  * 
+
+=== Bailee Segars
+*Team Lead*
+
+.Bailee
+image::CS499-BankManagement\docs\img\.jpg[]
+
+- Current Assignments:
+  * US-01 - Create Database Logic Diagram
+  * US-02 - Initialization Script for Database
+  * US-03 - Initial set up of docker container
+  * US-07 - Put Software Development Tools into Asciidoc
+  * US-08 - Put Software Development Environment into Asciidoc
+
+- Bio:
+  * 
+- Fun Fact:
+  * 
+
+=== Sierra Yerges
+*Admin*
+
+.Sierra
+image::CS499-BankManagement\docs\img\sierra.jpg[]
+
+- Current Assignments:
+  * Working as team admin/scrum master:
+    ** Keeping track of meeting minutes
+    ** Ensuring team member's submit individual reports
+    ** Creating *action items*, *epics*, *user stories*, etc.
+    ** Utilizing Jira to provide an easier way for others to track their stories
+  * US-03 - Initial set up of docker container
+  * US-04 - Put Project Overview into Asciidoc
+  * US-05 - Put Project Schedule into Asciidoc
+  * US-06 - Put Personnel and Roles into Asciidoc
+  * SDP finalization/submission
+
+- Bio:
+  * I am a Senior at UAH and hopefully (finger's crossed) graduating this semester
+  * I have been an intern at Northrop Grumman since Summer 2023
+  * Interested in becoming a Scrum Master
+- Fun Fact:
+  * I have a Bengal cat
 
 == Software Development Tools
 
