@@ -2,6 +2,7 @@
 Braden Doty; Taiyo Hino; Bailee Segars; Sierra Yerges
 v1.0, 2025-01-14
 :doctitle: Bank Management Utility (BANK)
+:sectnums:
 :toc:
 :experimental:
 :icons: font
@@ -39,7 +40,7 @@ Prioritizing security, the system includes robust authentication, encrypted data
 
 == Project Schedule
 === SDP (1/14 - 1/26)
-- *First draft*: 1/21
+- *First draft*: 1/20
 - *Final draft*: 1/25
 - *Submit*: 1/26
 - Use Asciidoc:
@@ -134,7 +135,7 @@ image::img\.jpg[]
 *Team Lead*
 
 .Bailee
-image::img\.jpg[]
+image::img/bailee.jpg[Bailee, 640, 480]
 
 - Current Assignments:
   * US-01 - Create Database Logic Diagram
@@ -144,15 +145,24 @@ image::img\.jpg[]
   * US-08 - Put Software Development Environment into Asciidoc
 
 - Bio:
-  * 
+  * Working as team leader:
+    ** Lead key decisions
+    ** Propose software development languages and tools for the team to use
+    ** Propose project schedule that works best for all members
+  * I am a computer science major at UAH who is graduating next semester
+  * I have been an intern at Amentum since Summer 2023
+  * I work as a TA for the CS department and a tutor for the SSC
+  * This summer I will evaluate photonic HPC systems compared to CMOS HPC systems as a research intern at the NSA
+  * Starting next semester, I will be an intern at SAIC
+  * Interested in operating system or compiler development
 - Fun Fact:
-  * 
+  * My favorite band is Sleep Token
 
 === Sierra Yerges
 *Admin*
 
 .Sierra
-image::img\sierra.jpg[]
+image::img\sierra.jpg[Sierra, 640, 480]
 
 - Current Assignments:
   * Working as team admin/scrum master:
@@ -174,8 +184,25 @@ image::img\sierra.jpg[]
   * I have a Bengal cat
 
 == Software Development Tools
+=== Project Management
+* *Tool:* Jira
+* *Purpose:* Jira is used to manage the project's Agile development process, including sprint planning, task assignment, progress tracking, and issue resolution.
+
+=== Database Management
+* *Database:* PostgreSQL
+* *Administration Tool:* pgAdmin
+* *Security:* SHA-256 hashing is implemented for secure password storage. User roles and permissions are managed within the database to ensure data integrity and access control.
+
+=== Containerization
+* *Technology:* Docker
+* *Implementation:* PostgreSQL and pgAdmin are deployed in separate Docker containers for improved scalability and resource management. A docker-compose file orchestrates the simultaneous deployment and management of both containers.
 
 == Software Development Environment
+* *Platform:* Windows
+* *Editor:* Visual Studio Code
+** *Extensions:* Extensions supporting Go development, HTML, and CSS are utilized within Visual Studio Code.
+* *Version Control:* Git
+* *Repository:* GitHub - The project's source code is hosted on GitHub for collaborative development, version control, and code sharing.
 
 == Risks, Issues, and Opportunities
 
