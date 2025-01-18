@@ -102,7 +102,7 @@ Prioritizing security, the system includes robust authentication, encrypted data
 *Software Developer*
 
 .Braden
-image::CS499-BankManagement\docs\img\.jpg[]
+image::img\.jpg[]
 
 - Current Assignments:
   * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
@@ -118,7 +118,7 @@ image::CS499-BankManagement\docs\img\.jpg[]
 *Software Developer*
 
 .Taiyo
-image::CS499-BankManagement\docs\img\.jpg[]
+image::img\.jpg[]
 
 - Current Assignments:
   * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
@@ -134,7 +134,7 @@ image::CS499-BankManagement\docs\img\.jpg[]
 *Team Lead*
 
 .Bailee
-image::CS499-BankManagement\docs\img\.jpg[]
+image::img\.jpg[]
 
 - Current Assignments:
   * US-01 - Create Database Logic Diagram
@@ -152,7 +152,7 @@ image::CS499-BankManagement\docs\img\.jpg[]
 *Admin*
 
 .Sierra
-image::CS499-BankManagement\docs\img\sierra.jpg[]
+image::img\sierra.jpg[]
 
 - Current Assignments:
   * Working as team admin/scrum master:
