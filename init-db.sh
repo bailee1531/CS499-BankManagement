@@ -39,6 +39,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<--
   GRANT DELETE ON person, employee, customer-id, account, loan, transactions TO "administrator";
   ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO "administrator";
 -- Create users and assign roles
-  CREATE USER "bailee" WITH PASSWORD 'asdf1234';
-  GRANT "administrator" TO "bailee";
+  CREATE USER "customer-api";
+  CREATE USER "teller-api";
+  CREATE USER "admin-api";
 EOSQL
