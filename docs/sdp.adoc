@@ -39,64 +39,16 @@ Prioritizing security, the system includes robust authentication, encrypted data
 * Store account data in a secure database or similar storage system for real-time access and updates.
 
 == Project Schedule
-=== SDP (1/14 - 1/26)
-- *First draft*: 1/20
-- *Final draft*: 1/25
-- *Submit*: 1/26
-- Use Asciidoc:
-  * Overview
-  * Schedule
-  * List of Personnel and Roles
-  * Software Development Tools
-  * Software Development Environment
-  * Risks, Issues, Opportunities
-  * Lessons Learned
+.Timeline View of Project Schedule
++++
+<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQpRL8T0uJfkTqcKJjgWuoZQta52dHO17MVwCNDR-VPMiCxNNAyScAmPgCfT2PzAc3ezaLguoN3_s9_/pubhtml?gid=453454190&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
++++
 
-=== Database (1/14 - 1/31) ... (2/1 - 3/13)
-- *Initial functionality*: 1/31
-- *Completed functionality*: 3/13
-- Tasks:
-  * Install WSL 2
-  * Use Docker Compose:
-    ** Postgres image
-  * Init script
-  * Create roles with permissions
-  * Create a few users
-  * Use SHA-256 for security
-  * Use pgAdmin for a web interface
-  * Logic diagram
-
-=== Create API (2/2 - 2/13) ... (2/14 - 3/27)
-- *Initial functionality*: 2/13
-- *Completed functionality*: 3/27
-- Tasks:
-  * Determine necessary commands
-  * Map commands to actions
-  * Write command communication with the database
-
-=== GUI (1/14 - 2/20) ... (2/21 - 4/17)
-- *Initial functionality*: 2/20
-- *Completed functionality*: 4/17
-- Tasks:
-  * Research GUI designs
-  * Research HTML & CSS
-  * Research Go-app
-  * Determine whether to use pure Go with Go-app or HTML & CSS
-  * Create a list of all necessary pages
-    ** Separate login screen for employee vs. customer?
-  * Design each page (e.g., Figma or sketches)
-  * Create all pages
-  * Connect to the database incrementally
-  * Create buttons corresponding to API actions/commands
-  * Test functionality
-
-=== Presentation Dates
-- *1/26*: SDP Presentation
-- *2/23*: Architectural Design Presentation (mostly working)
-- *4/20*: Final Presentation
-
-=== Final Project
-- *Due Date*: 4/27
+=== Important Dates
+* *1/26*: SDP Presentation
+* *2/23*: Architectural Design Presentation
+* *4/20*: Final Presentation
+* *4/27*: Final Project Due 
 
 == Personnel and Roles
 === Braden Doty
