@@ -40,9 +40,7 @@ Prioritizing security, the system includes robust authentication, encrypted data
 
 == Project Schedule
 .Timeline View of Project Schedule
-+++
-<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQpRL8T0uJfkTqcKJjgWuoZQta52dHO17MVwCNDR-VPMiCxNNAyScAmPgCfT2PzAc3ezaLguoN3_s9_/pubhtml?gid=453454190&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-+++
+image::img/ProjectSchedule.png[Timeline]
 
 === Important Dates
 * *1/26*: SDP Presentation
