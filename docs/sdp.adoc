@@ -56,7 +56,7 @@ image::img/ProjectSchedule.png[Timeline]
 image::img\.jpg[]
 
 - Current Assignments:
-  * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
+  * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
   * AI-04 - Research Website Banking Design
   * AI-05 - Research Frontend
 
@@ -72,7 +72,7 @@ image::img\.jpg[]
 image::img\.jpg[]
 
 - Current Assignments:
-  * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
+  * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
   * AI-04 - Research Website Banking Design
   * AI-05 - Research Frontend
 
@@ -93,6 +93,7 @@ image::img/bailee.jpg[Bailee, 640, 480]
   * US-03 - Initial set up of docker container
   * US-07 - Put Software Development Tools into Asciidoc
   * US-08 - Put Software Development Environment into Asciidoc
+  * US-09 - Create Project Timeline Diagram
 
 - Bio:
   * Working as team leader:
