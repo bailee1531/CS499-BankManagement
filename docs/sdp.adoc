@@ -179,7 +179,6 @@ image::img\sierra.jpg[]
 
 == Risks, Issues, and Opportunities
 
-cols="1,2,2,2"]
 |===
 |Ranking |Item |Type |Mitigation/Impact
 
