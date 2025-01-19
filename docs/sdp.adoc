@@ -2,6 +2,7 @@
 Braden Doty; Taiyo Hino; Bailee Segars; Sierra Yerges
 v1.0, 2025-01-14
 :doctitle: Bank Management Utility (BANK)
+:sectnums:
 :toc:
 :experimental:
 :icons: font
@@ -38,64 +39,14 @@ Prioritizing security, the system includes robust authentication, encrypted data
 * Store account data in a secure database or similar storage system for real-time access and updates.
 
 == Project Schedule
-=== SDP (1/14 - 1/26)
-- *First draft*: 1/21
-- *Final draft*: 1/25
-- *Submit*: 1/26
-- Use Asciidoc:
-  * Overview
-  * Schedule
-  * List of Personnel and Roles
-  * Software Development Tools
-  * Software Development Environment
-  * Risks, Issues, Opportunities
-  * Lessons Learned
+.Timeline View of Project Schedule
+image::img/ProjectSchedule.png[Timeline]
 
-=== Database (1/14 - 1/31) ... (2/1 - 3/13)
-- *Initial functionality*: 1/31
-- *Completed functionality*: 3/13
-- Tasks:
-  * Install WSL 2
-  * Use Docker Compose:
-    ** Postgres image
-  * Init script
-  * Create roles with permissions
-  * Create a few users
-  * Use SHA-256 for security
-  * Use pgAdmin for a web interface
-  * Logic diagram
-
-=== Create API (2/2 - 2/13) ... (2/14 - 3/27)
-- *Initial functionality*: 2/13
-- *Completed functionality*: 3/27
-- Tasks:
-  * Determine necessary commands
-  * Map commands to actions
-  * Write command communication with the database
-
-=== GUI (1/14 - 2/20) ... (2/21 - 4/17)
-- *Initial functionality*: 2/20
-- *Completed functionality*: 4/17
-- Tasks:
-  * Research GUI designs
-  * Research HTML & CSS
-  * Research Go-app
-  * Determine whether to use pure Go with Go-app or HTML & CSS
-  * Create a list of all necessary pages
-    ** Separate login screen for employee vs. customer?
-  * Design each page (e.g., Figma or sketches)
-  * Create all pages
-  * Connect to the database incrementally
-  * Create buttons corresponding to API actions/commands
-  * Test functionality
-
-=== Presentation Dates
-- *1/26*: SDP Presentation
-- *2/23*: Architectural Design Presentation (mostly working)
-- *4/20*: Final Presentation
-
-=== Final Project
-- *Due Date*: 4/27
+=== Important Dates
+* *1/26*: SDP Presentation
+* *2/23*: Architectural Design Presentation
+* *4/20*: Final Presentation
+* *4/27*: Final Project Due 
 
 == Personnel and Roles
 === Braden Doty
@@ -105,7 +56,7 @@ Prioritizing security, the system includes robust authentication, encrypted data
 image::img\.jpg[]
 
 - Current Assignments:
-  * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
+  * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
   * AI-04 - Research Website Banking Design
   * AI-05 - Research Frontend
 
@@ -121,7 +72,7 @@ image::img\.jpg[]
 image::img\.jpg[]
 
 - Current Assignments:
-  * US-09 - Put Risks, Issues, and Mitigations into Asciidoc
+  * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
   * AI-04 - Research Website Banking Design
   * AI-05 - Research Frontend
 
@@ -134,7 +85,7 @@ image::img\.jpg[]
 *Team Lead*
 
 .Bailee
-image::img\.jpg[]
+image::img/bailee.jpg[Bailee, 640, 480]
 
 - Current Assignments:
   * US-01 - Create Database Logic Diagram
@@ -142,17 +93,27 @@ image::img\.jpg[]
   * US-03 - Initial set up of docker container
   * US-07 - Put Software Development Tools into Asciidoc
   * US-08 - Put Software Development Environment into Asciidoc
+  * US-09 - Create Project Timeline Diagram
 
 - Bio:
-  * 
+  * Working as team leader:
+    ** Lead key decisions
+    ** Propose software development languages and tools for the team to use
+    ** Propose project schedule that works best for all members
+  * I am a computer science major at UAH who is graduating next semester
+  * I have been an intern at Amentum since Summer 2023
+  * I work as a TA for the CS department and a tutor for the SSC
+  * This summer I will evaluate photonic HPC systems compared to CMOS HPC systems as a research intern at the NSA
+  * Starting next semester, I will be an intern at SAIC
+  * Interested in operating system or compiler development
 - Fun Fact:
-  * 
+  * My favorite band is Sleep Token
 
 === Sierra Yerges
 *Admin*
 
 .Sierra
-image::img\sierra.jpg[]
+image::img\sierra.jpg[Sierra, 640, 480]
 
 - Current Assignments:
   * Working as team admin/scrum master:
@@ -174,8 +135,28 @@ image::img\sierra.jpg[]
   * I have a Bengal cat
 
 == Software Development Tools
+=== Project Management
+* *Tool:* Jira
+* *Purpose:* Jira is used to manage the project's Agile development process, including sprint planning, task assignment, progress tracking, and issue resolution.
+
+=== Database Management
+* *Database:* PostgreSQL
+* *Administration Tool:* pgAdmin
+* *Security:* SHA-256 hashing is implemented for secure password storage. User roles and permissions are managed within the database to ensure data integrity and access control.
++
+.Bank Management Logic Diagram
+image::img/BankManagementLogic.svg[]
+
+=== Containerization
+* *Technology:* Docker
+* *Implementation:* PostgreSQL and pgAdmin are deployed in separate Docker containers for improved scalability and resource management. A docker-compose file orchestrates the simultaneous deployment and management of both containers.
 
 == Software Development Environment
+* *Platform:* Windows
+* *Editor:* Visual Studio Code
+** *Extensions:* Extensions supporting Go development, HTML, and CSS are utilized within Visual Studio Code.
+* *Version Control:* Git
+* *Repository:* GitHub - The project's source code is hosted on GitHub for collaborative development, version control, and code sharing.
 
 == Risks, Issues, and Opportunities
 
