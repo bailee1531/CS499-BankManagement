@@ -65,6 +65,8 @@ image::img\.jpg[]
 - Fun Fact:
   * 
 
+<<<
+
 === Taiyo Hino
 *Software Developer*
 
@@ -81,13 +83,19 @@ image::img\.jpg[]
 - Fun Fact:
   * 
 
+<<<
+
 === Bailee Segars
 *Team Lead*
 
 .Bailee
-image::img/bailee.jpg[Bailee, 640, 480]
+image::img/bailee.jpg[Bailee, 320, 280]
 
 - Current Assignments:
+  * Working as team leader:
+    ** Lead key decisions
+    ** Propose software development languages and tools for the team to use
+    ** Propose project schedule that works best for all members
   * US-01 - Create Database Logic Diagram
   * US-02 - Initialization Script for Database
   * US-03 - Initial set up of docker container
@@ -96,10 +104,6 @@ image::img/bailee.jpg[Bailee, 640, 480]
   * US-09 - Create Project Timeline Diagram
 
 - Bio:
-  * Working as team leader:
-    ** Lead key decisions
-    ** Propose software development languages and tools for the team to use
-    ** Propose project schedule that works best for all members
   * I am a computer science major at UAH who is graduating next semester
   * I have been an intern at Amentum since Summer 2023
   * I work as a TA for the CS department and a tutor for the SSC
@@ -109,11 +113,13 @@ image::img/bailee.jpg[Bailee, 640, 480]
 - Fun Fact:
   * My favorite band is Sleep Token
 
+<<<
+
 === Sierra Yerges
 *Admin*
 
 .Sierra
-image::img\sierra.jpg[Sierra, 640, 480]
+image::img\sierra.jpg[Sierra, 320, 280]
 
 - Current Assignments:
   * Working as team admin/scrum master:
@@ -133,6 +139,8 @@ image::img\sierra.jpg[Sierra, 640, 480]
   * Interested in becoming a Scrum Master
 - Fun Fact:
   * I have a Bengal cat
+
+<<<
 
 == Software Development Tools
 === Project Management
