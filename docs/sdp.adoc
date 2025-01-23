@@ -53,7 +53,7 @@ image::img/ProjectSchedule.png[Timeline]
 *Software Developer*
 
 .Braden
-image::img/braden.jpg[Braden, 280, 320]
+image::img/braden.jpg[Braden, 280, 400]
 
 - Current Assignments:
   * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
