@@ -53,7 +53,7 @@ image::img/ProjectSchedule.png[Timeline]
 *Software Developer*
 
 .Braden
-image::img\.jpg[]
+image::img/braden.jpg[Braden, 280, 400]
 
 - Current Assignments:
   * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
@@ -61,9 +61,11 @@ image::img\.jpg[]
   * AI-05 - Research Frontend
 
 - Bio:
-  * 
+  * I am a computer science major with a concentration in Cybersecurity at UAH
+  * I currently work PRN for Athens-Limestone EMS.
+  * I volunteer with Monrovia Volunteer Fire Department
 - Fun Fact:
-  * 
+  * I have my Part 107 Drone Liscense
 
 <<<
 
