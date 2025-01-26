@@ -74,7 +74,7 @@ image::img/braden.jpg[Braden, 320, 280]
 *Software Developer*
 
 .Taiyo
-image::img\.jpg[]
+image::img/taiyo.jpg[Taiyo, 320, 280]
 
 - Current Assignments:
   * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
