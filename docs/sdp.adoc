@@ -165,84 +165,95 @@ image::img/BankManagementLogic.svg[]
 * *Repository:* GitHub - The project's source code is hosted on GitHub for collaborative development, version control, and code sharing.
 
 == Risks, Issues, and Opportunities
-
+=== Risks
 |===
-|Ranking |Item |Type |Mitigation/Impact
+|Impact Level |Item |Mitigation/Impact
 
-|N/A
+|5
 |Team Member Drops Class
-|Risk
 |Work extra hard & redistribute tasks
 
-|N/A
-|Code Does Not Work As Intended
-|Risk
-|Allocate extra debugging time & conduct frequent testing during development
+|5
+|Development Tool is Deprecated near/at Project Deadline
+|Find similar tool to use and modify project if necessary to accomodate
 
-|N/A
-|Code Integration Issues
-|Risk
-|Use version control (e.g., Git) effectively & conduct regular code reviews
+|5
+|System Downtime
+|Have page set up to show status of database to user. Notify us (software developers) to get it back up ASAP
 
-|N/A
+|4
 |Miscommunication Between Group Members
-|Risk
 |Use clear communication tools & practices like Discord & Jira
 
-|N/A
+|4
 |Members Are Not Meeting Deadlines
-|Risk
 |Create realistic timelines, track progress, & hold regular check-ins
 
-|N/A
+|4
+|Member Has Personal Issue and Cannot Work
+|Team members split up work
+
+|4
+|Security Risks
+|Look into alternative algorithms to sha256. Could possibly use MD5.
+
+|4
+|Usability Challenges - GUI
+|Testing of GUI prior to launch, User-centered design, and FAQ for users.
+
+|3
+|Code Integration Issues
+|Use version control (e.g., Git) effectively & conduct regular code reviews
+
+|2
+|Code Does Not Work As Intended
+|Allocate extra debugging time & conduct frequent testing during development
+|===
+
+=== Issues
+
+|===
+|Item |Mitigation/Impact
+
 |Members Unfamiliar With Go
-|Issue
 |Utilize the one knowledgeable member to mentor & share reference materials
 
-|N/A
 |Members Unfamiliar With HTML/CSS
-|Issue
 |Provide access to tutorials & reference materials for learning HTML/CSS
 
-|N/A
 |Inadequate Testing Environments
-|Issue
 |Set up proper development & testing environments
 
-|N/A
 |Conflicts Within The Team
-|Issue
 |Set up regular meetings to address concerns early & establish ground rules
 
-|N/A
 |Poor Documentation
-|Issue
 |Establish clear documentation standards (AsciiDoc)
 
-|N/A
+|===
+
+=== Opportunities
+
+|===
+|Item |Mitigation/Impact
+
 |Early Adoption of Security Best Practices
-|Opportunities
 |Saves time post-launch
 
-|N/A
 |Using Modular Design
-|Opportunities
 |Improves schedule and ensures faster delivery of updates
 
-|N/A
 |Code Reviews and Peer Programming
-|Opportunities
 |Saves schedule time by catching issues early & improves overall code performance
 
-|N/A
 |Defining Scope Early
-|Opportunities
 |Improves schedule predictability by minimizing unplanned work
 
-|N/A
 |User Feedback During Development
-|Opportunities
 |Reduces the likelihood of an unfriendly interface
+
+|Use Tips From Previous Teams With This Project
+|Reduces the likelihood of repeating mistakes, and can speed up development
 
 |===
 
