@@ -82,9 +82,9 @@ image::img/taiyo.jpg[Taiyo, 320, 280]
   * AI-05 - Research Frontend
 
 - Bio:
-  * 
+  * I am currently a Senior at UAH with a computer science major and a math minor.
 - Fun Fact:
-  * 
+  * I am Japanese.
 
 <<<
 
