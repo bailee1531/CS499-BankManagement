@@ -57,7 +57,6 @@ image::img/ProjectSchedule.png[Timeline]
 image::img/braden.jpg[Braden, 320, 280]
 
 - Current Assignments:
-  * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
   * AI-04 - Research Website Banking Design
   * AI-05 - Research Frontend
 
@@ -77,7 +76,6 @@ image::img/braden.jpg[Braden, 320, 280]
 image::img/taiyo.jpg[Taiyo, 320, 280]
 
 - Current Assignments:
-  * US-10 - Put Risks, Issues, and Mitigations into Asciidoc
   * AI-04 - Research Website Banking Design
   * AI-05 - Research Frontend
 
@@ -99,12 +97,8 @@ image::img/bailee.jpg[Bailee, 320, 280]
     ** Lead key decisions
     ** Propose software development languages and tools for the team to use
     ** Propose project schedule that works best for all members
-  * US-01 - Create Database Logic Diagram
-  * US-02 - Initialization Script for Database
-  * US-03 - Initial set up of docker container
-  * US-07 - Put Software Development Tools into Asciidoc
-  * US-08 - Put Software Development Environment into Asciidoc
-  * US-09 - Create Project Timeline Diagram
+  * US-13: Initial Customer Bash Scripts (support)
+  * US-14: Customer .csv file (support)
 
 - Bio:
   * I am a computer science major at UAH who is graduating next semester
@@ -130,11 +124,8 @@ image::img\sierra.jpg[Sierra, 320, 280]
     ** Ensuring team member's submit individual reports
     ** Creating *action items*, *epics*, *user stories*, etc.
     ** Utilizing Jira to provide an easier way for others to track their stories
-  * US-03 - Initial set up of docker container
-  * US-04 - Put Project Overview into Asciidoc
-  * US-05 - Put Project Schedule into Asciidoc
-  * US-06 - Put Personnel and Roles into Asciidoc
-  * SDP finalization/submission
+  * US-13: Initial Customer Bash Scripts
+  * US-14: Customer .csv file
 
 - Bio:
   * I am a Senior at UAH and hopefully (finger's crossed) graduating this semester
