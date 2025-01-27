@@ -57,8 +57,8 @@ image::img/ProjectSchedule.png[Timeline]
 image::img/braden.jpg[Braden, 320, 280]
 
 - Current Assignments:
-  * AI-04 - Research Website Banking Design
-  * AI-05 - Research Frontend
+  * AI-04: Research Website Banking Design
+  * AI-05: Research Frontend
 
 - Bio:
   * I am a computer science major with a concentration in Cybersecurity at UAH
@@ -76,8 +76,8 @@ image::img/braden.jpg[Braden, 320, 280]
 image::img/taiyo.jpg[Taiyo, 320, 280]
 
 - Current Assignments:
-  * AI-04 - Research Website Banking Design
-  * AI-05 - Research Frontend
+  * AI-04: Research Website Banking Design
+  * AI-05: Research Frontend
 
 - Bio:
   * I am currently a Senior at UAH with a computer science major and a math minor.
