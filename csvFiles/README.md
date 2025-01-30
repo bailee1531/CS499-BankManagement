@@ -76,7 +76,6 @@ Columns:
 * FirstName: First name of individual.
 * Address: Residential address.
 * PhoneNum: Relevant phone number.
-* CellNum: Relevant cell number.
 * SSN: Social Security Number.
 
 Purpose:

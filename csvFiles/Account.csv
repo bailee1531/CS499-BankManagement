@@ -1,6 +1,0 @@
-AccountID,CustomerID,AccountType,CurrBal,DateOpened
-1001,1,Checking,2300.00,2023-01-02
-1002,1,Savings,12000.00,2023-01-02
-1003,2,Checking,5000.00,2022-04-15
-1004,2,Savings,20000.00,2022-04-15
-1005,2,MoneyMarket,10000.00,2023-03-01
