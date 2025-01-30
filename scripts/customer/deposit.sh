@@ -25,7 +25,8 @@ fi
 # Update balance and log transaction
 if grep -q "^$accountID," "$accountsCSV"; then
   currBalance=$(awk -F, -v accID="$accountID" '$1 == accID {print $4}' "$accountsCSV")
-  newBalance=$(echo "$currBalance + $depositAmount" | bc)
+  newBalance=$(awk "BEGIN {print $currBalance + $depositAmount}")
+
   awk -F, -v accID="$accountID" -v newBal="$newBalance" 'BEGIN {OFS=","} $1 == accID {$4 = newBal} {print}' "$accountsCSV" > temp.csv && mv temp.csv "$accountsCSV"
 
   # Log transaction
@@ -36,7 +37,7 @@ if grep -q "^$accountID," "$accountsCSV"; then
     transactionID=$(($(tail -n +2 "$transactionsCSV" | wc -l) + 1))
   fi
 
-echo -e "\n$transactionID,$accountID,Deposit,$depositAmount,$(date '+%Y-%m-%d')" >> "$transactionsCSV"
+echo "$transactionID,$accountID,Deposit,$depositAmount,$(date '+%Y-%m-%d')" >> "$transactionsCSV"
 else
   exit 2
 fi

@@ -46,5 +46,5 @@ if [ ! -f "$personsCSV" ]; then
   echo "UserType,LastName,FirstName,Address,PhoneNum,SSN" > "$personsCSV"
 fi
 
-echo -e "\n$customer_id,$ssn" >> "$customersCSV"
-echo -e "\nCustomer,$lastName,$firstName,$address,$phone,$ssn" >> "$personsCSV"
+echo "$customer_id,$ssn" >> "$customersCSV"
+echo "Customer,$lastName,$firstName,$address,$phone,$ssn" >> "$personsCSV"

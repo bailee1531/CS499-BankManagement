@@ -7,12 +7,12 @@ accountsCSV="../../csvFiles/accounts.csv"
 
 accountType=$1
 initialBalance=$2
-customerID=$3
+ssn=$3  # Find the customer via SSN
 
 balanceReg="^[0-9]+(\\.[0-9]{1,2})?$"
 
 # Validation
-if [[ -z $accountType || -z $initialBalance || -z $customerID ]]; then
+if [[ -z $accountType || -z $initialBalance || -z $ssn ]]; then
   exit 3
 fi
 if ! [[ $accountType =~ ^(Checking|Savings|MoneyMarket)$ ]]; then
@@ -22,8 +22,8 @@ if ! [[ $initialBalance =~ $balanceReg ]]; then
   exit 2
 fi
 
-# Find customer ID by SSN
-customerID=$(awk -F, -v ssn="$ssn" '$6 == ssn {print NR-1}' "$personsCSV")
+# Find customer ID by SSN (ensure no extra spaces)
+customerID=$(awk -F, -v ssn="$ssn" '$6 == ssn {print NR-1}' "$personsCSV" | tr -d '[:space:]')
 
 if [[ -z $customerID ]]; then
   exit 4  # Customer not found
@@ -38,4 +38,4 @@ else
 fi
 
 dateOpened=$(date '+%Y-%m-%d')
-echo -e "\n$accountID,$customerID,$accountType,$initialBalance,$dateOpened" >> "$accountsCSV"
+echo "$accountID,$customerID,$accountType,$initialBalance,$dateOpened" >> "$accountsCSV"
