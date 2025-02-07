@@ -1,2 +1,2 @@
-CustomerID,SSN
-1,123-45-6789
+Username,Password,CustomerID,SSN
+johndoe,abcDEF123!,1,123-45-6789

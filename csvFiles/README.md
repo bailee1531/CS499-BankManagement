@@ -18,6 +18,12 @@ Tracks all customer accounts, their balances, and their types (e.g., Checking, S
 Stores customer-specific data.
 
 Columns:
+* Username: User made to be used at login.
+* Password: Must meet standard below.
+  * 8-14 characters.
+  * At least one digit.
+  * At least one character from the set !@#$&
+    * Ex. abcDEF123!
 * CustomerID: Unique identifier for the customer.
 * SSN: Links to the Person.csv file.
 
