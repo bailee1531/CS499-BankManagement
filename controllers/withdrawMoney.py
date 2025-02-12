@@ -18,8 +18,8 @@ def withdraw(accID, amount):
     message = ''
 
     # Account type and balance validation
-    if accType != 'Checking':
-        message = 'Cannot perform withdrawal on this account type. Please choose a checking account.'
+    if accType != 'Checking' and accType != 'Savings':
+        message = 'Cannot perform withdrawal on this account type. Please choose a checking or savings account.'
         exit()
     if amount > currentBal:
         message = 'Insufficient funds.'

@@ -16,7 +16,7 @@ def deposit(accID, amount):
     currentBal = accInfo.at[custIndex, 'CurrBal']
 
     message = ''
-    
+
     # Account type and balance validation
     if accType != 'Checking' and accType != 'Savings':
         message = 'Cannot deposit to this account type. Please choose a checking or savings account.'
@@ -28,5 +28,3 @@ def deposit(accID, amount):
     accInfo.to_csv(accPath, index=False)
 
     return message
-
-deposit(11, 22)
