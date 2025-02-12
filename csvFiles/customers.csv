@@ -1,2 +1,3 @@
-Username,Password,CustomerID,SSN
-johndoe,abcDEF123!,1,123-45-6789
+username,CustomerID
+olduser,1
+testuser,315
