@@ -13,7 +13,7 @@ from Crypto.PublicKey import ECC
 # username: username in login field
 # password: password in login field
 def login_page_button_pressed(new_or_returning, username, password):
-    custPath = 'csvFiles/customers.csv'
+    custPath = '../../csvFiles/customers.csv'
     message = ''
     # Creates a new private key for each new user
     # Saves private key to file associated with userID

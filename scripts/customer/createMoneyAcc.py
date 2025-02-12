@@ -12,7 +12,7 @@ import random
 def createAccount(custID, accType, depositAmnt):
     # Creates dataframe with current csv data
     accID = random.randint(200, 999) # generates a random ID
-    accPath = 'csvFiles/accounts.csv'
+    accPath = '../../csvFiles/accounts.csv'
     accInfo = pd.read_csv(accPath)
 
     newAccRow = {'AccountID': accID, 'CustomerID': custID, 'AccountType': accType, 'CurrBal': depositAmnt,'DateOpened': date.today()}
