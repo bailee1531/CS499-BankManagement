@@ -1,3 +1,5 @@
+# Bailee Segars
+
 import pandas as pd
 import random
 from Crypto.PublicKey import ECC
@@ -11,6 +13,8 @@ from Crypto.PublicKey import ECC
 # username: username in login field
 # password: password in login field
 def login_page_button_pressed(new_or_returning, username, password):
+    custPath = 'csvFiles/customers.csv'
+    message = ''
     # Creates a new private key for each new user
     # Saves private key to file associated with userID
     # format=PEM: Key is encoded in a PEM envelope (ASCII)
@@ -43,7 +47,7 @@ def login_page_button_pressed(new_or_returning, username, password):
             key = ECC.import_key(data, pwd)
 
     # Imports customer csv as a dataframe
-    userID = pd.read_csv('../../csvFiles/customers.csv')
+    userID = pd.read_csv(custPath)
 
     # Create account
     if new_or_returning == 1:
@@ -51,11 +55,13 @@ def login_page_button_pressed(new_or_returning, username, password):
         new_account(newID, password)     # generates a new private key
         newUserRow = {'username': username, 'CustomerID': newID}    # creates dict of new user information
         userID.loc[len(userID)] = newUserRow                        # adds information from dict to end of dataframe
-        userID.to_csv('customers.csv', index=False)                 # exports dataframe to customer.csv to overwrite with new information
+        userID.to_csv(custPath, index=False)                 # exports dataframe to customer.csv to overwrite with new information
     # Login
     elif new_or_returning == 2:
         try:
             oldID = userID.loc[userID['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
             existing_account(oldID, password)                                           # imports private key
         except ValueError:
-            message = 'Incorrect username or password. Please try again\n'              # if password is incorrect. Should make actual error on GUI
+            message = 'Incorrect username or password. Please try again.'              # if password is incorrect. Should make actual error on GUI
+
+    return message
