@@ -4,32 +4,52 @@ import pandas as pd
 import random
 from Crypto.PublicKey import ECC
 
-# Digital signature standard at D.1.2: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 
-# Function to be called from HTML
-# new_or_returning: 1 or 2 passed from button
-    # new user (create account) = 1
-    # returning user (login) = 2
-# username: username in login field
-# password: password in login field
 def login_page_button_pressed(new_or_returning, username, password):
+    """
+    Handles user account creation and login authentication.
+
+    Parameters
+    ----------
+    new_or_returning: {1, 2}
+        Passed from GUI based on which button a user presses.
+
+        - 1: 'Create Account' button pressed
+
+        - 2: 'Login' button pressed
+
+    username, password: string
+        Passed from text fields on log in screen of GUI.
+
+    See Also:
+    ---------
+    Digital signature standard at D.1.2: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
+
+    """
     custPath = 'csvFiles/customers.csv'
-    message = ''
-    # Creates a new private key for each new user
-    # Saves private key to file associated with userID
-    # format=PEM: Key is encoded in a PEM envelope (ASCII)
-    # passphrase=pwd: Password user created for account
-    # use_pkcs8=True: Uses PKCS#8 representation
-        # PKCS#8: Standard for encoding asymmetric private keys
-        # Offers the best way to securely encrypt the key (vs. PKCS#1)
-    # protection: 'PBKDF2WithHMAC-' + hash + 'And' + cipher
-        # hash: SHA512
-        # cipher: AES256-CBC
-    # compress=True: Compresses the representation of the public key (x coordinate only)
-    # prot_params: dict with the parameters to derive the encryption key
-        # iteration_count: Repeatedly uses KDF algorithm to slow down brute force attacks
-        # 210000 is recommended for PBKDF2 with SHA512
+
     def new_account(userID, pwd):
+        """
+        Creates a new private key for each new user, then saves private key to file associated with userID.
+
+        Parameters
+        ----------
+        userID: int
+            Random number between 200-999 generated when a user creates an account.
+        pwd: string
+            User created password in text field on GUI.
+
+        Notes
+        -----
+        new_account uses ECC method `export_key` with the following parameters:
+        - `format='PEM'`: Key is encoded in a PEM envelope
+        - `use_pkcs8=True`: Uses PKCS#8 standard for encoding asymmetric private keys
+        - `protection='PBKDF2WithHMAC-SHA512AndAES128-CBC'`: Uses SHA512 hash and AES256-CBC cipher
+        - `compress=True`: Compresses the representation of the public key
+        - `prot_params`: dict with the parameters to derive the encryption key
+            - `iteration_count`: Repeatedly uses KDF algorithm to slow down brute force attacks. 210000 is recommended for PBKDF2 with SHA512
+
+        """
         key = ECC.generate(curve='p256') # See DSS for information on p256 curve type
         with open(f'{userID}privatekey.pem', 'wt') as f:
             data = key.export_key(format='PEM',
@@ -40,8 +60,25 @@ def login_page_button_pressed(new_or_returning, username, password):
                                 prot_params={'iteration_count':210000})
             f.write(data)
 
-    # Imports an ECC key and uses the given password to decrypt the private key
-    def existing_account(userID, pwd):
+    def existing_account(userID, pwd) -> dict:
+        """
+        Imports an ECC key and uses the given password to decrypt the private key.
+
+        Parameters
+        ----------
+        userID: int
+            Number associated with username.
+        pwd: string
+            Password user entered in text field.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the status and message.
+
+            - If username and/or password entered incorrectly:\n
+            {"status": "error", "message": f"Incorrect username or password. Please try again"}
+        """
         with open(f'{userID}privatekey.pem', 'rt') as f:
             data = f.read()
             key = ECC.import_key(data, pwd)
@@ -62,6 +99,4 @@ def login_page_button_pressed(new_or_returning, username, password):
             oldID = userID.loc[userID['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
             existing_account(oldID, password)                                           # imports private key
         except ValueError:
-            message = 'Incorrect username or password. Please try again.'              # if password is incorrect. Should make actual error on GUI
-
-    return message
+            return {"status": "error", "message": f"Incorrect username or password. Please try again"}  # if password is incorrect. Should make actual error on GUI

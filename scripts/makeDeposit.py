@@ -1,12 +1,28 @@
 # Bailee Segars
 import pandas as pd
+from decimal import *
 
-# Deposit money to an account
-# Account must be a checking account and have sufficient funds
-# Only employees can directly deposit. Customer making transfers can indirectly deposit
-# accID: Account ID passed from account selected on web page
-# amount: Amount in text field on web page
-def deposit(accID, amount):
+def deposit(accID, amount) -> dict:
+    """
+    Deposit money into an account. Account must be a checking account.
+    
+    Only employees can directly deposit. Customers can perform indirect deposits by transferring funds.
+
+    Parameters
+    ----------
+    accID: int
+        Account ID passed from account selected on GUI.
+    amount: decimal
+        User-defined amount from GUI.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the status and message.
+
+        - If the account is not a checking or savings account:\n
+        {"status": "error", "message": f"Incorrect account type selected. Cannot deposit {amount} to account {accID}."}
+    """
     # Creates dataframe with csv data
     # Gets row for requested customer
     accPath = 'csvFiles/accounts.csv'
@@ -15,16 +31,11 @@ def deposit(accID, amount):
     accType = accInfo.at[custIndex, 'AccountType']
     currentBal = accInfo.at[custIndex, 'CurrBal']
 
-    message = ''
-
     # Account type and balance validation
     if accType != 'Checking' and accType != 'Savings':
-        message = 'Cannot deposit to this account type. Please choose a checking or savings account.'
-        exit()
+        return {"status": "error", "message": f"Incorrect account type selected. Cannot deposit {amount} to account {accID}."}
 
     # Completes withdrawal and updates csv file
-    currentBal += amount
-    accInfo.at[custIndex, 'CurrBal'] = currentBal
+    Decimal(currentBal) += Decimal(amount)
+    accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal)
     accInfo.to_csv(accPath, index=False)
-
-    return message
