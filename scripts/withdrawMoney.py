@@ -9,7 +9,7 @@ import pandas as pd
 def withdraw(accID, amount):
     # Creates dataframe with csv data
     # Gets row for requested customer
-    accPath = '../csvFiles/accounts.csv'
+    accPath = 'csvFiles/accounts.csv'
     accInfo = pd.read_csv(accPath)
     custIndex = accInfo.loc[accInfo['AccountID'] == accID].index[0]
     accType = accInfo.at[custIndex, 'AccountType']
