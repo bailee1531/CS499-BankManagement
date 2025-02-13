@@ -3,6 +3,7 @@ from datetime import date
 from decimal import *
 import pandas as pd
 import random
+import os
 
 def open_account(custID, accType, depositAmnt):
     """
@@ -19,7 +20,7 @@ def open_account(custID, accType, depositAmnt):
     """
     # Creates dataframe with current csv data
     accID = random.randint(200, 999) # generates a random ID
-    accPath = 'csvFiles/accounts.csv'
+    accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
     accInfo = pd.read_csv(accPath)
 
     newAccRow = {'AccountID': accID, 'CustomerID': custID, 'AccountType': accType, 'CurrBal': Decimal(depositAmnt),'DateOpened': date.today()}

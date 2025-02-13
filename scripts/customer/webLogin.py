@@ -1,9 +1,8 @@
 # Bailee Segars
-
+from Crypto.PublicKey import ECC
 import pandas as pd
 import random
-from Crypto.PublicKey import ECC
-
+import os
 
 def login_page_button_pressed(new_or_returning, username, password):
     """
@@ -26,7 +25,7 @@ def login_page_button_pressed(new_or_returning, username, password):
     Digital signature standard at D.1.2: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 
     """
-    custPath = 'csvFiles/customers.csv'
+    custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
 
     def new_account(userID, pwd):
         """

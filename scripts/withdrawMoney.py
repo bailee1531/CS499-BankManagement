@@ -1,6 +1,7 @@
 # Bailee Segars
 import pandas as pd
 from decimal import *
+import os
 
 def withdraw(accID, amount) -> dict:
     """
@@ -28,11 +29,11 @@ def withdraw(accID, amount) -> dict:
     """
     # Creates dataframe with csv data
     # Gets row for requested customer
-    accPath = 'csvFiles/accounts.csv'
+    accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     accInfo = pd.read_csv(accPath)
     custIndex = accInfo.loc[accInfo['AccountID'] == accID].index[0]
     accType = accInfo.at[custIndex, 'AccountType']
-    currentBal = accInfo.at[custIndex, 'CurrBal']
+    currentBal = Decimal(accInfo.at[custIndex, 'CurrBal'])
 
     # Account type and balance validation
     if accType != 'Checking' and accType != 'Savings':
@@ -41,6 +42,7 @@ def withdraw(accID, amount) -> dict:
         return {"status": "error", "message": f"Insufficient funds. Cannot withdraw {amount} from account {accID}."}
 
     # Completes withdrawal and updates csv file
-    Decimal(currentBal) -= Decimal(amount)
-    accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal)
+    currentBal -= Decimal(amount)
+    accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
+    print(accInfo)
     accInfo.to_csv(accPath, index=False)

@@ -1,6 +1,7 @@
 # Bailee Segars
 import pandas as pd
 from decimal import *
+import os
 
 def deposit(accID, amount) -> dict:
     """
@@ -25,17 +26,17 @@ def deposit(accID, amount) -> dict:
     """
     # Creates dataframe with csv data
     # Gets row for requested customer
-    accPath = 'csvFiles/accounts.csv'
+    accPath = accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     accInfo = pd.read_csv(accPath)
     custIndex = accInfo.loc[accInfo['AccountID'] == accID].index[0]
     accType = accInfo.at[custIndex, 'AccountType']
-    currentBal = accInfo.at[custIndex, 'CurrBal']
+    currentBal = Decimal(accInfo.at[custIndex, 'CurrBal'])
 
     # Account type and balance validation
     if accType != 'Checking' and accType != 'Savings':
         return {"status": "error", "message": f"Incorrect account type selected. Cannot deposit {amount} to account {accID}."}
 
     # Completes withdrawal and updates csv file
-    Decimal(currentBal) += Decimal(amount)
-    accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal)
+    currentBal += Decimal(amount)
+    accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
