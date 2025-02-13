@@ -1,9 +1,11 @@
 # Sierra Yerges
 import pandas as pd
+import os
+from decimal import Decimal
 from withdrawMoney import withdraw
 from makeDeposit import deposit
 
-def transferFunds(srcAccID: int, destAccID: int, amount: float) -> dict:
+def transferFunds(srcAccID: int, destAccID: int, amount: Decimal) -> dict:
     """
     Transfers funds between two accounts by withdrawing from one and depositing into another.
 
@@ -13,7 +15,7 @@ def transferFunds(srcAccID: int, destAccID: int, amount: float) -> dict:
         The source account ID from which funds are being transferred.
     destAccID : int
         The destination account ID to receive the transferred funds.
-    amount : float
+    amount : Decimal
         The amount of money to be transferred.
 
     Returns
@@ -43,8 +45,8 @@ def transferFunds(srcAccID: int, destAccID: int, amount: float) -> dict:
     - If the withdrawal is successful, it attempts to deposit the funds into the destination account.
     - If the deposit fails, the function **rolls back** the withdrawal to maintain data integrity.
     """
-    # Path to the accounts CSV file
-    accPath = '../csvFiles/accounts.csv'
+    # Get absolute path for accounts.csv
+    accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     
     # Load account data
     accInfo = pd.read_csv(accPath)
@@ -56,15 +58,15 @@ def transferFunds(srcAccID: int, destAccID: int, amount: float) -> dict:
         return {"status": "error", "message": f"Destination account {destAccID} not found."}
 
     # Ensure the transfer amount is valid
-    if amount <= 0:
+    if amount <= Decimal('0.00'):
         return {"status": "error", "message": "Transfer amount must be positive."}
 
     # Attempt to withdraw from the source account
     withdraw_result = withdraw(srcAccID, amount)
-    if withdraw_result:
+    if next(iter(withdraw_result.values())) == 'success':
         # If withdrawal succeeds, attempt to deposit into the destination account
         deposit_result = deposit(destAccID, amount)
-        if deposit_result:
+        if next(iter(deposit_result.values())) == 'success':
             return {"status": "success", "message": f"Successfully transferred ${amount} from Account {srcAccID} to Account {destAccID}."}
         else:
             # Rollback withdrawal if deposit fails

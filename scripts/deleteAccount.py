@@ -1,5 +1,6 @@
 # Sierra Yerges
 import pandas as pd
+import os
 
 def deleteAcc(custID: int, accID: int) -> dict:
     """
@@ -32,8 +33,8 @@ def deleteAcc(custID: int, accID: int) -> dict:
     - Only accounts with a zero balance can be deleted.
     - If an account is deleted, the updated dataset is saved back to the CSV file.
     """
-    # Path to the accounts CSV file
-    accPath = '../csvFiles/accounts.csv'
+    # Get absolute path for accounts.csv
+    accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     
     # Load account data
     accInfo = pd.read_csv(accPath)
