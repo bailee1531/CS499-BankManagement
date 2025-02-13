@@ -43,7 +43,7 @@ def login_page_button_pressed(new_or_returning, username, password):
         new_account uses ECC method `export_key` with the following parameters:
         - `format='PEM'`: Key is encoded in a PEM envelope
         - `use_pkcs8=True`: Uses PKCS#8 standard for encoding asymmetric private keys
-        - `protection='PBKDF2WithHMAC-SHA512AndAES128-CBC'`: Uses SHA512 hash and AES256-CBC cipher
+        - `protection='PBKDF2WithHMAC-SHA512AndAES256-CBC'`: Uses SHA512 hash and AES256-CBC cipher
         - `compress=True`: Compresses the representation of the public key
         - `prot_params`: dict with the parameters to derive the encryption key
             - `iteration_count`: Repeatedly uses KDF algorithm to slow down brute force attacks. 210000 is recommended for PBKDF2 with SHA512
@@ -54,7 +54,7 @@ def login_page_button_pressed(new_or_returning, username, password):
             data = key.export_key(format='PEM',
                                 passphrase=pwd,
                                 use_pkcs8=True,
-                                protection='PBKDF2WithHMAC-SHA512AndAES128-CBC',
+                                protection='PBKDF2WithHMAC-SHA512AndAES256-CBC',
                                 compress=True,
                                 prot_params={'iteration_count':210000})
             f.write(data)
