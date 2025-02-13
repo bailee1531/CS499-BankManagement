@@ -31,8 +31,13 @@ def withdraw(accID, amount) -> dict:
     # Gets row for requested customer
     accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     accInfo = pd.read_csv(accPath)
+
+    if accID not in accInfo['AccountID'].values:
+        return {"status": "error", "message": f"Source account {accID} not found."}
+
     custIndex = accInfo.loc[accInfo['AccountID'] == accID].index[0]
     accType = accInfo.at[custIndex, 'AccountType']
+    accInfo['CurrBal'] = accInfo['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     currentBal = Decimal(accInfo.at[custIndex, 'CurrBal'])
 
     # Account type and balance validation
@@ -42,9 +47,8 @@ def withdraw(accID, amount) -> dict:
         return {"status": "error", "message": f"Insufficient funds. Cannot withdraw {amount} from account {accID}."}
 
     # Completes withdrawal and updates csv file
-    currentBal -= Decimal(amount)
+    currentBal -= Decimal(amount).quantize(Decimal('0.00'))
     accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
-    print(accInfo)
     accInfo.to_csv(accPath, index=False)
 
     return {"status": "success", "message": f"Withdrew {amount} from account {accID}."}
