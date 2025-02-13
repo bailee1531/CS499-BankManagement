@@ -40,3 +40,5 @@ def deposit(accID, amount) -> dict:
     currentBal += Decimal(amount)
     accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
+
+    return {"status": "success", "message": f"{amount} deposited to account {accID}."}

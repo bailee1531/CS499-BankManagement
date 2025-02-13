@@ -46,3 +46,5 @@ def withdraw(accID, amount) -> dict:
     accInfo.at[custIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     print(accInfo)
     accInfo.to_csv(accPath, index=False)
+
+    return {"status": "success", "message": f"Withdrew {amount} from account {accID}."}
