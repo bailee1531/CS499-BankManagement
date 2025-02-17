@@ -27,5 +27,3 @@ def open_account(custID, accType, depositAmnt):
     newAccRow = {'AccountID': accID, 'CustomerID': custID, 'AccountType': accType, 'CurrBal': Decimal(depositAmnt).quantize(Decimal('0.00')),'DateOpened': date.today()}
     accInfo.loc[len(accInfo)] = newAccRow
     accInfo.to_csv(accPath, index=False)
-
-open_account(754, 'Savings', 1200)
