@@ -1,6 +1,6 @@
 # Bailee Segars
 import pandas as pd
-from decimal import *
+from decimal import Decimal
 import os
 
 def withdraw(accID, amount) -> dict:

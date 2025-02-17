@@ -1,6 +1,6 @@
 # Bailee Segars
 from datetime import date
-from decimal import *
+from decimal import Decimal
 import pandas as pd
 import random
 import os
