@@ -56,5 +56,3 @@ def deposit(accID, amount) -> dict:
     logInfo.to_csv(logPath, index=False)
 
     return {"status": "success", "message": f"{amount} deposited to account {accID}."}
-
-deposit(562, 100)
