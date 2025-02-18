@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAH Bank - Employee Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #c0e0a0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .navbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 50px;
+            background-color: #c0e0a0;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: black;
+            margin: 0 15px;
+        }
+        .login-container {
+            margin-top: 100px;
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            width: 300px;
+        }
+        .login-container input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: red;
+            color: white;
+        }
+        .footer {
+            width: 100%;
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo"><strong>UAH Bank</strong></div>
+        <div>
+            <a href="#">Personal Banking</a>
+            <a href="#">Credit Cards</a>
+            <a href="#">Mortgage</a>
+            <a href="#">About Us</a>
+            <a href="#">Sign Up</a>
+            <a href="#" style="color: red;">Login</a>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <h2>Employee Login</h2>
+        <input type="text" placeholder="Enter your Username">
+        <input type="password" placeholder="Enter your Password">
+        <p><a href="#" style="color: lightgray; text-decoration: none;">Forgot Password?</a></p>
+        <button>Login</button>
+    </div>
+
+    <div class="footer">
+        <p>&copy; UAH Bank All Rights Reserved</p>
+        <p>Contact@UAHBank.com | +1 256 99 9999 | Somewhere in the World</p>
+    </div>
+</body>
+</html>
