@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" >
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
-    <meta name="description" content="Welcome to UAH Bank. Your trusted partner in financial solutions." >
-    <title>UAH Bank - Home</title>
+    <meta name="description" content="Secure banking login for UAH Bank." >
+    <title>UAH Bank - Login</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon" >
-    <link rel="stylesheet" href="css/homepage.css" >
+    <link rel="stylesheet" href="css/login.css" >
   </head>
   <body>
     <header>
@@ -24,16 +24,44 @@
           <li><a href="#">About Us</a></li>
         </ul>
       </nav>
-      <div class="header__auth">
-        <a href="signup.html" class="auth-btn auth-btn--sign-up">Sign Up</a>
-        <a href="login.html" class="auth-btn auth-btn--login">Login</a>
-      </div>
     </header>
 
     <main>
-      <section class="hero">
-        <h1>Welcome to UAH Bank</h1>
-        <p>Your trusted partner in financial solutions.</p>
+      <section class="login-container" aria-labelledby="login-heading">
+        <h2 id="login-heading">Login</h2>
+        <form action="  " method="post" novalidate>
+          <div class="form-group">
+            <label for="username">Username<label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              placeholder="Enter your username"
+              required
+              autocomplete="username"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Password<label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <div class="form-group">
+            <a href="#" class="forgot-password">Forgot Password?</a>
+          </div>
+          <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
+            Login
+          </button>
+          <button type="button" class="btn btn--signup" onclick="window.location.href='signup.html';">
+            Sign Up
+          </button>
+        </form>
       </section>
     </main>
 
