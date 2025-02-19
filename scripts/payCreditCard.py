@@ -53,6 +53,10 @@ def payCreditCard(customerID: int, creditAccID: int, paymentAccID: int, amount: 
     if paymentIndex.empty:
         return {"status": "error", "message": f"Payment source account {paymentAccID} not found for Customer {customerID}."}
 
+    # Prevent users from paying a credit card with another credit card
+    if 5000 <= paymentAccID <= 9999:
+        return {"status": "error", "message": "Cannot use a credit card account to pay off another credit card."}
+
     # Ensure valid payment amount
     if amount <= Decimal('0.00'):
         return {"status": "error", "message": "Payment amount must be greater than zero."}

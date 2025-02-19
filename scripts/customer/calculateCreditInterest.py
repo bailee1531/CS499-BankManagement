@@ -13,7 +13,7 @@ def calculateCreditCardInterest():
         Updates 'accounts.csv' with new balances including accrued interest.
     """
     # Get absolute path for accounts.csv
-    accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
+    accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
 
     # Load account data
     accountsData = pd.read_csv(accountsPath)
@@ -35,3 +35,5 @@ def calculateCreditCardInterest():
 
     # Save updated balances
     accountsData.to_csv(accountsPath, index=False)
+
+

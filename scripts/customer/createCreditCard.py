@@ -23,12 +23,14 @@ def openCreditCardAccount(customerID: int) -> dict:
     """
     # Get absolute path for accounts.csv file
     accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
+    # Get absolute path for customer.csv file
+    customerPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/customers.csv'))
     
     # Load all existing account data into a DataFrame
-    accountsData = pd.read_csv(accountsPath)
+    customerData = pd.read_csv(customerPath)
 
     # Filter the DataFrame for the user with the specified customerID
-    userRow = accountsData[accountsData['CustomerID'] == customerID]
+    userRow = customerData[customerData['CustomerID'] == customerID]
 
     # Check if the customer exists; return an error message if not found
     if userRow.empty:
@@ -48,6 +50,12 @@ def openCreditCardAccount(customerID: int) -> dict:
 
     # Generate a random APR within the specified range
     apr = round(random.uniform(*apr_range), 2)
+
+    # Load all existing account data into a DataFrame
+    accountsData = pd.read_csv(accountsPath)
+
+    # Filter the DataFrame for the user with the specified customerID
+    userRow = accountsData[accountsData['CustomerID'] == customerID]
 
     # Generate a unique Account ID that does not conflict with existing IDs
     accountID = random.randint(5000, 9999)
@@ -71,6 +79,3 @@ def openCreditCardAccount(customerID: int) -> dict:
 
     # Return a success message with account details
     return {"status": "success", "message": f"Credit card account {accountID} created with a {apr}% APR."}
-
-result = openCreditCardAccount(315)
-print(result)
