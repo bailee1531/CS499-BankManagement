@@ -1,3 +1,2 @@
-username,CustomerID
-olduser,1
-testuser,315
+username,CustomerID,APRRangeID
+testuser,315,4
