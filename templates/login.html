@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block meta_description %}
+  Secure banking login for UAH Bank.
+{% endblock %}
+
+{% block title %}UAH Bank - Login{% endblock %}
+
+{# Override the header extra block to remove auth links from the login page #}
+{% block header_extra %}{% endblock %}
+
+{% block content %}
+<main>
+  <section class="login-container" aria-labelledby="login-heading">
+    <h2 id="login-heading">Login</h2>
+    
+    {# Login form with proper security and accessibility attributes #}
+    <form action="{{ url_for('userAuth_blueprint.login') }}" method="post" novalidate>
+      
+      {# Username Input #}
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          placeholder="Enter your username"
+          required
+          autocomplete="username"
+          class="form-control"
+        />
+      </div>
+      
+      {# Password Input #}
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+          class="form-control"
+        />
+      </div>
+      
+      {# Forgot Password Link #}
+      <div class="form-group">
+        <a href="#" class="forgot-password">
+          Forgot Password?
+        </a>
+      </div>
+      
+      {# Submit Button for Login #}
+      <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
+        Login
+      </button>
+      
+      {# Redirect Button for Sign Up #}
+      <button type="button" class="btn btn--signup" onclick="window.location.href='#';">
+        Sign Up
+      </button>
+    </form>
+  </section>
+</main>
+{% endblock %}
