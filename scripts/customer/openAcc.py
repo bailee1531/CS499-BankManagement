@@ -45,6 +45,19 @@ def open_account(custID, accType, depositAmnt):
 
     accID = generate_account_ID(accInfo)
 
-    newAccRow = {'AccountID': accID, 'CustomerID': custID, 'AccountType': accType, 'CurrBal': Decimal(depositAmnt).quantize(Decimal('0.00')),'DateOpened': date.today()}
+    # Determine APR based on account type
+    apr = None
+    if accType.lower() == 'Savings':
+        apr = 4.0
+    elif accType.lower() == 'Money Market':
+        apr = 3.0
+
+    newAccRow = {'AccountID': accID,
+                 'CustomerID': custID,
+                 'AccountType': accType,
+                 'CurrBal': Decimal(depositAmnt).quantize(Decimal('0.00')),
+                 'DateOpened': date.today(),
+                 'CreditLimit': None,
+                 'APR': apr}
     accInfo.loc[len(accInfo)] = newAccRow
     accInfo.to_csv(accPath, index=False)
