@@ -1,3 +1,2 @@
 AccountID,CustomerID,AccountType,CurrBal,DateOpened,CreditLimit,APR
-6989,315,CreditCard,100.0,2025-02-19,7000.0,29.74
-8610,315,CreditCard,0.0,2025-02-19,1000.0,27.68
+6989,315,Credit Card,100.0,2025-02-19,7000.0,29.74

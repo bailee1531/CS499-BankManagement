@@ -19,7 +19,7 @@ def calculateCreditCardInterest():
     accountsData = pd.read_csv(accountsPath)
 
     # Identify all credit card accounts
-    creditCardAccounts = accountsData[accountsData['AccountType'] == 'CreditCard']
+    creditCardAccounts = accountsData[accountsData['AccountType'] == 'Credit Card']
 
     for index, account in creditCardAccounts.iterrows():
         unpaidBalance = account['CurrBal']
@@ -36,4 +36,4 @@ def calculateCreditCardInterest():
     # Save updated balances
     accountsData.to_csv(accountsPath, index=False)
 
-
+calculateCreditCardInterest()
