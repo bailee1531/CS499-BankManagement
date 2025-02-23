@@ -68,7 +68,7 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
         "AccountID": accountID,
         "CustomerID": customerID,
         "AccountType": "Mortgage Loan",
-        "CurrBal": str(loanAmount),
+        "CurrBal": Decimal(loanAmount).quantize(Decimal('0.00')),
         "DateOpened": startDate,
         "CreditLimit": None,
         "APR": interestRate
