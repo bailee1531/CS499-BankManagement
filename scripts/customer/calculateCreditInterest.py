@@ -35,5 +35,3 @@ def calculateCreditCardInterest():
 
     # Save updated balances
     accountsData.to_csv(accountsPath, index=False)
-
-calculateCreditCardInterest()
