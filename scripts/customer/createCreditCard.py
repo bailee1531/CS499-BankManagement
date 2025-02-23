@@ -68,9 +68,9 @@ def openCreditCardAccount(customerID: int) -> dict:
         "CustomerID": customerID,
         "AccountType": "Credit Card",
         "CurrBal": 0.0,
+        "DateOpened": date.today(),
         "CreditLimit": random.choice([1000, 3000, 7000, 15000]),
-        "APR": apr,
-        "DateOpened": date.today().isoformat()
+        "APR": apr
     }
 
     # Append the new account details to the DataFrame and save back to CSV
