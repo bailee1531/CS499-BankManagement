@@ -25,7 +25,7 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
     Digital signature standard at D.1.2: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 
     """
-    custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
+    custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/customers.csv'))
 
     def new_account(userID, pwd, ssn):
         """
@@ -66,8 +66,8 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
         newUserRow = {'username': username,
                       'CustomerID': newID,
                       'APRRangeID': aprRangeID}    # creates dict of new user information
-        userID.loc[len(userID)] = newUserRow                        # adds information from dict to end of dataframe
-        userID.to_csv(custPath, index=False)                 # exports dataframe to customer.csv to overwrite with new information
+        userInfo.loc[len(userInfo)] = newUserRow       # adds information from dict to end of dataframe
+        userInfo.to_csv(custPath, index=False)       # exports dataframe to customer.csv to overwrite with new information
 
     def existing_account(userID, pwd) -> dict:
         """
@@ -93,7 +93,7 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
             key = ECC.import_key(data, pwd)
 
     # Imports customer csv as a dataframe
-    userID = pd.read_csv(custPath)
+    userInfo = pd.read_csv(custPath)
 
     # Create account
     if new_or_returning == 1:
@@ -102,8 +102,7 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
     # Login
     elif new_or_returning == 2:
         try:
-            oldID = userID.loc[userID['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
+            oldID = userInfo.loc[userInfo['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
             existing_account(oldID, password)                                           # imports private key
         except ValueError:
             return {"status": "error", "message": f"Incorrect username or password. Please try again"}  # if password is incorrect. Should make actual error on GUI
-        
