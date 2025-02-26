@@ -1,0 +1,152 @@
+# Sierra Yerges
+from transactionLog import generate_transaction_ID
+import pandas as pd
+from decimal import Decimal
+import os
+from datetime import date, timedelta
+
+def scheduleBillPayment(customerID: int, payeeName: str, payeeAddress: str, amount: Decimal, dueDate: str, paymentAccID: int) -> dict:
+    """
+    Schedules a bill payment for the customer.
+
+    Parameters
+    ----------
+    customerID : int
+        The Customer ID scheduling the payment.
+    payeeName : str
+        Name of the payee.
+    payeeAddress : str
+        Address of the payee.
+    amount : Decimal
+        The amount to pay.
+    dueDate : str
+        The due date for the payment in YYYY-MM-DD format.
+    paymentAccID : int
+        The Account ID from which the payment will be made.
+
+    Returns
+    -------
+    dict
+        - If scheduling is successful:
+          {"status": "success", "message": "Bill payment scheduled successfully."}
+        - If scheduling fails:
+          {"status": "error", "message": "Failure reason."}
+    """
+    billsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/bills.csv'))
+
+    # Load bills data
+    billsData = pd.read_csv(billsPath)
+
+    # Append new bill payment to DataFrame
+    newBillPayment = {
+        'CustomerID': customerID,
+        'PayeeName': payeeName,
+        'PayeeAddress': payeeAddress,
+        'Amount': Decimal(amount).quantize(Decimal('0.00')),
+        'DueDate': dueDate,
+        'PaymentAccID': paymentAccID
+    }
+    billsData.loc[len(billsData)] = newBillPayment
+    billsData.to_csv(billsPath, index=False)
+
+    return {"status": "success", "message": "Bill payment scheduled successfully."}
+
+def viewScheduledBills(customerID: int) -> list:
+    """
+    Retrieves all scheduled bills for a given customer.
+
+    Parameters
+    ----------
+    customerID : int
+        The Customer ID whose bills are to be retrieved.
+
+    Returns
+    -------
+    list
+        A list of dictionaries representing each scheduled bill.
+    """
+    billsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/bills.csv'))
+
+    if not os.path.exists(billsPath):
+        return [{"status": "error", "message": "No scheduled bills found."}]
+
+    billsData = pd.read_csv(billsPath)
+    customerBills = billsData[billsData['CustomerID'] == customerID].to_dict(orient='records')
+
+    return customerBills if customerBills else [{"status": "error", "message": "No scheduled bills found for this customer."}]
+
+def processScheduledBills() -> list:
+    """
+    Processes all scheduled bill payments due today.
+
+    Returns
+    -------
+    list
+        A list of dictionaries indicating the result of processing each bill.
+    """
+    accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
+    billsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/bills.csv'))
+    logPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
+
+    if not os.path.exists(billsPath):
+        return [{"status": "error", "message": "No scheduled bills to process."}]
+
+    accountsData = pd.read_csv(accountsPath)
+    billsData = pd.read_csv(billsPath)
+    logData = pd.read_csv(logPath)
+
+    today = date.today()
+    results = []
+
+    for index, bill in billsData.iterrows():
+        dueDate = date.fromisoformat(bill['DueDate'])
+        # If bill is due today
+        if dueDate == today:
+            accIndex = accountsData[accountsData['AccountID'] == bill['PaymentAccID']].index
+            if accIndex.empty:
+                results.append({"status": "error", "message": f"Payment account {bill['PaymentAccID']} not found."})
+                continue
+
+            amount = Decimal(str(bill['Amount']))
+            accountType = accountsData.at[accIndex[0], 'AccountType']
+
+            # Re-apply Decimal formatting before balance operations
+            accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+            balance = accountsData.at[accIndex[0], 'CurrBal']
+
+            success = False
+            # Checking and savings account used to pay bills
+            if balance >= amount:
+                # Deduct payment from source account
+                accountsData.at[accIndex[0], 'CurrBal'] = balance - amount
+                transactionID = generate_transaction_ID(logData)
+                success = True
+            # Credit card account used to pay bills
+            elif accountType == 'Credit Card':
+                # Allow payment by increasing credit card balance
+                accountsData.at[accIndex[0], 'CurrBal'] = balance + amount
+                transactionID = generate_transaction_ID(logData)
+                success = True
+            if success:
+                newDueDate = dueDate + timedelta(days=30)
+                billsData.at[index, 'DueDate'] = newDueDate.isoformat()
+
+                newLog = {
+                    'AccountID': bill['PaymentAccID'],
+                    'CustomerID': bill['CustomerID'],
+                    'TransactionType': f"Bill Payment to {bill['PayeeName']}",
+                    'Amount': Decimal(amount).quantize(Decimal('0.00')),
+                    'TransactionID': transactionID
+                }
+                logData.loc[len(logData)] = newLog
+
+                results.append({"status": "success", "message": f"Bill payment of ${amount} to {bill['PayeeName']} processed successfully. DueDate updated to {newDueDate}."})
+            else:
+                results.append({"status": "error", "message": f"Insufficient funds for payment to {bill['PayeeName']}."})
+
+    accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    accountsData.to_csv(accountsPath, index=False)
+    billsData.to_csv(billsPath, index=False)
+    logData.to_csv(logPath, index=False)
+
+    return results

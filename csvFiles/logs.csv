@@ -1,1 +1,5 @@
 AccountID,CustomerID,TransactionType,Amount,TransactionID
+14233,315,Interest Earned,1702.5,6973
+5016,315,Interest Earned,2.81,5344
+14233,315,Interest Earned,1712.16,9408
+5016,315,Bill Payment to Mark Smith,2500.0,1474
