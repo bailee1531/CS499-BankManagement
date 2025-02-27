@@ -1,0 +1,24 @@
+@import url("shared.css");
+
+/* Main Content Area (if additional overrides are needed for homepage) */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing);
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+}
+
+.hero h1 {
+    margin-bottom: 0.625rem;
+    font-size: 2rem;
+}
+
+.hero p {
+    font-size: 1.1rem;
+}
