@@ -1,10 +1,11 @@
 # Bailee Segars
 from Crypto.PublicKey import ECC
 import pandas as pd
+import hashlib
 import random
 import os
 
-def login_page_button_pressed(new_or_returning, username, password, ssn):
+def login_page_button_pressed(new_or_returning, username, password, ssn, q1, q2):
     """
     Handles user account creation and login authentication.
 
@@ -17,7 +18,7 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
 
         - 2: 'Login' button pressed
 
-    username, password, ssn: string
+    username, password, ssn, q1, q2: string
         Passed from text fields on log in screen of GUI.
 
     See Also:
@@ -25,9 +26,9 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
     Digital signature standard at D.1.2: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 
     """
-    custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
+    custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/customers.csv'))
 
-    def new_account(userID, pwd, ssn):
+    def new_account(userID, pwd, ssn, q1, q2) -> dict:
         """
         Creates a new private key for each new user, then saves private key to file associated with userID.
 
@@ -39,6 +40,18 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
             User created password in text field on GUI.
         ssn: string
             Social Security Number collected at account creation, encrypted and used to assign APR range ID.
+        q1: string
+            Correct answer set for security question 1.
+        q2: string
+            Corect answer set for security question 2.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the status and message.
+
+            If the account is created:
+            - {"status": "success", "message": "Successfully created account"}
 
         Notes
         -----
@@ -62,12 +75,14 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
                                 compress=True,
                                 prot_params={'iteration_count':210000})
             f.write(data)
-
         newUserRow = {'username': username,
                       'CustomerID': newID,
-                      'APRRangeID': aprRangeID}    # creates dict of new user information
-        userID.loc[len(userID)] = newUserRow                        # adds information from dict to end of dataframe
-        userID.to_csv(custPath, index=False)                 # exports dataframe to customer.csv to overwrite with new information
+                      'APRRangeID': aprRangeID,
+                      'Question1': hashlib.sha512(q1.encode()).hexdigest(),
+                      'Question2': hashlib.sha512(q2.encode()).hexdigest()}      # creates dict of new user information
+        userInfo.loc[len(userInfo)] = newUserRow     # adds information from dict to end of dataframe
+        userInfo.to_csv(custPath, index=False)       # exports dataframe to customer.csv to overwrite with new information
+        return {"status": "success", "message": "Successfully created account"}
 
     def existing_account(userID, pwd) -> dict:
         """
@@ -85,25 +100,28 @@ def login_page_button_pressed(new_or_returning, username, password, ssn):
         dict
             A dictionary containing the status and message.
 
-            - If username and/or password entered incorrectly:\n
-            {"status": "error", "message": f"Incorrect username or password. Please try again"}
+            If username and/or password entered incorrectly:
+            - {"status": "error", "message": "Incorrect username or password. Please try again"}
+
+            If username and password are correct:
+            - {"status": "success", "message": f"Successfully logged in as {username}"}
         """
         with open(f'{userID}privatekey.pem', 'rt') as f:
-            data = f.read()
-            key = ECC.import_key(data, pwd)
+            try:
+                data = f.read()
+                key = ECC.import_key(data, pwd)
+            except ValueError:
+                return {"status": "error", "message": "Incorrect username or password. Please try again"}
+        return {"status": "success", "message": f"Successfully logged in as {username}"}   
 
     # Imports customer csv as a dataframe
-    userID = pd.read_csv(custPath)
+    userInfo = pd.read_csv(custPath)
 
     # Create account
     if new_or_returning == 1:
         newID = random.randint(200, 999) # generates a random ID
-        new_account(newID, password, ssn)     # generates a new private key
+        new_account(newID, password, ssn, q1, q2)     # generates a new private key
     # Login
     elif new_or_returning == 2:
-        try:
-            oldID = userID.loc[userID['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
-            existing_account(oldID, password)                                           # imports private key
-        except ValueError:
-            return {"status": "error", "message": f"Incorrect username or password. Please try again"}  # if password is incorrect. Should make actual error on GUI
-        
+        oldID = userInfo.loc[userInfo['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
+        existing_account(oldID, password)                                           # imports private key
