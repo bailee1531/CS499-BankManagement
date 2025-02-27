@@ -1,3 +1,3 @@
 AccountID,CustomerID,AccountType,CurrBal,DateOpened,CreditLimit,APR
-13166,315,Mortgage Loan,250000.00,2025-02-23,,6.63
-6989,315,Credit Card,100.0,2025-02-19,7000.0,29.74
+5016,315,Credit Card,2623.35,2025-02-26,15000.0,27.96
+14233,315,Mortgage Loan,303414.66,2025-02-26,,6.81
