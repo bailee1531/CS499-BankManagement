@@ -1,34 +1,32 @@
 {% extends "base.html" %}
 {% block meta_description %}Secure banking login for UAH Bank.{% endblock %}
 {% block title %}UAH Bank - Login{% endblock %}
-
 {# Omit auth links on the login page #}
 {% block header_extra %}{% endblock %}
-
 {% block content %}
 <main>
-  <section class="login-container" aria-labelledby="login-heading">
-    <h2 id="login-heading">Login</h2>
-    <form action="{{ url_for('auth.login') }}" method="post" novalidate>
-      {{ form.hidden_tag() }}
-      <div class="form-group">
-        <label for="username">Username</label>
-        {{ form.username(class="form-control", placeholder="Enter your username", autocomplete="username") }}
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="current-password") }}
-      </div>
-      <div class="form-group">
-        <a href="#" class="forgot-password">Forgot Password?</a>
-      </div>
-      <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
-        Login
-      </button>
-      <button type="button" class="btn btn--signup" onclick="window.location.href='home';">
-        Sign Up
-      </button>
-    </form>
-  </section>
+    <section class="login-container" aria-labelledby="login-heading">
+        <h2 id="login-heading">Login</h2>
+        <form action="{{ url_for('auth.login') }}" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="username">Username</label>
+                {{ form.username(class="form-control", placeholder="Enter your username", autocomplete="username") }}
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="current-password") }}
+            </div>
+            <div class="form-group">
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+            <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
+                Login
+            </button>
+            <button type="button" class="btn btn--signup" onclick="window.location.href='home';">
+                Sign Up
+            </button>
+        </form>
+    </section>
 </main>
 {% endblock %}

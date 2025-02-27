@@ -2,141 +2,141 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 /* CSS Variables */
 :root {
-  --primary-bg: #c2e5a0;
-  --dark-bg: #434343;
-  --accent: #d9534f;
-  --white: #ffffff;
-  --black: #000000;
-  --border-radius: 0.3125rem;
-  --container-border-radius: 0.625rem;
-  --transition: 0.3s ease-in-out;
-  --spacing: 1.25rem;
+    --primary-bg: #c2e5a0;
+    --dark-bg: #434343;
+    --accent: #d9534f;
+    --white: #ffffff;
+    --black: #000000;
+    --border-radius: 0.3125rem;
+    --container-border-radius: 0.625rem;
+    --transition: 0.3s ease-in-out;
+    --spacing: 1.25rem;
 }
 
 /* Global Styles */
 html,
 body {
-  height: 100%;
-  font-family: Arial, sans-serif;
-  background-color: var(--primary-bg);
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: var(--primary-bg);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header Styles */
 header {
-  width: 100%;
-  padding: var(--spacing);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    width: 100%;
+    padding: var(--spacing);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .header__logo a {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--black);
-  font-weight: bold;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--black);
+    font-weight: bold;
 }
 
 .header__logo img {
-  width: 40px;
-  margin-right: 0.625rem;
+    width: 40px;
+    margin-right: 0.625rem;
 }
 
 .header__nav ul {
-  list-style: none;
-  display: flex;
-  gap: 0.9375rem;
+    list-style: none;
+    display: flex;
+    gap: 0.9375rem;
 }
 
 .header__nav a {
-  text-decoration: none;
-  color: var(--black);
+    text-decoration: none;
+    color: var(--black);
 }
 
 /* Header Authentication (used on pages that require it) */
 .header__auth {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-  align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    align-items: center;
 }
 
 .header__auth a {
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: var(--border-radius);
-  transition: background var(--transition), color var(--transition);
-  margin-left: 0.625rem;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: background var(--transition), color var(--transition);
+    margin-left: 0.625rem;
 }
 
 .auth-btn--sign-up {
-  background: transparent;
-  color: var(--black);
-  border: 1px solid var(--black);
+    background: transparent;
+    color: var(--black);
+    border: 1px solid var(--black);
 }
 
 .auth-btn--login {
-  background: var(--accent);
-  color: var(--white);
-  border: none;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
 }
 
 /* Footer Styles */
 footer {
-  background-color: var(--dark-bg);
-  color: var(--white);
-  text-align: center;
-  padding: var(--spacing);
+    background-color: var(--dark-bg);
+    color: var(--white);
+    text-align: center;
+    padding: var(--spacing);
 }
 
 .footer__content,
 .footer__contact,
 .footer__bottom {
-  margin: 0.3125rem 0;
+    margin: 0.3125rem 0;
 }
 
 .footer__content a,
 .footer__contact a,
 .footer__bottom a {
-  color: var(--white);
-  text-decoration: none;
+    color: var(--white);
+    text-decoration: none;
 }
 
 .footer__content a:hover,
 .footer__contact a:hover,
 .footer__bottom a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 /* Utility Classes */
 .hidden {
-  display: none;
+    display: none;
 }
 
 /* Responsive Styles */
 @media (max-width: 600px) {
-  header {
-    flex-direction: column;
-    align-items: center;
-  }
+    header {
+        flex-direction: column;
+        align-items: center;
+    }
 
-  .header__nav ul {
-    flex-direction: column;
-    gap: 0.625rem;
-  }
+    .header__nav ul {
+        flex-direction: column;
+        gap: 0.625rem;
+    }
 
-  .header__auth {
-    margin-top: 0.625rem;
-  }
+    .header__auth {
+        margin-top: 0.625rem;
+    }
 }
