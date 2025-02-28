@@ -115,7 +115,7 @@ def deposit(accID, amount) -> dict:
     else:
         transaction_type = 'Deposit'
         currentBal += Decimal(amount).quantize(Decimal('0.00'))
-    accInfo['CreditLimit'] = accInfo['CreditLimit'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
+    accInfo['CreditLimit'] = accInfo['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accInfo.at[accIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
 

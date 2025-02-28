@@ -171,7 +171,7 @@ def processScheduledBills() -> list:
                 results.append({"status": "error", "message": f"Insufficient funds for payment to {bill['PayeeName']}."})
 
     accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
-    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
+    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accountsData.to_csv(accountsPath, index=False)
     billsData['Amount'] = billsData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
     billsData.to_csv(billsPath, index=False)

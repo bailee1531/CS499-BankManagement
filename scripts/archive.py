@@ -42,10 +42,12 @@ def archive(recordType: str, recordID: int) -> dict:
             archivedBillsData = billRecord
         else:
             archivedBillsData = pd.concat([archivedBillsData, billRecord], ignore_index=True)
+        archivedBillsData['Amount'] = archivedBillsData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         archivedBillsData.to_csv(archivedBillsPath, index=False)
 
         # Remove the bill from active records
         billsData = billsData[billsData['BillID'] != recordID]
+        billsData['Amount'] = billsData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         billsData.to_csv(billsPath, index=False)
 
         return {"status": "success", "message": f"Bill with ID {recordID} archived successfully."}
@@ -69,10 +71,14 @@ def archive(recordType: str, recordID: int) -> dict:
             archivedLoansData = loanRecord
         else:
             archivedLoansData = pd.concat([archivedLoansData, loanRecord], ignore_index=True)
+        archivedLoansData['CurrBal'] = archivedLoansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        archivedLoansData['CreditLimit'] = archivedLoansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         archivedLoansData.to_csv(archivedLoansPath, index=False)
 
         # Remove the mortgage loan from active records
         loansData = loansData[loansData['AccountID'] != recordID]
+        loansData['CurrBal'] = loansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        loansData['CreditLimit'] = loansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         loansData.to_csv(loansPath, index=False)
 
         return {"status": "success", "message": f"Mortgage Loan with ID {recordID} archived successfully."}
@@ -125,3 +131,7 @@ def viewArchivedLoans(customerID: int) -> list:
     customerLoans = archivedLoansData[archivedLoansData['CustomerID'] == customerID].to_dict(orient='records')
 
     return customerLoans if customerLoans else [{"status": "error", "message": "No archived mortgage loans found for this customer."}]
+
+print(archive('bill',41131))
+print(viewArchivedBills(315))
+print(viewArchivedLoans(315))
