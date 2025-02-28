@@ -1,5 +1,10 @@
 AccountID,CustomerID,TransactionType,Amount,TransactionID
-14233,315,Interest Earned,1702.5,6973
+14233,315,Interest Earned,1702.50,6973
 5016,315,Interest Earned,2.81,5344
 14233,315,Interest Earned,1712.16,9408
-5016,315,Bill Payment to Mark Smith,2500.0,1474
+1000,315,Withdrawal,100.00,2016
+9162,315,Payment to Credit Card,100.00,7317
+8521,315,Bill Payment to Mark Smith,2500.00,1054
+8521,315,Bill Payment to landlord,1800.00,6155
+8521,315,Bill Payment to landlord,1800.00,9336
+1000,315,Bill Payment to Mark Smith,2500.00,7725
