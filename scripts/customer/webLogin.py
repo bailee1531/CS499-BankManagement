@@ -5,7 +5,7 @@ import hashlib
 import random
 import os
 
-def login_page_button_pressed(new_or_returning, username, password, ssn, q1, q2):
+def login_page_button_pressed(new_or_returning, username, password, *argv):
     """
     Handles user account creation and login authentication.
 
@@ -119,9 +119,12 @@ def login_page_button_pressed(new_or_returning, username, password, ssn, q1, q2)
 
     # Create account
     if new_or_returning == 1:
+        ssn = argv[0]
+        q1 = argv[1]
+        q2 = argv[2]
         newID = random.randint(200, 999) # generates a random ID
         new_account(newID, password, ssn, q1, q2)     # generates a new private key
     # Login
     elif new_or_returning == 2:
         oldID = userInfo.loc[userInfo['username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
-        existing_account(oldID, password)                                           # imports private key
+        existing_account(oldID, password)                                               # imports private key
