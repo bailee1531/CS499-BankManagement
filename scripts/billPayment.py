@@ -1,5 +1,6 @@
 # Sierra Yerges
 from transactionLog import generate_transaction_ID
+import random
 import pandas as pd
 from decimal import Decimal
 import os
@@ -37,14 +38,20 @@ def scheduleBillPayment(customerID: int, payeeName: str, payeeAddress: str, amou
     # Load bills data
     billsData = pd.read_csv(billsPath)
 
+    # Generate a unique Account ID that does not conflict with existing IDs
+    billID = random.randint(1, 50000)
+    while billID in billsData['BillID'].values:
+        billID = random.randint(1, 50000)
+
     # Append new bill payment to DataFrame
     newBillPayment = {
+        'BillID': billID,
         'CustomerID': customerID,
         'PayeeName': payeeName,
         'PayeeAddress': payeeAddress,
         'Amount': Decimal(amount).quantize(Decimal('0.00')),
         'DueDate': dueDate,
-        'PaymentAccID': paymentAccID
+        'PaymentAccID': paymentAccID,
     }
     billsData.loc[len(billsData)] = newBillPayment
     billsData.to_csv(billsPath, index=False)
@@ -107,24 +114,43 @@ def processScheduledBills() -> list:
                 results.append({"status": "error", "message": f"Payment account {bill['PaymentAccID']} not found."})
                 continue
 
-            amount = Decimal(str(bill['Amount']))
             accountType = accountsData.at[accIndex[0], 'AccountType']
 
             # Re-apply Decimal formatting before balance operations
             accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
             balance = accountsData.at[accIndex[0], 'CurrBal']
+            billsData['Amount'] = billsData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+            amount = Decimal(bill['Amount']).quantize(Decimal('0.00'))
+
 
             success = False
             # Checking and savings account used to pay bills
-            if balance >= amount:
-                # Deduct payment from source account
-                accountsData.at[accIndex[0], 'CurrBal'] = balance - amount
-                transactionID = generate_transaction_ID(logData)
-                success = True
-            # Credit card account used to pay bills
-            elif accountType == 'Credit Card':
+            if accountType == 'Credit Card':
+                creditLimit = accountsData.at[accIndex[0], 'CreditLimit']
+                creditLimit = Decimal(str(creditLimit))
+                
+                if balance + amount > creditLimit:
+                    overLimitFee = Decimal('35.00')
+                    dueDate = (date.today() + timedelta(days=30)).isoformat()
+
+                    scheduleBillPayment(
+                        bill['CustomerID'],
+                        'Evergreen Bank Credit Department',
+                        '301 Sparkman Dr NW, Huntsville, AL 35899',
+                        overLimitFee,
+                        dueDate,
+                        bill['PaymentAccID']
+                    )
+
+                    results.append({"status": "error", "message": f"Over-limit fee of ${overLimitFee} billed and due by {dueDate}."})
+                    continue
                 # Allow payment by increasing credit card balance
                 accountsData.at[accIndex[0], 'CurrBal'] = balance + amount
+                transactionID = generate_transaction_ID(logData)
+                success = True
+            elif balance >= amount:
+                # Deduct payment from source account
+                accountsData.at[accIndex[0], 'CurrBal'] = balance - amount
                 transactionID = generate_transaction_ID(logData)
                 success = True
             if success:
@@ -140,13 +166,16 @@ def processScheduledBills() -> list:
                 }
                 logData.loc[len(logData)] = newLog
 
-                results.append({"status": "success", "message": f"Bill payment of ${amount} to {bill['PayeeName']} processed successfully. DueDate updated to {newDueDate}."})
+                results.append({"status": "success", "message": f"Bill payment of ${amount} to {bill['PayeeName']} processed successfully. Due Date updated to {newDueDate}."})
             else:
                 results.append({"status": "error", "message": f"Insufficient funds for payment to {bill['PayeeName']}."})
 
     accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accountsData.to_csv(accountsPath, index=False)
+    billsData['Amount'] = billsData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
     billsData.to_csv(billsPath, index=False)
+    logData['Amount'] = logData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
     logData.to_csv(logPath, index=False)
 
     return results

@@ -52,12 +52,19 @@ def withdraw(accID, amount) -> dict:
 
     # Completes withdrawal and updates csv file
     currentBal -= Decimal(amount).quantize(Decimal('0.00'))
+    accInfo['CreditLimit'] = accInfo['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accInfo.at[accIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
 
     transactionID = generate_transaction_ID(logInfo)
-    newLog = {'AccountID': accID, 'CustomerID': custID, 'TransactionType': 'Withdrawal', 'Amount': amount,'TransactionID': transactionID}
-    logInfo.loc[len(accInfo)] = newLog
-    logInfo.to_csv(logPath, index=False)
+    newLogEntry = pd.DataFrame([{
+        'AccountID': accID,
+        'CustomerID': custID,
+        'TransactionType': 'Withdrawal',
+        'Amount': Decimal(amount).quantize(Decimal('0.00')),
+        'TransactionID': transactionID
+    }])
+
+    newLogEntry.to_csv(logPath, index=False, mode='a', header=not os.path.exists(logPath))
 
     return {"status": "success", "message": f"Withdrew {amount} from account {accID}."}

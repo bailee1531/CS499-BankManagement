@@ -3,6 +3,7 @@ import pandas as pd
 import random
 import os
 from datetime import date
+from decimal import Decimal
 
 def openCreditCardAccount(customerID: int) -> dict:
     """
@@ -62,14 +63,16 @@ def openCreditCardAccount(customerID: int) -> dict:
     while accountID in accountsData['AccountID'].values:
         accountID = random.randint(5000, 9999)
 
+    limit = random.choice([1000, 3000, 7000, 15000])
+
     # Create a dictionary with new credit card account details
     newAccount = {
         "AccountID": accountID,
         "CustomerID": customerID,
         "AccountType": "Credit Card",
-        "CurrBal": 0.0,
+        "CurrBal": 0.00,
         "DateOpened": date.today(),
-        "CreditLimit": random.choice([1000, 3000, 7000, 15000]),
+        "CreditLimit": Decimal(limit).quantize(Decimal('0.00')),
         "APR": apr
     }
 
@@ -79,3 +82,5 @@ def openCreditCardAccount(customerID: int) -> dict:
 
     # Return a success message with account details
     return {"status": "success", "message": f"Credit card account {accountID} created with a {apr}% APR."}
+
+print(openCreditCardAccount(315))

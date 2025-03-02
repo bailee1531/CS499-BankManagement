@@ -12,38 +12,44 @@ def transferFunds(srcAccID: int, destAccID: int, amount: Decimal) -> dict:
     Parameters
     ----------
     srcAccID : int
-        The source account ID from which funds are being transferred.
+        The account ID from which the funds will be withdrawn.
     destAccID : int
-        The destination account ID to receive the transferred funds.
+        The account ID that will receive the funds.
     amount : Decimal
         The amount of money to be transferred.
 
     Returns
     -------
     dict
-        A dictionary containing the status and a message.
+        A dictionary indicating the status of the transfer.
 
-        - If the source or destination account does not exist:
+        - If either account does not exist:
           {"status": "error", "message": "Source/Destination account {ID} not found."}
-        
-        - If the transfer amount is invalid (zero or negative):
+
+        - If the amount is zero or negative:
           {"status": "error", "message": "Transfer amount must be positive."}
-        
-        - If the withdrawal from the source account fails:
+
+        - If withdrawal from the source account fails:
           {"status": "error", "message": "Withdrawal failed. Transfer aborted."}
-        
-        - If the deposit into the destination account fails:
+
+        - If deposit into the destination account fails:
           {"status": "error", "message": "Deposit failed. Transaction rolled back."}
-        
+
         - If the transfer is successful:
-          {"status": "success", "message": "Successfully transferred ${amount} from Account {srcAccID} to Account {destAccID}."}
+          {"status": "success", "message": f"Successfully transferred ${amount} from Account {srcAccID} to Account {destAccID}."}
+
+    Process
+    -------
+    1. Validates if both the source and destination accounts exist.
+    2. Ensures the transfer amount is a positive value.
+    3. Attempts to withdraw the specified amount from the source account.
+    4. If the withdrawal is successful, deposits the amount into the destination account.
+    5. If the deposit fails, reverses the withdrawal to maintain account balances.
 
     Notes
     -----
-    - The function reads from `accounts.csv` located in `../csvFiles/`.
-    - This function first withdraws funds from the source account.
-    - If the withdrawal is successful, it attempts to deposit the funds into the destination account.
-    - If the deposit fails, the function **rolls back** the withdrawal to maintain data integrity.
+    - The function interacts with `accounts.csv` located in `../csvFiles/`.
+    - This ensures **transaction integrity** by rolling back withdrawals if deposits fail.
     """
     # Get absolute path for accounts.csv
     accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
