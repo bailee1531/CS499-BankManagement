@@ -1,8 +1,8 @@
-from makeDeposit import deposit
+from withdrawMoney import withdraw
 from decimal import Decimal
 import unittest
 
-class TestDeposit(unittest.TestCase):
+class TestWithdraw(unittest.TestCase):
     def test_param_type(self):
         def params_test(accID, amount):
             self.assertIsInstance(accID, int)
@@ -11,23 +11,23 @@ class TestDeposit(unittest.TestCase):
         params_test(615, 167.89)
         params_test(789, 20)
 
-    def test_deposit(self):
-        self.assertTrue(deposit(615, 167.89))
-        self.assertTrue(deposit(789, 20))
+    def test_withdraw(self):
+        self.assertTrue(withdraw(615, 167.89))
+        self.assertTrue(withdraw(789, 20))
 
     def test_invalid_accID(self):
         with self.assertRaises(TypeError) as context:
-            deposit('test', 167.89)
+            withdraw('test', 167.89)
         self.assertEqual('accID must be an integer', str(context.exception))
 
     def test_invalid_amount(self):
         with self.assertRaises(TypeError) as context:
-            deposit(615, 'test')
+            withdraw(615, 'test')
         self.assertEqual('amount must be a decimal', str(context.exception))
 
     def test_invalid_amount_list(self):
         with self.assertRaises(TypeError) as context:
-            deposit(615, [20,30,40])
+            withdraw(615, [20,30,40])
         self.assertEqual('amount must be a decimal', str(context.exception))
 
 if __name__ == '__main__':
