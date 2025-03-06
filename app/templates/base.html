@@ -1,23 +1,42 @@
+<!--
+  Base Template for Evergreen Bank
+  This file provides the common layout for all pages.
+  It includes header, navigation, content blocks, and footer.
+-->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <!-- Character set and viewport settings for responsiveness -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Dynamic meta description for SEO; override in child templates if needed -->
     <meta name="description" content="{% block meta_description %}Default description{% endblock %}">
+    
+    <!-- Dynamic title; override in child templates -->
     <title>{% block title %}Evergreen Bank{% endblock %}</title>
+    
+    <!-- Favicon and base stylesheet -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    
+    <!-- Additional head elements can be inserted by child templates -->
+    {% block head_extra %}{% endblock %}
 </head>
 
 <body>
+    <!-- Header Section -->
     <header>
         <div class="header__logo">
-            <a href="{{ url_for('home') }}">
+            <!-- Logo linking to home; consider adding a title attribute for accessibility -->
+            <a href="{{ url_for('home') }}" title="Evergreen Bank Home">
                 <img src="{{ url_for('static', filename='images/Evergreen_Logo.png') }}" alt="Evergreen Bank Logo">
                 <span>Evergreen Bank</span>
             </a>
         </div>
+        
+        <!-- Main Navigation -->
         <nav class="header__nav" aria-label="Main Navigation">
             <ul>
                 <li><a href="#">Personal Banking</a></li>
@@ -26,23 +45,31 @@
                 <li><a href="#">About Us</a></li>
             </ul>
         </nav>
+        
+        <!-- Optional Authentication Links (Sign Up / Login) -->
         {% block header_extra %}
         <div class="header__auth">
-            <a href="#">Sign Up</a>
-            <a href="{{ url_for('auth.login') }}" class="auth-btn auth-btn--login">Login</a>
+            <a href="{{ url_for('auth.register_step1') }}" class="header-btn header-btn--sign-up">Sign Up</a>
+            <a href="{{ url_for('auth.login') }}" class="header-btn header-btn--login">Login</a>
         </div>
         {% endblock %}
     </header>
+    
+    <!-- Main Content Block -->
     {% block content %}
     {% endblock %}
+    
+    <!-- Footer Section -->
     <footer>
         <div class="footer__content">
+            <!-- Navigation links (update these links when real routes are available) -->
             <a href="#">Personal Banking</a> |
             <a href="#">Credit Cards</a> |
             <a href="#">Mortgage</a> |
             <a href="#">About Us</a>
         </div>
         <div class="footer__contact">
+            <!-- Contact information -->
             <a href="mailto:Contact@UAHBank.com">📧 Contact@UAHBank.com</a> |
             <a href="tel:+12569999999">📞 +1 256 99 9999</a> |
             <a href="https://maps.google.com?q=Somewhere+in+the+World" target="_blank" rel="noopener">
@@ -51,10 +78,11 @@
         </div>
         <div class="footer__bottom">
             <p>
+                <!-- Consider generating the year dynamically if possible -->
                 UAH Bank &copy; 2025 |
                 <a href="#">Privacy Policy</a> |
                 <a href="#">Terms of Service</a> |
-                <a href="#">Employee Login</a>
+                <a href="{{ url_for('employee_home') }}" class="footer-btn footer-btn--login">Employee Home</a>
             </p>
         </div>
     </footer>

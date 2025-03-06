@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block meta_description %}Secure account registration for Evergreen Bank.{% endblock %}
+{% block title %}Evergreen Bank - Create Account{% endblock %}
+{% block header_extra %}{% endblock %}
+{% block content %}
+<main>
+    <section class="register-container" aria-labelledby="register-heading">
+        <h2 id="register-heading">Create Account</h2>
+        <form action="{{ url_for('auth.register_step1') }}" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <!-- First Name Field -->
+            <div class="form-group">
+                <label for="first_name">First Name *</label>
+                {{ form.first_name(class="form-control", placeholder="Enter your first name", autocomplete="given-name") }}
+                {% if form.first_name.errors %}
+                <div class="error-message">
+                    {% for error in form.first_name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Last Name Field -->
+            <div class="form-group">
+                <label for="last_name">Last Name *</label>
+                {{ form.last_name(class="form-control", placeholder="Enter your last name", autocomplete="family-name") }}
+                {% if form.last_name.errors %}
+                <div class="error-message">
+                    {% for error in form.last_name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Address Field -->
+            <div class="form-group">
+                <label for="address">Address *</label>
+                {{ form.address(class="form-control", placeholder="Enter your address") }}
+                {% if form.address.errors %}
+                <div class="error-message">
+                    {% for error in form.address.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Phone Number Field -->
+            <div class="form-group">
+                <label for="phone_number">Phone Number *</label>
+                {{ form.phone_number(class="form-control", placeholder="Enter your phone number", autocomplete="tel") }}
+                {% if form.phone_number.errors %}
+                <div class="error-message">
+                    {% for error in form.phone_number.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Tax ID Field -->
+            <div class="form-group">
+                <label for="tax_id">Social Security Number (Tax ID) *</label>
+                {{ form.tax_id(class="form-control", placeholder="Enter your SSN or Tax ID") }}
+                {% if form.tax_id.errors %}
+                <div class="error-message">
+                    {% for error in form.tax_id.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Birthday Field -->
+            <div class="form-group">
+                <label for="birthday">Birthday *</label>
+                {{ form.birthday(class="form-control", placeholder="Enter your birthday", autocomplete="bday") }}
+                {% if form.birthday.errors %}
+                <div class="error-message">
+                    {% for error in form.birthday.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn--register" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';">
+                Next Step
+            </button>
+            <button type="button" class="btn btn--login" onclick="window.location.href='{{ url_for('auth.login') }}';">
+                Login
+            </button>
+        </form>
+    </section>
+</main>
+{% endblock %}
+

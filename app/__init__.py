@@ -42,5 +42,14 @@ def create_app(test_config=None):
         """
         return render_template("index.html")
 
+
+    @app.route('/employee-home')
+
+    def employee_home():
+        """
+        Employee Home route that renders the homepage.
+        """
+        return render_template("employee_home.html")
+
     return app
 
