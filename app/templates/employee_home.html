@@ -1,30 +1,27 @@
-{# 
-  Employee Home Page Template 
-  Extends base.html and provides a specialized layout for employee login options.
+{#
+Employee Home Page Template
+Extends base.html and provides a specialized layout for employee login options.
 #}
 {% extends "base.html" %}
-
 {# Override the title block for the employee page #}
 {% block title %}Employee Homepage{% endblock %}
-
-{# 
-  Include additional CSS specific to the employee home page.
-  The stylesheet (employee_home.css) is added in addition to the base styles.
+{#
+Include additional CSS specific to the employee home page.
+The stylesheet (employee_home.css) is added in addition to the base styles.
 #}
 {% block head_extra %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/employee_home.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/employee_home.css') }}">
 {% endblock %}
-
 {# Main content section for employee login options #}
 {% block content %}
 <main class="employee-home">
-  <div class="employee-home-container">
-    <!-- Display header text; fallback to "Employee Login" if not provided -->
-    <h2 id="login-heading">{{ header_text or "Employee Login" }}</h2>
-    <div class="employee-home-buttons">
-      <a href="{{ url_for('auth.teller_login') }}" class="btn btn--login">Teller Login</a>
-      <a href="{{ url_for('auth.admin_login') }}" class="btn btn--login">Admin Login</a>
+    <div class="employee-home-container">
+        <!-- Display header text; fallback to "Employee Login" if not provided -->
+        <h2 id="login-heading">{{ header_text or "Employee Login" }}</h2>
+        <div class="employee-home-buttons">
+            <a href="{{ url_for('auth.teller_login') }}" class="btn btn--login">Teller Login</a>
+            <a href="{{ url_for('auth.admin_login') }}" class="btn btn--login">Admin Login</a>
+        </div>
     </div>
-  </div>
 </main>
 {% endblock %}

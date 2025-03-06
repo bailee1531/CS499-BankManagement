@@ -1,8 +1,6 @@
 {% extends "base.html" %}
-
 {% block meta_description %}{{ meta_description or "Secure banking login for UAH Bank." }}{% endblock %}
 {% block title %}{{ title or "UAH Bank - Teller Login" }}{% endblock %}
-
 {# Omit auth links on the login page #}
 {% block header_extra %}{% endblock %}
 {% block content %}
@@ -15,22 +13,22 @@
                 <label for="username">Username</label>
                 {{ form.username(class="form-control", placeholder="Enter your username", autocomplete="username") }}
                 {% if form.username.errors %}
-                    <div class="error-message">
-                        {% for error in form.username.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                <div class="error-message">
+                    {% for error in form.username.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="current-password") }}
                 {% if form.password.errors %}
-                    <div class="error-message">
-                        {% for error in form.password.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                <div class="error-message">
+                    {% for error in form.password.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
             <div class="form-group">

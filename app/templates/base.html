@@ -10,17 +10,13 @@
     <!-- Character set and viewport settings for responsiveness -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <!-- Dynamic meta description for SEO; override in child templates if needed -->
     <meta name="description" content="{% block meta_description %}Default description{% endblock %}">
-    
     <!-- Dynamic title; override in child templates -->
     <title>{% block title %}Evergreen Bank{% endblock %}</title>
-    
     <!-- Favicon and base stylesheet -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-    
     <!-- Additional head elements can be inserted by child templates -->
     {% block head_extra %}{% endblock %}
 </head>
@@ -29,13 +25,12 @@
     <!-- Header Section -->
     <header>
         <div class="header__logo">
-            <!-- Logo linking to home; consider adding a title attribute for accessibility -->
+            <!-- Logo linking to home -->
             <a href="{{ url_for('home') }}" title="Evergreen Bank Home">
                 <img src="{{ url_for('static', filename='images/Evergreen_Logo.png') }}" alt="Evergreen Bank Logo">
                 <span>Evergreen Bank</span>
             </a>
         </div>
-        
         <!-- Main Navigation -->
         <nav class="header__nav" aria-label="Main Navigation">
             <ul>
@@ -45,7 +40,6 @@
                 <li><a href="#">About Us</a></li>
             </ul>
         </nav>
-        
         <!-- Optional Authentication Links (Sign Up / Login) -->
         {% block header_extra %}
         <div class="header__auth">
@@ -54,11 +48,9 @@
         </div>
         {% endblock %}
     </header>
-    
     <!-- Main Content Block -->
     {% block content %}
     {% endblock %}
-    
     <!-- Footer Section -->
     <footer>
         <div class="footer__content">
@@ -78,7 +70,6 @@
         </div>
         <div class="footer__bottom">
             <p>
-                <!-- Consider generating the year dynamically if possible -->
                 UAH Bank &copy; 2025 |
                 <a href="#">Privacy Policy</a> |
                 <a href="#">Terms of Service</a> |
