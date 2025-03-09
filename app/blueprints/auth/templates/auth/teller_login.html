@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block meta_description %}{{ meta_description or "Secure banking login for UAH Bank." }}{% endblock %}
-{% block title %}{{ title or "UAH Bank - Login" }}{% endblock %}
+{% block title %}{{ title or "UAH Bank - Teller Login" }}{% endblock %}
 {# Omit auth links on the login page #}
 {% block header_extra %}{% endblock %}
 {% block content %}
 <main>
     <section class="login-container" aria-labelledby="login-heading">
-        <h2 id="login-heading">{{ header_text or "Login" }}</h2>
+        <h2 id="login-heading">{{"Teller Login"}}</h2>
         <form action="{{ form_action or url_for('auth.login') }}" method="post" novalidate>
             {{ form.hidden_tag() }}
             <div class="form-group">
@@ -36,9 +36,6 @@
             </div>
             <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
                 Login
-            </button>
-            <button type="button" class="btn btn--signup" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';">
-                Sign Up
             </button>
         </form>
     </section>

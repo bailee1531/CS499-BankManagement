@@ -1,0 +1,71 @@
+@import "shared.css";
+
+/* Register Page Container */
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+/* Form Container for Register Page */
+.form-container {
+    background-color: transparent;
+    width: 50%;
+    margin: 50px auto;
+    text-align: left;
+    /* Inherit text color from shared.css */
+}
+
+/* Form Heading */
+.form-container h2 {
+    text-align: center;
+}
+
+/* Form Row Layout */
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+/* Form Row Labels */
+.form-row label {
+    font-weight: bold;
+    flex: 1;
+}
+
+/* Form Row Inputs */
+.form-row input {
+    flex: 2;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Register Form Button */
+.form-container button {
+    width: 150px;
+    padding: 8px;
+    background-color: #007BFF;
+    /* You can update this to use a CSS variable if desired, e.g. var(--accent) */
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Signup Button (if used) */
+.signup-btn {
+    background-color: var(--accent);
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
+    color: var(--white);
+}
+
+/* Note:
+   - The header and footer styles (and their colors) are inherited from shared.css.
+   - Global body settings (like background-color and font-family) are also provided by shared.css,
+     so they are not redefined here.
+*/
