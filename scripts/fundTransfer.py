@@ -2,8 +2,8 @@
 import pandas as pd
 import os
 from decimal import Decimal
-from withdrawMoney import withdraw
-from makeDeposit import deposit
+from scripts.withdrawMoney import withdraw
+from scripts.makeDeposit import deposit
 
 def transferFunds(srcAccID: int, destAccID: int, amount: Decimal) -> dict:
     """

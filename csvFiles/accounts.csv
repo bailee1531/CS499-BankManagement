@@ -1,3 +1,1 @@
 AccountID,CustomerID,AccountType,CurrBal,DateOpened,CreditLimit,APR
-1000,315,Checking,3700.00,2025-02-28,,
-8521,315,Credit Card,14800.00,2025-02-28,15000.00,29.18
