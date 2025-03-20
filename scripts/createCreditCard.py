@@ -23,9 +23,9 @@ def openCreditCardAccount(customerID: int) -> dict:
           {"status": "error", "message": "Customer {customerID} not found."}
     """
     # Get absolute path for accounts.csv file
-    accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
+    accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     # Get absolute path for customer.csv file
-    customerPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/customers.csv'))
+    customerPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/customers.csv'))
     
     # Load all existing account data into a DataFrame
     customerData = pd.read_csv(customerPath)
@@ -82,5 +82,3 @@ def openCreditCardAccount(customerID: int) -> dict:
 
     # Return a success message with account details
     return {"status": "success", "message": f"Credit card account {accountID} created with a {apr}% APR."}
-
-print(openCreditCardAccount(315))
