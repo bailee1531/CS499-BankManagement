@@ -33,13 +33,13 @@ def forgot_password(userID, q1, q2, newPwd):
         If at least one of the answers is incorrect:
         - {"status": "error", "message": "Incorrect answer to at least one security question"}
     """
-    custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/customers.csv'))
-    userInfo = pd.read_csv(custPath)
+    perPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/persons.csv'))
+    userInfo = pd.read_csv(perPath)
 
-    if userID not in userInfo['CustomerID'].values:
+    if userID not in userInfo['ID'].values:
         return {"status": "error", "message": f"Source account {userID} not found."}
 
-    userIndex = userInfo.loc[userInfo['CustomerID'] == userID].index[0]
+    userIndex = userInfo.loc[userInfo['ID'] == userID].index[0]
     answer1 = userInfo.at[userIndex, 'Question1']
     answer2 = userInfo.at[userIndex, 'Question2']
 

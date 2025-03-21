@@ -1,1 +1,1 @@
-UserType,LastName,FirstName,Address,PhoneNum
+UserType,ID,LastName,FirstName,Address,Email,PhoneNum,Question1,Question2

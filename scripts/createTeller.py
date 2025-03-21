@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import os
 
-def create_teller(name):
+def create_teller(firstName, lastName):
     """
     Creates a new teller account.
 
@@ -19,8 +19,9 @@ def create_teller(name):
     while employeeID in employeeInfo['EmployeeID'].values:
         employeeID = random.randint(1299, 5999)
 
-    newEmployeeRow = {'EmployeeID': employeeID,
-                      'EmployeeName': name,
+    username = firstName + '.' + lastName
+    newEmployeeRow = {'Username': username,
+                      'EmployeeID': employeeID,
                       'Position': 'Teller'}
     
     employeeInfo.loc[len(employeeInfo)] = newEmployeeRow
