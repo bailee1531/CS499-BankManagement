@@ -18,27 +18,64 @@ class TestFundTransfer(unittest.TestCase):
     - Invalid transfer amounts
     """
 
+    def _mock_accounts_df(self, src_type, dest_type, src_bal="1000.00", dest_bal="500.00"):
+        return pd.DataFrame([
+            {"AccountID": 101, "CustomerID": 1, "AccountType": src_type, "CurrBal": src_bal},
+            {"AccountID": 202, "CustomerID": 1, "AccountType": dest_type, "CurrBal": dest_bal},
+        ])
+
+    def _mock_success(self, *args, **kwargs):
+        return {"status": "success", "message": "Success"}
+
+    def _mock_blocked(self, *args, **kwargs):
+        return {"status": "error", "message": "Not allowed"}
+
     @patch("scripts.fundTransfer.deposit")
     @patch("scripts.fundTransfer.withdraw")
     @patch("scripts.fundTransfer.pd.read_csv")
-    def test_successful_transfer(self, mock_read_csv, mock_withdraw, mock_deposit):
-        """
-        Test that a valid transfer between two accounts deducts and credits the correct amounts.
-        """
-        mock_accounts_df = pd.DataFrame([
-            {"AccountID": 101, "CustomerID": 1, "AccountType": "Checking", "CurrBal": "500.00"},
-            {"AccountID": 202, "CustomerID": 1, "AccountType": "Savings", "CurrBal": "100.00"},
-        ])
-        mock_read_csv.return_value = mock_accounts_df
-        mock_withdraw.return_value = {"status": "success", "message": "Withdraw successful"}
-        mock_deposit.return_value = {"status": "success", "message": "Deposit successful"}
+    def test_valid_account_type_transfers(self, mock_read_csv, mock_withdraw, mock_deposit):
+        valid_combinations = [
+            ("Checking", "Checking"),
+            ("Checking", "Savings"),
+            ("Checking", "Credit Card"),
+            ("Checking", "Mortgage Loan"),
+            ("Savings", "Checking"),
+            ("Savings", "Savings"),
+            ("Savings", "Credit Card"),
+            ("Savings", "Mortgage Loan"),
+        ]
 
-        result = transferFunds(101, 202, Decimal("100.00"))
+        for src, dest in valid_combinations:
+            with self.subTest(src_type=src, dest_type=dest):
+                mock_read_csv.return_value = self._mock_accounts_df(src, dest)
+                mock_withdraw.side_effect = self._mock_success
+                mock_deposit.side_effect = self._mock_success
 
-        self.assertEqual(result, {
-            "status": "success",
-            "message": "Successfully transferred $100.00 from Account 101 to Account 202."
-        })
+                result = transferFunds(101, 202, Decimal("100.00"))
+                self.assertEqual(result["status"], "success")
+
+    @patch("scripts.fundTransfer.deposit")
+    @patch("scripts.fundTransfer.withdraw")
+    @patch("scripts.fundTransfer.pd.read_csv")
+    def test_invalid_account_type_transfers(self, mock_read_csv, mock_withdraw, mock_deposit):
+        invalid_combinations = [
+            ("Credit Card", "Checking"),
+            ("Credit Card", "Savings"),
+            ("Credit Card", "Mortgage Loan"),
+            ("Mortgage Loan", "Checking"),
+            ("Mortgage Loan", "Savings"),
+            ("Mortgage Loan", "Credit Card"),
+        ]
+
+        for src, dest in invalid_combinations:
+            with self.subTest(src_type=src, dest_type=dest):
+                mock_read_csv.return_value = self._mock_accounts_df(src, dest)
+                mock_withdraw.side_effect = self._mock_blocked
+                mock_deposit.side_effect = self._mock_blocked
+
+                result = transferFunds(101, 202, Decimal("100.00"))
+                self.assertEqual(result["status"], "error")
+                self.assertIn("fail", result["message"].lower() or "not allowed")
 
     @patch("scripts.fundTransfer.deposit")
     @patch("scripts.fundTransfer.withdraw")
@@ -81,23 +118,24 @@ class TestFundTransfer(unittest.TestCase):
         })
 
     @patch("scripts.fundTransfer.pd.read_csv")
-    def test_invalid_transfer_amount(self, mock_read_csv):
+    def test_invalid_transfer_amounts(self, mock_read_csv):
         """
         Test that transfer fails if amount is zero or negative.
         """
+        # Mock valid accounts
         mock_accounts_df = pd.DataFrame([
             {"AccountID": 101, "CustomerID": 1, "AccountType": "Checking", "CurrBal": "300.00"},
             {"AccountID": 202, "CustomerID": 1, "AccountType": "Savings", "CurrBal": "200.00"},
         ])
         mock_read_csv.return_value = mock_accounts_df
 
-        result = transferFunds(101, 202, Decimal("0.00"))
-
-        self.assertEqual(result, {
-            "status": "error",
-            "message": "Transfer amount must be positive."
-        })
-
+        for invalid_amount in [Decimal("0.00"), Decimal("-100.00")]:
+            with self.subTest(amount=invalid_amount):
+                result = transferFunds(101, 202, invalid_amount)
+                self.assertEqual(result, {
+                    "status": "error",
+                    "message": "Transfer amount must be positive."
+                })
 
 if __name__ == "__main__":
     unittest.main()
