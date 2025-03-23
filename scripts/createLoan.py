@@ -75,7 +75,12 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
     }
 
     # Append the new account details to the DataFrame
-    accountsData = pd.concat([accountsData, pd.DataFrame([newLoanAccount])], ignore_index=True)
+    newLoanDf = pd.DataFrame([newLoanAccount], columns=accountsData.columns)
+    if accountsData.empty:
+        accountsData = newLoanDf
+    else:
+        accountsData = pd.concat([accountsData, newLoanDf], ignore_index=True)
+
     accountsData.to_csv(accountsPath, index=False)
 
     return {"status": "success", "message": f"Mortgage loan account {accountID} created with an interest rate of {interestRate}% for {termYears} years."}
