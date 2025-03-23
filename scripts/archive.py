@@ -131,7 +131,3 @@ def viewArchivedLoans(customerID: int) -> list:
     customerLoans = archivedLoansData[archivedLoansData['CustomerID'] == customerID].to_dict(orient='records')
 
     return customerLoans if customerLoans else [{"status": "error", "message": "No archived mortgage loans found for this customer."}]
-
-print(archive('bill',41131))
-print(viewArchivedBills(315))
-print(viewArchivedLoans(315))
