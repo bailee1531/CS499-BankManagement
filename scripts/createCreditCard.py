@@ -77,7 +77,11 @@ def openCreditCardAccount(customerID: int) -> dict:
     }
 
     # Append the new account details to the DataFrame and save back to CSV
-    accountsData = pd.concat([accountsData, pd.DataFrame([newAccount])], ignore_index=True)
+    newAccountDf = pd.DataFrame([newAccount])
+    if accountsData.empty:
+        accountsData = newAccountDf.copy()
+    else:
+        accountsData = pd.concat([accountsData, newAccountDf], ignore_index=True)
     accountsData.to_csv(accountsPath, index=False)
 
     # Return a success message with account details
