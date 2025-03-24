@@ -93,7 +93,7 @@ def deposit(accID, amount) -> dict:
     logInfo = pd.read_csv(logPath)
 
     if accID not in accInfo['AccountID'].values:
-        return {"status": "error", "message": f"Source account {accID} not found."}
+        return {"status": "error", "message": f"Destination account {accID} not found."}
     
     accIndex = accInfo.loc[accInfo['AccountID'] == accID].index[0]
     accType = accInfo.at[accIndex, 'AccountType']
