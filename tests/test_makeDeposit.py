@@ -22,9 +22,6 @@ class TestDeposit(unittest.TestCase):
 
     def _mock_success(self, *args):
         return {"status": "success", "message": "Success"}
-
-    def _mock_blocked(self, *args):
-        return {"status": "error", "message": "Not allowed"}
     
     @patch("scripts.makeDeposit.deposit")
     @patch("scripts.makeDeposit.pd.read_csv")
