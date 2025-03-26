@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{# Override the title block #}
+{% block title %}{{ title or "UAH Bank - User Settings" }}{% endblock %}
+{#
+Include additional CSS specific to the settings page.
+The stylesheet (settings.css) is added in addition to the base styles.
+#}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+{% endblock %}
+{# Main content section for employee login options #}
+{% block content %}
+<main>
+    <section class="settings-container">
+      <h1 style="text-align: center;">User Settings</h1> 
+  
+      <div style="position: relative;"> 
+        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Phone</h3>
+        <section class="phone-container" style="position: relative;">
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+        </section>
+      </div>
+  
+      <div style="position: relative;"> 
+        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Email</h3>
+        <section class="email-container" style="position: relative;">
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+        </section>
+      </div>
+  
+      <div style="position: relative;"> 
+        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Address</h3>
+        <section class="address-container" style="position: relative;">
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+        </section>
+      </div>
+  
+      <div style="position: relative;"> 
+        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Accounts</h3>
+        <section class="accounts-container" style="position: relative;">
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+        </section>
+      </div>
+    </section>
+  </main>
+{% endblock %}
