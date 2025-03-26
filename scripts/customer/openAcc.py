@@ -41,23 +41,27 @@ def open_account(custID, accType, depositAmnt):
     # Creates dataframe with current csv data
     accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
     accInfo = pd.read_csv(accPath)
-    accInfo['CurrBal'] = accInfo['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
 
-    accID = generate_account_ID(accInfo)
+    if depositAmnt >= 0:
+        accID = generate_account_ID(accInfo)
 
-    # Determine APR based on account type
-    apr = None
-    if accType.lower() == 'Savings':
-        apr = 4.0
-    elif accType.lower() == 'Money Market':
-        apr = 3.0
+        # Determine APR based on account type
+        apr = None
+        if accType.lower() == 'Savings':
+            apr = 4.0
+        elif accType.lower() == 'Money Market':
+            apr = 3.0
 
-    newAccRow = {'AccountID': accID,
-                 'CustomerID': custID,
-                 'AccountType': accType,
-                 'CurrBal': Decimal(depositAmnt).quantize(Decimal('0.00')),
-                 'DateOpened': date.today(),
-                 'CreditLimit': None,
-                 'APR': apr}
-    accInfo.loc[len(accInfo)] = newAccRow
-    accInfo.to_csv(accPath, index=False)
+        newAccRow = {'AccountID': accID,
+                    'CustomerID': custID,
+                    'AccountType': accType,
+                    'CurrBal': Decimal(depositAmnt).quantize(Decimal('0.00')),
+                    'DateOpened': date.today(),
+                    'CreditLimit': None,
+                    'APR': apr}
+        accInfo.loc[len(accInfo)] = newAccRow
+        accInfo['CurrBal'] = accInfo['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        accInfo.to_csv(accPath, index=False)
+        return {"status": "success", "message": f"{accType} account {accID} created."}
+    else:
+        return {"status": "error", "message": "Cannot open an account with a negative deposit."}
