@@ -16,9 +16,11 @@
     <title>{% block title %}Evergreen Bank{% endblock %}</title>
     <!-- Favicon and base stylesheet -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
     <!-- Additional head elements can be inserted by child templates -->
-    {% block head_extra %}{% endblock %}
+    {% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+    <script src="{{ url_for('static', filename='js/flash-messages.js') }}" defer></script>
+    {% endblock %}
 </head>
 
 <body>
@@ -34,31 +36,42 @@
         <!-- Main Navigation -->
         <nav class="header__nav" aria-label="Main Navigation">
             <ul>
-                <li><a href="#">Personal Banking</a></li>
-                <li><a href="#">Credit Cards</a></li>
-                <li><a href="#">Mortgage</a></li>
+                <li><a href="{{ url_for('accounts.personal_accounts') }}">Personal Banking</a></li>
+                <li><a href="{{ url_for('accounts.credit_cards') }}">Credit Cards</a></li>
+                <li><a href="{{ url_for('accounts.mortgage') }}">Mortgage</a></li>
                 <li><a href="#">About Us</a></li>
             </ul>
         </nav>
         <!-- Optional Authentication Links (Sign Up / Login) -->
         {% block header_extra %}
         <div class="header__auth">
-            <a href="{{ url_for('auth.register_step1') }}" class="header-btn header-btn--sign-up">Sign Up</a>
-            <a href="{{ url_for('auth.login') }}" class="header-btn header-btn--login">Login</a>
+            <a href="{{ url_for('auth.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn--login">Login</a>
         </div>
         {% endblock %}
     </header>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
     <!-- Main Content Block -->
     {% block content %}
     {% endblock %}
     <!-- Footer Section -->
     <footer>
         <div class="footer__content">
-            <!-- Navigation links (update these links when real routes are available) -->
-            <a href="#">Personal Banking</a> |
-            <a href="#">Credit Cards</a> |
-            <a href="#">Mortgage</a> |
-            <a href="#">About Us</a>
+            <ul>
+                <li><a href="{{ url_for('accounts.personal_accounts') }}">Personal Banking</a></li>
+                <li><a href="{{ url_for('accounts.credit_cards') }}">Credit Cards</a></li>
+                <li><a href="{{ url_for('accounts.mortgage') }}">Mortgage</a></li>
+                <li><a href="#">About Us</a></li>
+            </ul>
         </div>
         <div class="footer__contact">
             <!-- Contact information -->
@@ -73,10 +86,11 @@
                 UAH Bank &copy; 2025 |
                 <a href="#">Privacy Policy</a> |
                 <a href="#">Terms of Service</a> |
-                <a href="{{ url_for('employee_home') }}" class="footer-btn footer-btn--login">Employee Home</a>
+                <a href="{{ url_for('employee_home') }}" class=".btn">Employee Home</a>
             </p>
         </div>
     </footer>
 </body>
 
 </html>
+

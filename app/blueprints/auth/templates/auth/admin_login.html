@@ -1,19 +1,25 @@
 {% extends "base.html" %}
-{% block meta_description %}{{ meta_description or "Secure banking login for UAH Bank." }}{% endblock %}
-{% block title %}{{ title or "UAH Bank - Admin Login" }}{% endblock %}
+{% block meta_description %}
+{{ meta_description or "Secure banking login for UAH Bank." }}
+{% endblock %}
+{% block title %}
+{{ title or "UAH Bank - Admin Login" }}
+{% endblock %}
 {# Omit auth links on the login page #}
-{% block header_extra %}{% endblock %}
 {% block content %}
 <main>
     <section class="login-container" aria-labelledby="login-heading">
-        <h2 id="login-heading">{{"Admin Login"}}</h2>
-        <form action="{{ form_action or url_for('auth.login') }}" method="post" novalidate>
+        <h2 id="login-heading">Admin Login</h2>
+        <form action="{{ form_action or url_for('auth.login') }}" method="post" novalidate aria-describedby="admin-login-instructions">
+            <p id="admin-login-instructions" class="visually-hidden">
+                Enter your administrator credentials to log in.
+            </p>
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="username">Username</label>
-                {{ form.username(class="form-control", placeholder="Enter your username", autocomplete="username") }}
+                {{ form.username() }}
                 {% if form.username.errors %}
-                <div class="error-message">
+                <div class="error-message" id="username-error">
                     {% for error in form.username.errors %}
                     <span class="text-danger">{{ error }}</span>
                     {% endfor %}
@@ -22,9 +28,9 @@
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="current-password") }}
+                {{ form.password() }}
                 {% if form.password.errors %}
-                <div class="error-message">
+                <div class="error-message" id="password-error">
                     {% for error in form.password.errors %}
                     <span class="text-danger">{{ error }}</span>
                     {% endfor %}
@@ -34,7 +40,7 @@
             <div class="form-group">
                 <a href="#" class="forgot-password">Forgot Password?</a>
             </div>
-            <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
+            <button type="submit" name="new_or_returning" value="2" class="btn btn--login" aria-label="Log in to your administrator account">
                 Login
             </button>
         </form>

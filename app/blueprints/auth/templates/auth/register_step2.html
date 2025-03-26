@@ -59,6 +59,18 @@
                     </div>
                     {% endif %}
                 </div>
+                <!-- Confirm Password Field -->
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password *</label>
+                    {{ form.confirm_password(class="form-control", placeholder="Re-enter your password", autocomplete="new-password") }}
+                    {% if form.confirm_password.errors %}
+                    <div class="error-message">
+                        {% for error in form.confirm_password.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             <!-- Security Questions Section -->
             <div class="security-questions">
@@ -112,7 +124,7 @@
                     {% endif %}
                 </div>
             </div>
-            <button type="submit" class="btn btn--register">Create Account</button>
+            <button type="submit" class="btn btn--login">Create Account</button>
         </form>
     </section>
 </main>

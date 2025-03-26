@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block meta_description %}
+Explore Evergreen Bank's credit card options — tailored rewards and benefits to fit your lifestyle.
+{% endblock %}
+{% block title %}
+Evergreen Bank - Credit Cards
+{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+{% endblock %}
+{% block content %}
+<main>
+    <!-- Credit Cards Section -->
+    <section class="accounts-section" aria-labelledby="credit-cards-heading">
+        <h2 id="credit-cards-heading">Credit Cards</h2>
+        <div class="accounts-container">
+            <!-- Credit Card Option -->
+            <article class="account-box">
+                <h3>Travel Visa</h3>
+                <p>Earn 2x rewards on travel, dining, and everyday purchases worldwide.</p>
+                <a href="/credit-cards/travel-visa" class="account-btn" aria-label="Open Travel Visa Credit Card">Open Travel Visa</a>
+            </article>
+        </div>
+    </section>
+</main>
+{% endblock %}
