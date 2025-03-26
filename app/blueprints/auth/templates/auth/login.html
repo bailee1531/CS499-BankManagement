@@ -1,19 +1,25 @@
 {% extends "base.html" %}
-{% block meta_description %}{{ meta_description or "Secure banking login for UAH Bank." }}{% endblock %}
-{% block title %}{{ title or "UAH Bank - Login" }}{% endblock %}
+{% block meta_description %}
+{{ meta_description or "Secure banking login for UAH Bank." }}
+{% endblock %}
+{% block title %}
+{{ title or "UAH Bank - Login" }}
+{% endblock %}
 {# Omit auth links on the login page #}
-{% block header_extra %}{% endblock %}
 {% block content %}
 <main>
     <section class="login-container" aria-labelledby="login-heading">
         <h2 id="login-heading">{{ header_text or "Login" }}</h2>
-        <form action="{{ form_action or url_for('auth.login') }}" method="post" novalidate>
+        <form action="{{ form_action or url_for('auth.login') }}" method="post" novalidate aria-describedby="login-instructions">
+            <p id="login-instructions" class="visually-hidden">
+                Enter your username and password to securely access your UAH Bank account.
+            </p>
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="username">Username</label>
-                {{ form.username(class="form-control", placeholder="Enter your username", autocomplete="username") }}
+                {{ form.username() }}
                 {% if form.username.errors %}
-                <div class="error-message">
+                <div class="error-message" id="username-error">
                     {% for error in form.username.errors %}
                     <span class="text-danger">{{ error }}</span>
                     {% endfor %}
@@ -22,9 +28,9 @@
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="current-password") }}
+                {{ form.password() }}
                 {% if form.password.errors %}
-                <div class="error-message">
+                <div class="error-message" id="password-error">
                     {% for error in form.password.errors %}
                     <span class="text-danger">{{ error }}</span>
                     {% endfor %}
@@ -32,12 +38,12 @@
                 {% endif %}
             </div>
             <div class="form-group">
-                <a href="#" class="forgot-password">Forgot Password?</a>
+                <a href="{{ forgot_password_url or '#' }}" class="forgot-password">Forgot Password?</a>
             </div>
-            <button type="submit" name="new_or_returning" value="2" class="btn btn--login">
+            <button type="submit" name="new_or_returning" value="2" class="btn btn--login" aria-label="Log in to your UAH Bank account">
                 Login
             </button>
-            <button type="button" class="btn btn--signup" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';">
+            <button type="button" class="btn" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';" aria-label="Sign up for a new UAH Bank account">
                 Sign Up
             </button>
         </form>
