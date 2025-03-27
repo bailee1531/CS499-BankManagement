@@ -25,6 +25,11 @@ def credit_cards():
 def mortgage():
     return render_template('accounts/mortgage.html')
 
+# Route for viewing about us page
+@accounts_bp.route('/about_us')
+def about_us():
+    return render_template('accounts/about_us.html')
+
 # Route for the user dashboard
 # Accepts both GET and POST requests
 @accounts_bp.route('/account-dashboard', methods=['GET', 'POST'])

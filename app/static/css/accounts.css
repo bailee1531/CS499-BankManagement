@@ -59,6 +59,13 @@
     border-radius: 2px;
 }
 
+.accounts-section h3 {
+    color: var(--white);
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    position: relative;
+}
+
 /* =======================================
    Account Boxes Layout
 ======================================= */
