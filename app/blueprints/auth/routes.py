@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from app.blueprints.auth.forms import LoginForm, RegistrationStep1Form, RegistrationStep2Form
+from app.blueprints.auth.forms import LoginForm, RegistrationStep1Form, RegistrationStep2Form, SettingsForm
 from scripts.customer import webLogin
 import email_validator
 
@@ -20,7 +20,7 @@ def login():
         password = form.password.data
         
         # Call the login function for customers (type 2)
-        webLogin.login_page_button_pressed(2, username, password)
+        webLogin.login_page_button_pressed(2, "Customer", username, password)
         session["user"] = username
         flash("Login Successful!")
         return redirect(url_for('customer.dashboard'))
@@ -45,7 +45,7 @@ def teller_login():
         password = form.password.data
         
         # Call the login function for employees (using a different type code, e.g., 3)
-        webLogin.login_page_button_pressed(2, username, password)
+        webLogin.login_page_button_pressed(2, "Teller", username, password)
         session["teller"] = username
         flash("Teller Login Successful!")
         return redirect(url_for('teller.dashboard'))
@@ -70,7 +70,7 @@ def admin_login():
         password = form.password.data
         
         # Call the login function for admins (using another type code, e.g., 4)
-        webLogin.login_page_button_pressed(2, username, password)
+        webLogin.login_page_button_pressed(2, "Admin", username, password)
         session["admin"] = username
         flash("Admin Login Successful!")
         return redirect(url_for('admin.dashboard'))
@@ -133,5 +133,17 @@ def register_step2():
         return redirect(url_for('auth.login'))
     return render_template('auth/register_step2.html', form=form)
 
+@auth_bp.route('/settings', methods=['GET', 'POST'])
+def settings():
+    form = SettingsForm()
 
+    # if not any(role in session for role in ('user', 'teller', 'admin')):
+    #     flash("You must be logged in to access settings.", "warning")
+    #     return redirect(url_for('auth.login'))
 
+    # if form.validate_on_submit():
+    #     # TODO: Save form data to user record (update database or CSV)
+    #     flash("Settings updated successfully.", "success")
+    #     return redirect(url_for('auth.settings'))
+
+    return render_template('settings.html', form=form, title="User Settings")

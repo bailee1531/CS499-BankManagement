@@ -136,3 +136,13 @@ class RegistrationStep2Form(FlaskForm):
         # If the second question is the same as the first, raise a validation error.
         if field.data == self.security_question_1.data:
             raise ValidationError("Security questions must be different.")
+
+# -----------------------------------------------------------------------------
+# SettingsForm: Allows user to manage personal information.
+# -----------------------------------------------------------------------------
+class SettingsForm(FlaskForm):
+    phone = StringField('Phone', validators=[DataRequired(), Regexp(r'^\d{3}-\d{3}-\d{4}$')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    address = StringField('Address', validators=[DataRequired(), Length(max=100)])
+    submit = SubmitField('Update Settings')

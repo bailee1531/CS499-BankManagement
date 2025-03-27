@@ -1,55 +1,75 @@
 {% extends "base.html" %}
-{# Override the title block #}
-{% block title %}{{ title or "UAH Bank - User Settings" }}{% endblock %}
-{#
-Include additional CSS specific to the settings page.
-The stylesheet (settings.css) is added in addition to the base styles.
-#}
+{% block meta_description %}{{ meta_description or "Manage your account settings securely." }}{% endblock %}
+{% block title %}{{ title or "UAH Bank - Settings" }}{% endblock %}
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 {% endblock %}
-{# Main content section for employee login options #}
+{% block header_extra %}{% endblock %}
+
 {% block content %}
 <main>
-    <section class="settings-container">
-      <h1 style="text-align: center;">User Settings</h1> 
-  
-      <div style="position: relative;"> 
-        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Phone</h3>
-        <section class="phone-container" style="position: relative;">
-          <button class="edit-button">
-            <i class="material-icons">edit</i>
-          </button>
-        </section>
-      </div>
-  
-      <div style="position: relative;"> 
-        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Email</h3>
-        <section class="email-container" style="position: relative;">
-          <button class="edit-button">
-            <i class="material-icons">edit</i>
-          </button>
-        </section>
-      </div>
-  
-      <div style="position: relative;"> 
-        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Address</h3>
-        <section class="address-container" style="position: relative;">
-          <button class="edit-button">
-            <i class="material-icons">edit</i>
-          </button>
-        </section>
-      </div>
-  
-      <div style="position: relative;"> 
-        <h3 style="position: absolute; top: -1.5rem; left: 1rem; color: var(--black);">Accounts</h3>
-        <section class="accounts-container" style="position: relative;">
-          <button class="edit-button">
-            <i class="material-icons">edit</i>
-          </button>
-        </section>
-      </div>
+    <section class="settings-container" aria-labelledby="settings-heading">
+        <h2 id="settings-heading">User Settings</h2>
+
+        <form action="{{ form_action or url_for('auth.settings') }}" method="post" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!-- Phone -->
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                {{ form.phone(class="form-control", placeholder="123-456-7890") }}
+                {% if form.phone.errors %}
+                    <div class="error-message">
+                        {% for error in form.phone.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                {{ form.email(class="form-control", placeholder="example@email.com") }}
+                {% if form.email.errors %}
+                    <div class="error-message">
+                        {% for error in form.email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password(class="form-control", placeholder="123Password!") }}
+                {% if form.password.errors %}
+                    <div class="error-message">
+                        {% for error in form.password.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+                <label for="address">Address</label>
+                {{ form.address(class="form-control", placeholder="123 UAH Drive") }}
+                {% if form.address.errors %}
+                    <div class="error-message">
+                        {% for error in form.address.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn--update">Update Settings</button>
+        </form>
     </section>
-  </main>
+</main>
 {% endblock %}
