@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+{% endblock %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h1>Teller Management</h1>
+
+    <!-- Search bar and create button -->
+    <div class="admin-controls">
+        <input type="text" id="searchBar" placeholder="Search Teller ID or Name..." onkeyup="filterTellers()">
+        <button class="create-btn" onclick="openModal()">Create Teller Account</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="createFormModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Create Teller</h2>
+            <input type="text" id="firstNameInput" placeholder="First Name" required>
+            <input type="text" id="lastNameInput" placeholder="Last Name" required>
+            <button onclick="submitTeller()">Submit</button>
+        </div>
+    </div>
+
+    <!-- Grid of teller cards -->
+    <div class="teller-grid" id="tellerGrid">
+        {% for teller in tellers %}
+        <div class="teller-card">
+            <div class="avatar"></div>
+            <div class="teller-info">
+                <strong>{{ teller.Username }}</strong>
+                <p>Employee ID: {{ teller.EmployeeID }}</p>
+                <p>Password protected</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- JavaScript logic -->
+<script>
+function filterTellers() {
+    const input = document.getElementById("searchBar").value.toLowerCase();
+    const cards = document.querySelectorAll(".teller-card");
+
+    cards.forEach(card => {
+        const name = card.querySelector("strong").innerText.toLowerCase();
+        card.classList.toggle("hidden", !name.includes(input));
+    });
+}
+
+function openModal() {
+    document.getElementById("createFormModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("createFormModal").style.display = "none";
+    document.getElementById("firstNameInput").value = "";
+    document.getElementById("lastNameInput").value = "";
+}
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeModal();
+});
+
+function submitTeller() {
+    const firstName = document.getElementById("firstNameInput").value.trim();
+    const lastName = document.getElementById("lastNameInput").value.trim();
+
+    if (!firstName || !lastName) {
+        alert("Please enter both first and last name.");
+        return;
+    }
+
+    fetch("/auth/create-teller", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert("Failed to create teller: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        alert("Something went wrong.");
+    });
+}
+</script>
+{% endblock %}
