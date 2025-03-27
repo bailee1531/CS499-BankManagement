@@ -1,0 +1,6 @@
+Flask
+Flask-WTF
+email_validator
+pandas
+pycryptodome
+gunicorn

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: cs499-group3b-app
+    runtime: python
+    buildCommand: ""
+    startCommand: python3 run.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
