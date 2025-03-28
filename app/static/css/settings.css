@@ -27,20 +27,24 @@ main {
   color: var(--white);
 }
 
+/* Header with Edit Button */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 /* Edit Button */
 .edit-button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0.25rem;
-  color: var(--black);
-  font-size: 1.25rem;
+  color: var(--white);
+  font-size: 1.5rem;
 }
 
-/* Material Icon Style */
 .edit-button i.material-icons {
   vertical-align: middle;
 }

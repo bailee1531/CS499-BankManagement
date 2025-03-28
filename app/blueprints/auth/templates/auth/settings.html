@@ -9,67 +9,84 @@
 
 {% block content %}
 <main>
-    <section class="settings-container" aria-labelledby="settings-heading">
-        <h2 id="settings-heading">User Settings</h2>
+  <section class="settings-container" aria-labelledby="settings-heading">
+    <div class="form-header">
+      <h2 id="settings-heading">User Settings</h2>
+      <button type="button" class="edit-button" id="edit-toggle" title="Edit">
+        <i class="material-icons">edit</i>
+      </button>
+    </div>
 
-        <form action="{{ form_action or url_for('auth.settings') }}" method="post" novalidate>
-            {{ form.hidden_tag() }}
+    <form id="settings-form" action="{{ form_action or url_for('auth.settings') }}" method="post" novalidate>
+      {{ form.hidden_tag() }}
 
-            <!-- Phone -->
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                {{ form.phone(class="form-control", placeholder="123-456-7890") }}
-                {% if form.phone.errors %}
-                    <div class="error-message">
-                        {% for error in form.phone.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+      <!-- Phone -->
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        {{ form.phone(class="form-control", disabled=True) }}
+        {% if form.phone.errors %}
+        <div class="error-message">
+          {% for error in form.phone.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
 
-            <!-- Email -->
-            <div class="form-group">
-                <label for="email">Email</label>
-                {{ form.email(class="form-control", placeholder="example@email.com") }}
-                {% if form.email.errors %}
-                    <div class="error-message">
-                        {% for error in form.email.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        {{ form.email(class="form-control", disabled=True) }}
+        {% if form.email.errors %}
+        <div class="error-message">
+          {% for error in form.email.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
 
-            <!-- Password -->
-            <div class="form-group">
-                <label for="password">Password</label>
-                {{ form.password(class="form-control", placeholder="123Password!") }}
-                {% if form.password.errors %}
-                    <div class="error-message">
-                        {% for error in form.password.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+      <!-- New Password -->
+      <div class="form-group">
+        <label for="password">New Password</label>
+        {{ form.password(class="form-control", disabled=True) }}
+        {% if form.password.errors %}
+        <div class="error-message">
+          {% for error in form.password.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
 
-            <!-- Address -->
-            <div class="form-group">
-                <label for="address">Address</label>
-                {{ form.address(class="form-control", placeholder="123 UAH Drive") }}
-                {% if form.address.errors %}
-                    <div class="error-message">
-                        {% for error in form.address.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+      <!-- Address -->
+      <div class="form-group">
+        <label for="address">Address</label>
+        {{ form.address(class="form-control", disabled=True) }}
+        {% if form.address.errors %}
+        <div class="error-message">
+          {% for error in form.address.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
 
-            <!-- Submit -->
-            <button type="submit" class="btn btn--update">Update Settings</button>
-        </form>
-    </section>
+      <button type="submit" class="btn btn--update" id="update-btn" disabled>Update Settings</button>
+    </form>
+  </section>
 </main>
+
+<script>
+  document.getElementById('edit-toggle').addEventListener('click', () => {
+    const inputs = document.querySelectorAll('#settings-form input');
+    const updateBtn = document.getElementById('update-btn');
+
+    inputs.forEach(input => {
+      input.disabled = !input.disabled;
+    });
+
+    updateBtn.disabled = !updateBtn.disabled;
+  });
+</script>
 {% endblock %}

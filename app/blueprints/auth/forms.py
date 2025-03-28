@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp, ValidationError, Optional
 
 # -----------------------------------------------------------------------------
 # LoginForm: A simple login form for user authentication.
@@ -138,11 +138,11 @@ class RegistrationStep2Form(FlaskForm):
             raise ValidationError("Security questions must be different.")
 
 # -----------------------------------------------------------------------------
-# SettingsForm: Allows user to manage personal information.
+# SettingsForm: Customer can modify personal information.
 # -----------------------------------------------------------------------------
 class SettingsForm(FlaskForm):
-    phone = StringField('Phone', validators=[DataRequired(), Regexp(r'^\d{3}-\d{3}-\d{4}$')])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    address = StringField('Address', validators=[DataRequired(), Length(max=100)])
+    phone = StringField('Phone', validators=[Optional(), Regexp(r'^\d{3}-\d{3}-\d{4}$')])
+    password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
+    email = StringField('Email', validators=[Optional(), Email()])
+    address = StringField('Address', validators=[Optional(), Length(max=100)])
     submit = SubmitField('Update Settings')

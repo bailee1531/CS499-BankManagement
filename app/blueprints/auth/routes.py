@@ -1,10 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.blueprints.auth.forms import LoginForm, RegistrationStep1Form, RegistrationStep2Form, SettingsForm
-from scripts.customer import webLogin
+from scripts.customer import webLogin, modifyInfo
+from Crypto.PublicKey import ECC
+import pandas as pd
+import os
 import email_validator
 
 # Create the authentication blueprint.
 auth_bp = Blueprint('auth', __name__, template_folder='templates')
+customer_bp = Blueprint('customer', __name__, template_folder='templates')
 
 @auth_bp.route('/customer/login', methods=['GET', 'POST'])
 def login():
@@ -136,14 +140,54 @@ def register_step2():
 @auth_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
     form = SettingsForm()
+    username = session.get("user")
 
-    # if not any(role in session for role in ('user', 'teller', 'admin')):
-    #     flash("You must be logged in to access settings.", "warning")
-    #     return redirect(url_for('auth.login'))
+    if not username:
+        flash("You must be logged in to access settings.", "warning")
+        return redirect(url_for('auth.login'))
 
-    # if form.validate_on_submit():
-    #     # TODO: Save form data to user record (update database or CSV)
-    #     flash("Settings updated successfully.", "success")
-    #     return redirect(url_for('auth.settings'))
+    # Load user data
+    custPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../csvFiles/customers.csv'))
+    perPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../csvFiles/persons.csv'))
+    cust_df = pd.read_csv(custPath)
+    per_df = pd.read_csv(perPath)
 
-    return render_template('settings.html', form=form, title="User Settings")
+    try:
+        customer_id = cust_df.loc[cust_df['Username'] == username, 'CustomerID'].iloc[0]
+    except IndexError:
+        flash("User not found.", "danger")
+        return redirect(url_for('auth.login'))
+
+    person_idx = per_df.index[per_df['ID'] == customer_id].tolist()
+    if not person_idx:
+        flash("Customer data not found.", "danger")
+        return redirect(url_for('auth.login'))
+
+    idx = person_idx[0]
+
+    if form.validate_on_submit():
+        changes = {}
+
+        if form.phone.data != per_df.at[idx, 'PhoneNum']:
+            changes['PhoneNum'] = form.phone.data
+        if form.email.data != per_df.at[idx, 'Email']:
+            changes['Email'] = form.email.data
+        if form.address.data != per_df.at[idx, 'Address']:
+            changes['Address'] = form.address.data
+        if form.password.data.strip():
+            changes['Password'] = form.password.data
+
+        if changes:
+            result = modifyInfo(customer_id, changes)
+            flash(result['message'], "success" if result['status'] in ["success", "partial"] else "danger")
+        else:
+            flash("No changes were made.", "info")
+
+        return redirect(url_for('auth.settings'))
+
+    # Pre-fill form values
+    form.phone.data = per_df.at[idx, 'PhoneNum']
+    form.email.data = per_df.at[idx, 'Email']
+    form.address.data = per_df.at[idx, 'Address']
+
+    return render_template("settings.html", form=form, title="User Settings")
