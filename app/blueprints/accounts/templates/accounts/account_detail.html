@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="coming-soon-page">
+  <section class="coming-soon-section">
+    <h1>Account Details Coming Soon!</h1>
+    <a href="{{ url_for('accounts.user_dashboard') }}" class="btn btn--default">Back to Accounts</a>
+  </section>
+</main>
+{% endblock %}

@@ -14,23 +14,21 @@ Evergreen Bank - Personal Accounts
     <section class="accounts-section" aria-labelledby="accounts-heading">
         <h2 id="accounts-heading">Personal Accounts</h2>
         <div class="accounts-container">
-            <!-- Account Option: Checking -->
             <article class="account-box">
                 <h3>Regular Checking Account</h3>
                 <p>Perfect for everyday spending and direct deposits.</p>
-                <a href="/checking" class="account-btn" aria-label="Open Regular Checking Account">Open Checking Account</a>
+                <a href="{{ url_for('accounts.personal_accounts', account_type='checking') }}" class="account-btn" aria-label="Open Regular Checking Account">Open Checking Account</a>
             </article>
-            <!-- Account Option: Savings -->
             <article class="account-box">
                 <h3>Savings Account</h3>
                 <p>Grow your money monthly with a competitive interest rate.</p>
-                <a href="/savings" class="account-btn" aria-label="Open Savings Account">Open Savings Account</a>
+                <a href="{{ url_for('accounts.personal_accounts', account_type='savings') }}" class="account-btn" aria-label="Open Savings Account">Open Savings Account</a>
             </article>
-            <!-- Account Option: Money Market -->
             <article class="account-box">
                 <h3>Money Market Account</h3>
                 <p>Earn higher interest with tiered rates and easy access to funds.</p>
-                <a href="/money-market" class="account-btn" aria-label="Open Money Market Account">Open Money Market Account</a>
+                <a href="{{ url_for('accounts.personal_accounts', account_type='money-market') }}" class="account-btn" aria-label="Open Money Market Account">Open Money Market Account</a>
+            </article>
             </article>
         </div>
         <!-- Registration / Login Call-to-Action -->

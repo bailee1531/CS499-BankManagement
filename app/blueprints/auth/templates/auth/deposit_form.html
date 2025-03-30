@@ -12,12 +12,12 @@ Evergreen Bank - Deposit Funds
 <main class="confirmation-page" role="main">
     <section class="thank-you-section" aria-labelledby="thank-you-heading">
         <h2 id="thank-you-heading">
-            Thank you for opening a {{ account_type.replace('_', ' ').title() }}!
+            Thank you for opening a {{ account_type.replace('_', ' ').title() if account_type else 'your new account' }}!
         </h2>
         <p class="instruction-text">
             Please enter the amount you'd like to deposit into your new account.
         </p>
-        <form method="POST" action="{{ url_for('auth.finalize_registration') }}" class="deposit-form" novalidate>
+        <form method="POST" action="{{ form_action }}" class="deposit-form" novalidate>
             {{ form.csrf_token }}
             <div class="form-group">
                 <label for="{{ form.deposit_amount.id }}">{{ form.deposit_amount.label.text }}</label>

@@ -45,8 +45,14 @@
         <!-- Optional Authentication Links (Sign Up / Login) -->
         {% block header_extra %}
         <div class="header__auth">
+            {% if 'user' in session %}
+            <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn--login">Logout</button>
+            </form>
+            {% else %}
             <a href="{{ url_for('auth.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
-            <a href="{{ url_for('auth.login') }}" class="btn btn--login">Login</a>
+            <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+            {% endif %}
         </div>
         {% endblock %}
     </header>

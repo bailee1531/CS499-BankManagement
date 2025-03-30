@@ -83,7 +83,7 @@
             <button type="submit" class="btn btn--register" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';">
                 Next Step
             </button>
-            <button type="button" class="btn btn--login" onclick="window.location.href='{{ url_for('auth.login') }}';">
+            <button type="button" class="btn btn--login" onclick="window.location.href='{{ url_for('auth.customer_login') }}';">
                 Login
             </button>
         </form>

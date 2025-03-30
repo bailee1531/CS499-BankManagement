@@ -12,8 +12,9 @@ from app import create_app  # Import the application factory function from the a
 app = create_app()
 
 if __name__ == '__main__':
-    # Get the port from the environment (Render sets this)
-    port = int(os.environ.get('PORT', 5000))
-    
-    # Run the app on 0.0.0.0 so it's accessible externally
-    app.run(debug=True, host='0.0.0.0', port=port)
+    # For local debugging:
+    app.run(debug=True)
+
+    # For deployment on Render (binds to 0.0.0.0 and uses the PORT environment variable)
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(debug=False, host='0.0.0.0', port=port)
