@@ -13,7 +13,8 @@ def modify_info(userID: int, modifyReq: dict) -> dict:
     for key, value in modifyReq.items():
         try:
             perInfo.at[userIndex, key] = value
-            perInfo.to_csv(perPath, index=False)
         except:
             return {"status": "error", "message": f"{key} not found."}
-        return {"status": "success", "message": f"{key} successfully changed to {value}."}
+    # Save once after all updates
+    perInfo.to_csv(perPath, index=False)
+    return {"status": "success", "message": f"{key} successfully changed to {value}."}

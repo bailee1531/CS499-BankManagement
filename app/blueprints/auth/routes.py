@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import hashlib
 from flask import (
     Blueprint, render_template, redirect,
     url_for, flash, session, current_app
@@ -27,6 +28,8 @@ LOGIN = 2
 # -----------------------------------------------------------------------------
 def get_customer_csv_path():
     return os.path.join(current_app.root_path, '..', 'csvFiles', 'customers.csv')
+def get_person_csv_path():
+    return os.path.join(current_app.root_path, '..', 'csvFiles', 'persons.csv')
 
 def process_login(form, session_key, login_type):
     if session_key in session:
@@ -222,9 +225,10 @@ def settings():
         flash("You must be logged in to access settings.", "warning")
         return redirect(url_for('auth.login'))
 
-    # Load user data
-    custPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../csvFiles/customers.csv'))
-    perPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../csvFiles/persons.csv'))
+    # Load user data from CSVs
+    custPath = get_customer_csv_path()
+    perPath = get_person_csv_path()
+
     cust_df = pd.read_csv(custPath)
     per_df = pd.read_csv(perPath)
 
@@ -241,25 +245,43 @@ def settings():
 
     idx = person_idx[0]
 
+    # if form.validate_on_submit():
+        # changes = {}
+
+        # if form.phone.data.strip() != str(per_df.at[idx, 'PhoneNum']).strip():
+        #     changes['PhoneNum'] = form.phone.data.strip()
+        # if form.email.data.strip() != str(per_df.at[idx, 'Email']).strip():
+        #     changes['Email'] = form.email.data.strip()
+        # if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
+        #     changes['Address'] = form.address.data.strip()
+        # if form.password.data.strip():
+        #     hashed_pw = hashlib.sha512(form.password.data.strip().encode()).hexdigest()
+        #     changes['Password'] = hashed_pw
+
+        # if changes:
+        #     messages = []
+        #     success = True
+        #     for key, value in changes.items():
+        #         result = modifyInfo.modify_info(customer_id, {key: value})
+        #         messages.append(result["message"])
+        #         if result["status"] != "success":
+        #             success = False
+        #     flash(" | ".join(messages), "success" if success else "danger")
+        # else:
+        #     flash("No changes were made.", "info")
+
+        # return redirect(url_for('auth.settings'))
     if form.validate_on_submit():
-        changes = {}
-
-        if form.phone.data != per_df.at[idx, 'PhoneNum']:
-            changes['PhoneNum'] = form.phone.data
-        if form.email.data != per_df.at[idx, 'Email']:
-            changes['Email'] = form.email.data
-        if form.address.data != per_df.at[idx, 'Address']:
-            changes['Address'] = form.address.data
-        if form.password.data.strip():
-            changes['Password'] = form.password.data
-
-        if changes:
-            result = modifyInfo(customer_id, changes)
-            flash(result['message'], "success" if result['status'] in ["success", "partial"] else "danger")
-        else:
-            flash("No changes were made.", "info")
-
+        print("Form validated!")
+        result = modifyInfo.modify_info(customer_id, {'PhoneNum': '111-111-1111'})
+        print("DEBUG RESULT:", result)
+        flash(result["message"], "success" if result["status"] == "success" else "danger")
         return redirect(url_for('auth.settings'))
+    else:
+        print("Form did NOT validate.")
+        print("Form errors:", form.errors)
+
+
 
     # Pre-fill form values
     form.phone.data = per_df.at[idx, 'PhoneNum']
