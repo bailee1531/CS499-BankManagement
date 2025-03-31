@@ -29,10 +29,13 @@ def create_app(test_config=None):
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
     # Register blueprints with the application
-    # Import the authentication blueprint from its routes module
+    # Authentication blueprint
     from app.blueprints.auth.routes import auth_bp
-    # Register the blueprint with a URL prefix '/auth'
     app.register_blueprint(auth_bp, url_prefix="/auth")
+
+    # Accounts blueprint
+    from app.blueprints.accounts.routes import accounts_bp
+    app.register_blueprint(accounts_bp)  # uses /accounts from the blueprint itself
 
     # Define a simple home route that renders the index.html template
     @app.route('/')
@@ -42,14 +45,11 @@ def create_app(test_config=None):
         """
         return render_template("index.html")
 
-
     @app.route('/employee-home')
-
     def employee_home():
         """
-        Employee Home route that renders the homepage.
+        Employee Home route that renders the employee homepage.
         """
         return render_template("employee_home.html")
 
     return app
-

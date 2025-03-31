@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block meta_description %}
+Thank you for opening an account with Evergreen Bank.
+{% endblock %}
+{% block title %}
+Evergreen Bank - Deposit Funds
+{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+{% endblock %}
+{% block content %}
+<main class="confirmation-page" role="main">
+    <section class="thank-you-section" aria-labelledby="thank-you-heading">
+        <h2 id="thank-you-heading">
+            Thank you for opening a {{ account_type.replace('_', ' ').title() }}!
+        </h2>
+        <p class="instruction-text">
+            Please enter the amount you'd like to deposit into your new account.
+        </p>
+        <form method="POST" action="{{ url_for('auth.finalize_registration') }}" class="deposit-form" novalidate>
+            {{ form.csrf_token }}
+            <div class="form-group">
+                <label for="{{ form.deposit_amount.id }}">{{ form.deposit_amount.label.text }}</label>
+                {{ form.deposit_amount(size=32, **{'class': 'form-control', 'id': form.deposit_amount.id, 'aria-describedby': 'deposit-help'}) }}
+                <small id="deposit-help" class="visually-hidden">
+                    Enter a valid amount in USD to deposit into your account.
+                </small>
+                {% if form.deposit_amount.errors %}
+                <ul class="form-errors" role="alert" aria-live="assertive">
+                    {% for error in form.deposit_amount.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn submit-btn" aria-label="Submit your deposit amount">Submit Deposit</button>
+        </form>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block meta_description %}
+Explore flexible mortgage solutions with Evergreen Bank — your trusted partner in home financing.
+{% endblock %}
+{% block title %}
+Evergreen Bank - Mortgages
+{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+{% endblock %}
+{% block content %}
+<main>
+    <section class="accounts-section" aria-labelledby="mortgage-heading">
+        <h2 id="mortgage-heading">Mortgages</h2>
+        <div class="accounts-container">
+            <!-- Mortgage Option -->
+            <article class="account-box">
+                <h3>Home Loan</h3>
+                <p>Finance your dream home with our flexible, low-interest home loan options tailored to your needs.</p>
+                <a href="/mortgage" class="account-btn" aria-label="Open Home Loan">Open Home Loan</a>
+            </article>
+        </div>
+    </section>
+</main>
+{% endblock %}
