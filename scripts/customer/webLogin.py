@@ -143,11 +143,12 @@ def login_page_button_pressed(new_or_returning, type, username, password, *argv)
                 newID = random.randint(200, 999)
         else:
             newID = employeeInfo.loc[employeeInfo['Username'] == username, 'EmployeeID'].iloc[0]
-        new_account(newID)     # generates a new private key
+        return new_account(newID)     # generates a new private key
     # Login
     elif new_or_returning == 2:
         if type == 'Customer':
             oldID = custInfo.loc[custInfo['Username'] == username, 'CustomerID'].iloc[0]    # finds userID from username
         else:
             oldID = employeeInfo.loc[employeeInfo['Username'] == username, 'EmployeeID'].iloc[0]
-        existing_account(oldID)
+        return existing_account(oldID)
+    
