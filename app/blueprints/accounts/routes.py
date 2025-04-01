@@ -105,6 +105,11 @@ def credit_cards() -> Response:
     return render_template('accounts/credit_cards.html')
 
 
+# Route for viewing about us page
+@accounts_bp.route('/about_us')
+def about_us():
+    return render_template('accounts/about_us.html')
+
 # -----------------------------------------------------------------------------
 # Route: /loans
 # Displays general loan info page
