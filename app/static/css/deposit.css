@@ -1,0 +1,166 @@
+@import "shared.css";
+
+/*-------------------------------------------------
+  Confirmation Page Container
+
+--------------------------------------------------*/
+.confirmation-page {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1.25rem;
+    /* 40px top/bottom, 20px left/right */
+    background-color: var(--background);
+}
+
+/*-------------------------------------------------
+  Thank You Section
+  - Styles the container holding the thank you message.
+  - Applies a dark background, padding, rounded corners,
+    and a subtle box-shadow for emphasis.
+  - Constrains the maximum width for readability.
+--------------------------------------------------*/
+.thank-you-section {
+    background-color: #434343;
+    padding: 2.5rem;
+    /* 40px */
+    border-radius: var(--border-radius);
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.08);
+    /* Approx. 0 4px 10px */
+    max-width: 37.5rem;
+    /* 600px */
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    /* Default text color inside the section */
+}
+
+/*-------------------------------------------------
+  Thank You Section Heading
+  - Sets the font size and bottom margin for visual hierarchy.
+  - Ensures the heading text remains white.
+--------------------------------------------------*/
+.thank-you-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.9375rem;
+    /* 15px */
+    color: #ffffff;
+}
+
+/*-------------------------------------------------
+  Instruction Text
+  - Styles additional text below the heading.
+  - Uses a slightly lighter shade for contrast.
+--------------------------------------------------*/
+.instruction-text {
+    font-size: 1rem;
+    margin-bottom: 1.875rem;
+    /* 30px */
+    color: #f0f0f0;
+}
+
+/*-------------------------------------------------
+  Form Styling (Deposit Form)
+--------------------------------------------------*/
+
+/* Form Group
+   - Provides vertical spacing between form fields.
+   - Aligns text to the left for labels and inputs.
+*/
+.deposit-form .form-group {
+    margin-bottom: 1.5625rem;
+    /* 25px */
+    text-align: left;
+}
+
+/* Form Labels
+   - Displays labels as block elements.
+   - Applies bold text with spacing for clear readability.
+*/
+.deposit-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    /* 8px */
+    color: #f0f0f0;
+}
+
+/* Form Inputs
+   - Ensures inputs fill the available width.
+   - Adds padding, border, and rounded corners.
+   - Includes a transition effect for focus state.
+*/
+.deposit-form input.form-control {
+    width: 100%;
+    padding: 0.625rem;
+    /* 10px */
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    transition: border-color 0.3s ease;
+}
+
+/* Input Focus State
+   - Highlights the input border when focused.
+*/
+.deposit-form input.form-control:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+/* Form Errors
+   - Displays error messages in red with a disc list style.
+   - Provides left padding for proper indentation.
+*/
+.form-errors {
+    margin-top: 0.625rem;
+    /* 10px */
+    color: red;
+    list-style-type: disc;
+    padding-left: 1.25rem;
+    /* 20px */
+}
+
+/*-------------------------------------------------
+  Button Styling
+--------------------------------------------------*/
+
+/* Submit Button
+   - Styles the main call-to-action button with padding,
+     background color, and rounded corners.
+   - Centers the button and adds a smooth hover transition.
+*/
+.submit-btn {
+    padding: 0.75rem 1.5rem;
+    /* 12px top/bottom, 24px left/right */
+    background-color: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover State for Submit Button
+   - Darkens the background color on hover for interactive feedback.
+*/
+.submit-btn:hover {
+    background-color: var(--accent-dark);
+}
+
+/*-------------------------------------------------
+  - Adjusts padding and button width for smaller screens.
+--------------------------------------------------*/
+@media (max-width: 37.5rem) {
+
+    /* 600px */
+    .thank-you-section {
+        padding: 1.5625rem;
+        /* 25px */
+    }
+
+    .submit-btn {
+        width: 100%;
+    }
+}
+

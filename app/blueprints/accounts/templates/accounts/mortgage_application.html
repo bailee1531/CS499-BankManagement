@@ -1,0 +1,106 @@
+{# Extend the base layout #}
+{% extends "base.html" %}
+
+{% block meta_description %}
+Thank you for choosing Evergreen Bank for your mortgage needs.
+{% endblock %}
+
+{# Page title shown in the browser tab #}
+{% block title %}
+Evergreen Bank - Mortgage Application
+{% endblock %}
+
+{# Include page-specific CSS stylesheet #}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{# Main page content for mortgage application #}
+{% block content %}
+<main class="mortgage-application-page" role="main">
+
+    {# Section: Mortgage Application Form #}
+    <section class="thank-you-section" aria-labelledby="mortgage-heading">
+        <h2 id="thank-you-heading">
+            Mortgage Application
+        </h2>
+        
+        <p class="instruction-text">
+            Please fill in your current income, desired loan amount, and loan term in years.
+        </p>
+
+        {# Mortgage application form (POST request with CSRF protection) #}
+        <form method="POST" action="{{ form_action }}" class="deposit-form" novalidate>
+            {{ form.csrf_token }}
+
+            {# Income Field #}
+            <div class="form-group">
+                <label for="{{ form.current_income.id }}">
+                    {{ form.current_income.label.text }}
+                </label>
+                {{ form.current_income }}
+                <small id="income-help" class="visually-hidden">
+                    Enter your current annual income in USD.
+                </small>
+
+                {# Display income field errors #}
+                {% if form.current_income.errors %}
+                <ul class="form-errors" role="alert" aria-live="assertive">
+                    {% for error in form.current_income.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            {# Loan Amount Field #}
+            <div class="form-group">
+                <label for="{{ form.loan_amount.id }}">
+                    {{ form.loan_amount.label.text }}
+                </label>
+                {{ form.loan_amount }}
+                <small id="loan-help" class="visually-hidden">
+                    Enter the loan amount you are seeking in USD.
+                </small>
+
+                {# Display loan amount field errors #}
+                {% if form.loan_amount.errors %}
+                <ul class="form-errors" role="alert" aria-live="assertive">
+                    {% for error in form.loan_amount.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            {# Loan Term Field #}
+            <div class="form-group">
+                <label for="{{ form.loan_term.id }}">
+                    {{ form.loan_term.label.text }}
+                </label>
+                {{ form.loan_term }}
+                <small id="term-help" class="visually-hidden">
+                    Enter the loan term in years.
+                </small>
+
+                {# Display loan term field errors #}
+                {% if form.loan_term.errors %}
+                <ul class="form-errors" role="alert" aria-live="assertive">
+                    {% for error in form.loan_term.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            {# Submit button to finalize the mortgage application #}
+            <button type="submit"
+                    class="btn submit-btn"
+                    aria-label="Submit your mortgage application">
+                Submit Application
+            </button>
+        </form>
+    </section>
+
+</main>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+<!-- Meta description block for SEO -->
+{% block meta_description %}
+Welcome to Evergreen Bank. Your trusted partner in financial solutions.
+{% endblock %}
+
+<!-- Title block for the page -->
+{% block title %}
+Evergreen Bank - All Accounts
+{% endblock %}
+
+<!-- Additional head content for CSS and JavaScript -->
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+<script src="{{ url_for('static', filename='js/account-selection.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<!-- Main content of the page -->
+<main role="main" class="accounts-page">
+    
+    <!-- Account selection section -->
+    <section class="accounts-section">
+        <h2 id="account-selection-heading">Select Your Account Type</h2>
+        
+        <!-- Form for account selection with POST method -->
+        <form method="POST" action="{{ url_for('registration.register_step3') }}" id="accountForm" aria-labelledby="account-selection-heading">
+            
+            <!-- Hidden CSRF token and hidden account type field -->
+            {{ form.hidden_tag() }}
+            {{ form.account_type(class="hidden", value="") }}
+            
+            <!-- Fieldset for the different account types -->
+            <fieldset class="accounts-container" role="group" aria-label="Account Types">
+                
+                <!-- Defining account options with a list of tuples (type, title, description) -->
+                {% set accounts = [
+                    ("checking", "Regular Checking Account", "Used for everyday transactions."),
+                    ("savings", "Savings Account", "Earns interest at a given percentage per month."),
+                    ("money_market", "Money Market Account", "Earns interest at a given percentage per month."),
+                    ("travel_visa", "Travel Visa", "Earns 2x rewards on travel."),
+                    ("home_loan", "Home Loan", "Finance your dream home with competitive rates.")
+                ] %}
+                
+                <!-- Looping through the accounts list to generate account boxes -->
+                {% for type, title, desc in accounts %}
+                <div class="account-box" role="button" tabindex="0" aria-pressed="false">
+                    <h3>{{ title }}</h3>
+                    <p>{{ desc }}</p>
+                    <!-- Button for selecting the account type -->
+                    <button type="button" class="account-btn" data-type="{{ type }}" aria-label="Open {{ title }}">
+                        {{ title | replace(" Account", "") | replace(" Loan", "") }}
+                    </button>
+                </div>
+                {% endfor %}
+            </fieldset>
+            
+            <!-- Hidden submit input, which will be triggered by JavaScript -->
+            <input type="submit" id="hiddenSubmit" style="display:none;">
+            
+            <!-- NoScript message for users without JavaScript -->
+            <noscript>
+                <p style="color: red; text-align: center; margin-top: 1rem;">
+                    JavaScript is required to select and submit an account type.
+                </p>
+            </noscript>
+        </form>
+    </section>
+
+</main>
+{% endblock %}

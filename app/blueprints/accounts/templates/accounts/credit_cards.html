@@ -1,0 +1,43 @@
+{# Extend the base HTML layout#}
+{% extends "base.html" %}
+
+{% block meta_description %}
+Explore Evergreen Bank's credit card options — tailored rewards and benefits to fit your lifestyle.
+{% endblock %}
+
+{# Page title that appears in the browser tab #}
+{% block title %}
+Evergreen Bank - Credit Cards
+{% endblock %}
+
+{# Include page-specific CSS stylesheet #}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+{% endblock %}
+
+{# Main content block for the Credit Cards page #}
+{% block content %}
+<main>
+
+    {# Credit Cards Section with proper semantic and accessibility markup #}
+    <section class="accounts-section" aria-labelledby="credit-cards-heading">
+        <h2 id="credit-cards-heading">Credit Cards</h2>
+
+        <div class="accounts-container">
+            {# Individual credit card offering #}
+            <article class="account-box">
+                <h3>Travel Visa</h3>
+                <p>Earn 2x rewards on travel, dining, and everyday purchases worldwide.</p>
+
+                {# Call-to-action button to open a Travel Visa card #}
+                <a href="/credit-cards?open=travel-visa"
+                   class="account-btn"
+                   aria-label="Open Travel Visa Credit Card">
+                   Open Travel Visa
+                </a>
+            </article>
+        </div>
+    </section>
+
+</main>
+{% endblock %}
