@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Account Overview{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/account_overview.css') }}">
+ <script src="{{ url_for('static', filename='js/collapsible_sections.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<main class="account-page">
+  <div class="account-summary">
+    <!-- Display Total Account Balance -->
+    <h2>Total Balance: $<span id="accountBalance">{{ account.curr_bal | default(0) | round(2) }}</span></h2>
+
+    
+    <!-- Deposit and Withdrawal Buttons -->
+    <div class="transaction-buttons">
+      <button id="depositBtn" class="account-btn" type="button">Deposit</button>
+      <button id="withdrawalBtn" class="account-btn" type="button">Withdraw</button>
+    </div>
+    
+    <!-- Collapsible Sections for Transactions -->
+    <div class="transactions-section">
+      <!-- Current Transactions Section -->
+      <button class="account-btn toggle-btn" data-target="current-transactions" data-label="Current Transactions">
+        Show Current Transactions
+      </button>
+      <section id="current-transactions" class="transactions-box" style="display: none;">
+        <h3>Current Transactions</h3>
+        {% if current_transactions %}
+          <ul>
+          {% for txn in current_transactions %}
+            <li>{{ txn.description }} - ${{ txn.amount }}</li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p>No current transactions available.</p>
+        {% endif %}
+      </section>
+      
+      <!-- Past Transactions Section -->
+      <button class="account-btn toggle-btn" data-target="past-transactions" data-label="Past Transactions">
+        Show Past Transactions
+      </button>
+      <section id="past-transactions" class="transactions-box" style="display: none;">
+        <h3>Past Transactions</h3>
+        {% if past_transactions %}
+          <ul>
+          {% for txn in past_transactions %}
+            <li>{{ txn.description }} - ${{ txn.amount }}</li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p>No past transactions available.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}

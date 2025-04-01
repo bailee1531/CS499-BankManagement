@@ -42,9 +42,9 @@ def customer_dashboard() -> Response:
     # Render the customer dashboard template with the list of accounts
     return render_template("customer/customer_dashboard.html", accounts=accounts_list)
 
-@customer_bp.route('/account/<int:account_id>')
+@customer_bp.route('/account-overview/<int:account_id>')
 @login_required("customer_id")
-def account_detail(account_id: int) -> Response:
+def account_overview(account_id: int) -> Response:
     """
     Display detailed information for a specific account.
 
@@ -70,6 +70,21 @@ def account_detail(account_id: int) -> Response:
         
         # Convert the account row to a dictionary for easy access in the template
         account = account_row.iloc[0].to_dict()
+
+        # Placeholder for transactions code
+        # TODO: Replace with actual code to load and process transactions.
+        current_transactions = []  # Placeholder: List of current (pending) transactions
+        past_transactions = []     # Placeholder: List of past (completed) transactions
+
     except Exception as e:
         # If there is an error retrieving account details, show an error message and redirect
         flash_error("Error retrieving account details.")
+        return redirect(url_for("customer.customer_dashboard"))
+    
+    # Render the account overview template with the account details and placeholder transactions.
+    return render_template(
+        "customer/account_overview.html",
+        account=account,
+        current_transactions=current_transactions,
+        past_transactions=past_transactions
+    )

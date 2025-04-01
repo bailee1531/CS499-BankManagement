@@ -13,7 +13,7 @@
 {% block head_extra %}
   <!-- Additional head content, includes the CSS link for the user dashboard -->
   {{ super() }}  <!-- Calls the parent template's head content -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/customer_dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -26,7 +26,7 @@
       <div class="accounts-container">
         <!-- Loop over each account in 'accounts' and display details -->
         {% for account in accounts %}
-          <a href="{{ url_for('customer.customer_dashboard', account_id=account.account_id) }}" class="account-box">
+          <a href="{{ url_for('customer.account_overview', account_id=account.account_id) }}" class="account-box">
             <h3>{{ account.account_type }}</h3> <!-- Account type (e.g., checking, savings) -->
             <p>Account ID: {{ account.account_id }}</p> <!-- Unique identifier for the account -->
             <span class="account-balance">

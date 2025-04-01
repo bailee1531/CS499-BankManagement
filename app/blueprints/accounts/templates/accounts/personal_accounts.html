@@ -60,7 +60,7 @@ Evergreen Bank - Personal Accounts
 
         </div>
 
-        {% if not session.get('user') %}
+        {% if not session.get('customer') %}
         <div class="registration-cta">
             <p>Don't have an account yet?</p>
             <a href="{{ url_for('registration.register_step1') }}" class="account-btn">
