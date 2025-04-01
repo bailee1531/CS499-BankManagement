@@ -1,28 +1,39 @@
-from flask import Blueprint, render_template, session, flash, redirect, url_for, request, Response
-import pandas as pd
+"""
+accounts/routes.py
 
-from scripts.customer import openAcc
-from scripts import createCreditCard
-from app.blueprints.utilities import (
-    get_csv_path, get_logged_in_customer,
-    get_customer_accounts, user_has_account_type,
-    login_required, flash_success, flash_error
+Defines routes for handling personal accounts, credit cards, and mortgage applications.
+"""
+import pandas as pd
+from decimal import Decimal
+
+from flask import (
+    Blueprint, render_template, session, flash, redirect, url_for, request, Response
 )
 
+# Internal utility and form imports
+from scripts import createCreditCard, createLoan
+from app.blueprints.sharedUtilities import get_csv_path, flash_success, flash_error
+from app.blueprints.accounts.forms import MortgageForm
+
+# Initialize blueprint
 accounts_bp = Blueprint('accounts', __name__, template_folder='templates')
 
+
+# -----------------------------------------------------------------------------
+# Route: /personal
+# Displays the personal accounts page or redirects to deposit form if a type is selected
+# -----------------------------------------------------------------------------
 @accounts_bp.route('/personal', methods=['GET'])
 def personal_accounts() -> Response:
     """
     Display personal accounts page or redirect to deposit form if an account type is provided.
 
     Returns:
-        Response: Rendered template for personal accounts or a redirection response.
+        Response: Rendered personal accounts page or redirection to deposit form.
     """
-    account_type: str = request.args.get("account_type")  # e.g., "checking", "savings", etc.
+    account_type: str = request.args.get("account_type")
 
     if account_type:
-        # Ensure customer is logged in by checking for customer_id in session
         if "customer_id" not in session:
             flash_error("You must be logged in to open an account.")
             return redirect(url_for("auth.customer_login", next=request.url))
@@ -37,25 +48,29 @@ def personal_accounts() -> Response:
             flash_error("Invalid account type selected.")
             return redirect(url_for("accounts.personal_accounts"))
 
-        # Set pending account information in session and redirect to deposit step
+        # Set pending account info in session and redirect to deposit form
         session['pending_account_type'] = account_type
         session['pending_account_name'] = valid_types[account_type]
-        return redirect(url_for("auth.deposit_form"))
+        return redirect(url_for("registration.deposit_form"))
 
     return render_template('accounts/personal_accounts.html')
 
 
+# -----------------------------------------------------------------------------
+# Route: /credit-cards
+# Handles credit card actions (e.g., Travel Visa card)
+# -----------------------------------------------------------------------------
 @accounts_bp.route('/credit-cards')
 def credit_cards() -> Response:
     """
     Handle credit card operations, including opening a Travel Visa credit card.
 
     Returns:
-        Response: Rendered template for credit cards or redirection after processing.
+        Response: Rendered credit card page or redirection after processing.
     """
     card_to_open: str = request.args.get('open')
+
     if card_to_open:
-        # Ensure customer is logged in by checking for customer_id in session
         if "customer_id" not in session:
             flash_error("You must be logged in to open a credit card.")
             return redirect(url_for("auth.customer_login", next=request.url))
@@ -64,8 +79,9 @@ def credit_cards() -> Response:
 
         if card_to_open.lower() == 'travel-visa':
             try:
-                # Read current accounts from CSV and check if the credit card already exists
                 accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+
+                # Check if the user already has a credit card
                 existing_card = accounts_df[
                     (accounts_df["CustomerID"] == customer_id) &
                     (accounts_df["AccountType"] == "Credit Card")
@@ -74,84 +90,85 @@ def credit_cards() -> Response:
                     flash("You already have a Travel Visa credit card.", "warning")
                     return redirect(url_for("accounts.credit_cards"))
 
+                # Create the credit card account
                 createCreditCard.openCreditCardAccount(customer_id)
                 flash_success("Travel Visa credit card opened successfully!")
-                return redirect(url_for("accounts.user_dashboard"))
+                return redirect(url_for("customer.customer_dashboard"))
+
             except Exception as e:
                 flash_error(f"Unable to open Travel Visa account: {str(e)}")
                 return redirect(url_for("accounts.credit_cards"))
-        else:
-            flash_error("Invalid credit card selection.")
-            return redirect(url_for("accounts.credit_cards"))
+
+        flash_error("Invalid credit card selection.")
+        return redirect(url_for("accounts.credit_cards"))
 
     return render_template('accounts/credit_cards.html')
 
 
-@accounts_bp.route('/mortgage')
-def mortgage() -> Response:
+# -----------------------------------------------------------------------------
+# Route: /loans
+# Displays general loan info page
+# -----------------------------------------------------------------------------
+@accounts_bp.route('/loans')
+def loans() -> Response:
     """
-    Render mortgage information page.
+    Render loan information page.
 
     Returns:
-        Response: Rendered template for mortgage information.
+        Response: Rendered loan information page.
     """
-    return render_template('accounts/mortgage.html')
+    return render_template('accounts/loan_info.html')
 
 
-@accounts_bp.route('/accounts')
-@login_required("customer_id")
-def user_dashboard() -> Response:
+# -----------------------------------------------------------------------------
+# Route: /customer/mortgage
+# Handles GET/POST for mortgage loan application
+# -----------------------------------------------------------------------------
+@accounts_bp.route('/customer/mortgage', methods=['GET', 'POST'])
+def mortgage_application():
     """
-    Render the user's dashboard displaying their accounts.
+    Route for mortgage loan application.
 
     Returns:
-        Response: Rendered template for the user's dashboard.
+        Response: Redirects to dashboard on success, otherwise renders the application form.
     """
-    customer_id: int = get_logged_in_customer()
-    try:
-        customer_accounts_df = get_customer_accounts(customer_id)
-        accounts_list = []
-        for _, row in customer_accounts_df.iterrows():
-            accounts_list.append({
-                "account_id": row["AccountID"],
-                "account_type": row["AccountType"],
-                "curr_bal": row["CurrBal"]
-            })
-    except Exception as e:
-        flash_error("Error retrieving account information.")
-        accounts_list = []
+    form = MortgageForm()
 
-    return render_template("accounts/user_dashboard.html", accounts=accounts_list)
+    if form.validate_on_submit():
+        loan_amount = Decimal(form.loan_amount.data)
+        loan_term = form.loan_term.data
+        customer_id = session.get("customer_id")
 
+        if not customer_id:
+            flash_error("Customer not logged in or session expired.")
+            return redirect(url_for('auth.customer_login'))
 
-@accounts_bp.route('/account/<int:account_id>')
-@login_required("customer_id")
-def account_detail(account_id: int) -> Response:
-    """
-    Display detailed information for a specific account.
+        try:
+            accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
 
-    Args:
-        account_id (int): The ID of the account to display.
+            # Check for existing mortgage
+            existing_mortgage = accounts_df[
+                (accounts_df["CustomerID"] == customer_id) &
+                (accounts_df["AccountType"].str.lower() == "mortgage loan")
+            ]
+            if not existing_mortgage.empty:
+                flash_error("You already have a mortgage loan account. Only one is allowed per customer.")
+                return redirect(url_for("customer.customer_dashboard"))
 
-    Returns:
-        Response: Rendered template with account details or redirection on error.
-    """
-    try:
-        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-        account_row = accounts_df[accounts_df["AccountID"] == account_id]
-        if account_row.empty:
-            flash_error("Account not found.")
-            return redirect(url_for("accounts.user_dashboard"))
-        account = account_row.iloc[0].to_dict()
-    except Exception as e:
-        flash_error("Error retrieving account details.")
-        return redirect(url_for("accounts.user_dashboard"))
+        except Exception as e:
+            flash_error(f"Error checking existing mortgage accounts: {str(e)}")
+            return redirect(url_for("customer.customer_dashboard"))
 
-    return render_template("accounts/account_detail.html", account=account)
+        # Attempt to create new mortgage loan
+        result = createLoan.createMortgageLoanAccount(customer_id, loan_amount, loan_term)
+        if result.get("status") == "success":
+            flash_success(result.get("message"))
+            return redirect(url_for('customer.customer_dashboard'))
+        else:
+            flash_error(result.get("message"))
 
-@accounts_bp.route("/admin-dashboard")
-def admin_dashboard():
-    csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../csvFiles/employees.csv"))
-    df = pd.read_csv(csv_path)
-    tellers = df[df["Position"] == "Teller"].to_dict(orient="records")
-    return render_template("auth/admin_dashboard.html", tellers=tellers)
+    return render_template(
+        'accounts/mortgage_application.html',
+        form=form,
+        form_action=url_for('accounts.mortgage_application')
+    )

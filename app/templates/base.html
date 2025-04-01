@@ -38,23 +38,29 @@
             <ul>
                 <li><a href="{{ url_for('accounts.personal_accounts') }}">Personal Banking</a></li>
                 <li><a href="{{ url_for('accounts.credit_cards') }}">Credit Cards</a></li>
-                <li><a href="{{ url_for('accounts.mortgage') }}">Mortgage</a></li>
+                <li><a href="{{ url_for('accounts.loans') }}">Mortgage</a></li>
                 <li><a href="#">About Us</a></li>
             </ul>
         </nav>
         <!-- Optional Authentication Links (Sign Up / Login) -->
         {% block header_extra %}
         <div class="header__auth">
-            {% if 'user' in session %}
+            {% if 'customer' in session or 'teller' in session or 'admin' in session %}
+            <!-- Dashboard Button -->
+            <a href="{{ url_for('customer.customer_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                Dashboard
+            </a>
+            <!-- Logout Button -->
             <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
                 <button type="submit" class="btn btn--login">Logout</button>
             </form>
             {% else %}
-            <a href="{{ url_for('auth.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
+            <a href="{{ url_for('registration.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
             <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
             {% endif %}
         </div>
         {% endblock %}
+
     </header>
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=True) %}
@@ -75,7 +81,7 @@
             <ul>
                 <li><a href="{{ url_for('accounts.personal_accounts') }}">Personal Banking</a></li>
                 <li><a href="{{ url_for('accounts.credit_cards') }}">Credit Cards</a></li>
-                <li><a href="{{ url_for('accounts.mortgage') }}">Mortgage</a></li>
+                <li><a href="{{ url_for('accounts.loans') }}">Mortgage</a></li>
                 <li><a href="#">About Us</a></li>
             </ul>
         </div>

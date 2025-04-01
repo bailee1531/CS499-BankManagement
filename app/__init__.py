@@ -23,20 +23,35 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     # Set a secret key for securely signing the session cookie
-    app.secret_key = "hello"  # In production, use a more secure and environment-specific key
+    app.secret_key = "hello"  
 
     # Configure the session lifetime (e.g., 30 minutes)
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
-    # Register blueprints with the application
-    # Authentication blueprint
+    # ---------------------------
+    # Register Blueprints
+    # ---------------------------
+    
+    # Register the authentication blueprint (handles login, logout, etc.)
     from app.blueprints.auth.routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
-    # Accounts blueprint
+    # Register the accounts blueprint (handles user account management)
     from app.blueprints.accounts.routes import accounts_bp
-    app.register_blueprint(accounts_bp)  # uses /accounts from the blueprint itself
+    app.register_blueprint(accounts_bp)  
 
+    # Register the customer blueprint (handles customer-specific features)
+    from app.blueprints.customer.routes import customer_bp
+    app.register_blueprint(customer_bp)  
+
+    # Register the registration blueprint (handles user registration)
+    from app.blueprints.registration.routes import register_bp
+    app.register_blueprint(register_bp)  
+
+    # ---------------------------
+    # Home Routes
+    # ---------------------------
+    
     # Define a simple home route that renders the index.html template
     @app.route('/')
     def home():
@@ -45,6 +60,7 @@ def create_app(test_config=None):
         """
         return render_template("index.html")
 
+    # Employee home route that renders the employee homepage
     @app.route('/employee-home')
     def employee_home():
         """
