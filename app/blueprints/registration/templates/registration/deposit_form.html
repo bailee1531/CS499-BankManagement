@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+<!-- Meta description block for SEO -->
+{% block meta_description %}
+Thank you for opening an account with Evergreen Bank.
+{% endblock %}
+
+<!-- Title block for the page -->
+{% block title %}
+Evergreen Bank - Deposit Funds
+{% endblock %}
+
+<!-- Additional head content like CSS for styling -->
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Main content of the page -->
+<main class="confirmation-page" role="main">
+    
+    <!-- Thank you section for new account holders -->
+    <section class="thank-you-section" aria-labelledby="thank-you-heading">
+        <h2 id="thank-you-heading">
+            <!-- Dynamic account type display -->
+            Thank you for opening a {{ account_type.replace('_', ' ').title() if account_type else 'your new account' }}!
+        </h2>
+        <p class="instruction-text">
+            Please enter the amount you'd like to deposit into your new account.
+        </p>
+        
+        <!-- Form for deposit amount input -->
+        <form method="POST" action="{{ form_action }}" class="deposit-form" novalidate>
+            {{ form.csrf_token }} <!-- CSRF token for form security -->
+            
+            <div class="form-group">
+                <!-- Label for the deposit amount input field -->
+                <label for="{{ form.deposit_amount.id }}">{{ form.deposit_amount.label.text }}</label>
+                
+                <!-- Deposit amount input field with additional attributes for accessibility and styling -->
+                {{ form.deposit_amount(size=32, **{'class': 'form-control', 'id': form.deposit_amount.id, 'aria-describedby': 'deposit-help'}) }}
+                
+                <!-- Help text for deposit field -->
+                <small id="deposit-help" class="visually-hidden">
+                    Enter a valid amount in USD to deposit into your account.
+                </small>
+                
+                <!-- Error handling for deposit amount field -->
+                {% if form.deposit_amount.errors %}
+                <ul class="form-errors" role="alert" aria-live="assertive">
+                    {% for error in form.deposit_amount.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <!-- Submit button for the form -->
+            <button type="submit" class="btn submit-btn" aria-label="Submit your deposit amount">Submit Deposit</button>
+        </form>
+    </section>
+
+</main>
+{% endblock %}

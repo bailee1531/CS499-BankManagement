@@ -1,0 +1,108 @@
+<!--
+  Base Template for Evergreen Bank
+  This file provides the common layout for all pages.
+  It includes header, navigation, content blocks, and footer.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Character set and viewport settings for responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Dynamic meta description for SEO; override in child templates if needed -->
+    <meta name="description" content="{% block meta_description %}Default description{% endblock %}">
+    <!-- Dynamic title; override in child templates -->
+    <title>{% block title %}Evergreen Bank{% endblock %}</title>
+    <!-- Favicon and base stylesheet -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <!-- Additional head elements can be inserted by child templates -->
+    {% block head_extra %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+    <script src="{{ url_for('static', filename='js/flash-messages.js') }}" defer></script>
+    {% endblock %}
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header__logo">
+            <!-- Logo linking to home -->
+            <a href="{{ url_for('home') }}" title="Evergreen Bank Home">
+                <img src="{{ url_for('static', filename='images/Evergreen_Logo.png') }}" alt="Evergreen Bank Logo">
+                <span>Evergreen Bank</span>
+            </a>
+        </div>
+        <!-- Main Navigation -->
+        <nav class="header__nav" aria-label="Main Navigation">
+            <ul>
+                <li><a href="{{ url_for('accounts.personal_accounts') }}">Personal Banking</a></li>
+                <li><a href="{{ url_for('accounts.credit_cards') }}">Credit Cards</a></li>
+                <li><a href="{{ url_for('accounts.loans') }}">Mortgage</a></li>
+                <li><a href="{{ url_for('accounts.about_us') }}">About Us</a></li>
+            </ul>
+        </nav>
+        <!-- Optional Authentication Links (Sign Up / Login) -->
+        {% block header_extra %}
+        <div class="header__auth">
+            {% if 'customer' in session or 'teller' in session or 'admin' in session %}
+            <!-- Dashboard Button -->
+            <a href="{{ url_for('customer.customer_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                Dashboard
+            </a>
+            <!-- Logout Button -->
+            <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn--login">Logout</button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('registration.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
+            <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+            {% endif %}
+        </div>
+        {% endblock %}
+
+    </header>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <!-- Main Content Block -->
+    {% block content %}
+    {% endblock %}
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer__content">
+            <ul>
+                <li><a href="{{ url_for('accounts.personal_accounts') }}">Personal Banking</a></li>
+                <li><a href="{{ url_for('accounts.credit_cards') }}">Credit Cards</a></li>
+                <li><a href="{{ url_for('accounts.loans') }}">Mortgage</a></li>
+                <li><a href="{{ url_for('accounts.about_us') }}">About Us</a></li>
+            </ul>
+        </div>
+        <div class="footer__contact">
+            <!-- Contact information -->
+            <a href="mailto:Contact@UAHBank.com">📧 Contact@UAHBank.com</a> |
+            <a href="tel:+12569999999">📞 +1 256 99 9999</a> |
+            <a href="https://maps.google.com?q=Somewhere+in+the+World" target="_blank" rel="noopener">
+                📍 Somewhere in the World
+            </a>
+        </div>
+        <div class="footer__bottom">
+            <p>
+                UAH Bank &copy; 2025 |
+                <a href="#">Privacy Policy</a> |
+                <a href="#">Terms of Service</a> |
+                <a href="{{ url_for('employee_home') }}" class=".btn">Employee Home</a>
+            </p>
+        </div>
+    </footer>
+</body>
+
+</html>
+

@@ -1,0 +1,45 @@
+{# Extend the base HTML layout #}
+{% extends "base.html" %}
+
+{% block meta_description %}
+Explore flexible mortgage solutions with Evergreen Bank — your trusted partner in home financing.
+{% endblock %}
+
+{# Title of the page that appears in the browser tab #}
+{% block title %}
+Evergreen Bank - Loans
+{% endblock %}
+
+{# Include page-specific CSS stylesheet #}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+{% endblock %}
+
+{# Main content section for loan-related offerings #}
+{% block content %}
+<main>
+
+    {# Mortgages section with accessible labeling #}
+    <section class="accounts-section" aria-labelledby="mortgage-heading">
+        <h2 id="mortgage-heading">Mortgages</h2>
+
+        <div class="accounts-container">
+            {# Individual mortgage product listing #}
+            <article class="account-box">
+                <h3>Home Loan</h3>
+                <p>
+                    Finance your dream home with our flexible, low-interest home loan options tailored to your needs.
+                </p>
+
+                {# CTA button to open the mortgage application route #}
+                <a href="{{ url_for('accounts.mortgage_application') }}"
+                   class="account-btn"
+                   aria-label="Open Home Loan">
+                   Open Home Loan
+                </a>
+            </article>
+        </div>
+    </section>
+
+</main>
+{% endblock %}

@@ -1,0 +1,74 @@
+{# Extend the base layout #}
+{% extends "base.html" %}
+
+{% block meta_description %}
+Welcome to Evergreen Bank. Your trusted partner in financial solutions.
+{% endblock %}
+
+{# Browser tab title #}
+{% block title %}
+Evergreen Bank - Personal Accounts
+{% endblock %}
+
+{# Include page-specific CSS file #}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+{% endblock %}
+
+{# Main content for the Personal Accounts page #}
+{% block content %}
+<main>
+
+    {# Section: Personal Accounts Listing #}
+    <section class="accounts-section" aria-labelledby="accounts-heading">
+        <h2 id="accounts-heading">Personal Accounts</h2>
+
+        <div class="accounts-container">
+
+            {# Regular Checking Account #}
+            <article class="account-box">
+                <h3>Regular Checking Account</h3>
+                <p>Perfect for everyday spending and direct deposits.</p>
+                <a href="{{ url_for('accounts.personal_accounts', account_type='checking') }}"
+                   class="account-btn"
+                   aria-label="Open Regular Checking Account">
+                   Open Checking Account
+                </a>
+            </article>
+
+            {# Savings Account #}
+            <article class="account-box">
+                <h3>Savings Account</h3>
+                <p>Grow your money monthly with a competitive interest rate.</p>
+                <a href="{{ url_for('accounts.personal_accounts', account_type='savings') }}"
+                   class="account-btn"
+                   aria-label="Open Savings Account">
+                   Open Savings Account
+                </a>
+            </article>
+
+            {# Money Market Account #}
+            <article class="account-box">
+                <h3>Money Market Account</h3>
+                <p>Earn higher interest with tiered rates and easy access to funds.</p>
+                <a href="{{ url_for('accounts.personal_accounts', account_type='money-market') }}"
+                   class="account-btn"
+                   aria-label="Open Money Market Account">
+                   Open Money Market Account
+                </a>
+            </article>
+
+        </div>
+
+        {% if not session.get('user') %}
+        <div class="registration-cta">
+            <p>Don't have an account yet?</p>
+            <a href="{{ url_for('registration.register_step1') }}" class="account-btn">
+                Register Now
+            </a>
+        </div>
+        {% endif %}
+    </section>
+
+</main>
+{% endblock %}

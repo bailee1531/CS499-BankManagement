@@ -1,0 +1,141 @@
+@import "shared.css";
+
+/*---------------------------------------------
+   Register Page Styles
+----------------------------------------------*/
+
+/* Page Container
+   Centers the overall page content and provides consistent padding.
+   Replaces fixed pixels with rem units for scalability.
+*/
+.container {
+    text-align: center;
+    padding: 1.25rem;
+    /* 20px → 1.25rem */
+}
+
+/* Form Container
+   Sets up a responsive container for the registration form.
+   Uses percentage width with a max-width limit for better responsiveness.
+*/
+.form-container {
+    background-color: transparent;
+    /* Inherit text color from shared.css */
+    width: 90%;
+    max-width: 500px;
+    /* Prevent form from becoming too wide on larger screens */
+    margin: 3.125rem auto;
+    /* 50px → 3.125rem; centers the container */
+    text-align: left;
+}
+
+/* Form Heading
+   Centers the heading within the form and adds spacing below.
+*/
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Form Row Layout
+   Uses flexbox to arrange each form field row.
+   Aligns items vertically and distributes space evenly.
+*/
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.9375rem;
+    /* 15px → 0.9375rem */
+}
+
+/* Form Row Labels
+   Styles labels to be bold and allocates proper space using flexbox.
+   An optional right margin ensures spacing between label and input.
+*/
+.form-row label {
+    font-weight: bold;
+    flex: 1;
+    margin-right: 0.5rem;
+}
+
+/* Form Row Inputs
+   Styles the input fields with padding, border, and rounded corners.
+   Adds a transition for a smooth focus effect.
+*/
+.form-row input {
+    flex: 2;
+    padding: 0.5rem;
+    /* 8px → 0.5rem */
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    /* 4px → 0.25rem */
+    transition: border-color 0.3s ease;
+}
+
+/* Input Focus State
+   Enhances the input's visual feedback on focus for better accessibility.
+*/
+.form-row input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.3);
+}
+
+/* Register Form Button
+   Styles the main registration button with a consistent look.
+   Includes a transition for hover effects and centers the button.
+*/
+.form-container button {
+    width: 150px;
+    padding: 0.5rem;
+    /* 8px → 0.5rem */
+    background-color: #007BFF;
+    /* Consider using var(--accent) for consistency */
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: block;
+    margin: 1rem auto;
+    /* Center the button with vertical spacing */
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Button Hover and Focus States
+   Provides clear visual cues when users interact with the button.
+*/
+.form-container button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+}
+
+.form-container button:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Signup Button (if used)
+   Alternative button style for signup-related actions.
+   Uses rem units and includes hover feedback.
+*/
+.signup-btn {
+    background-color: var(--accent);
+    padding: 0.3125rem 0.625rem;
+    /* 5px 10px → rem values */
+    border-radius: var(--border-radius);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.signup-btn:hover {
+    opacity: 0.9;
+    /* Slight opacity change on hover */
+}
+
+/* Note:
+   - Header, footer, and global settings (e.g., background-color, font-family) are inherited from shared.css.
+   - Consider reviewing shared.css for additional variables to enhance consistency across the site.
+*/
