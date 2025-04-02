@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-  Account Dashboard - Coming Soon
+  Account Dashboard
 {% endblock %}
 
 {% block meta_description %}
@@ -16,10 +16,9 @@
 {% block content %}
   <!-- Main content of the page -->
   <main class="accounts-page">
-    <h1 id="account-selection-heading">Your Accounts</h1>
-    
     <!-- Section for displaying all accounts -->
     <section class="accounts-section">
+      <h1 id="account-selection-heading">Your Accounts</h1>
       <div class="accounts-container">
         <!-- Loop over each account in 'accounts' and display details -->
         {% for account in accounts %}
@@ -32,7 +31,8 @@
             </span>
           </a>
         {% endfor %}
-        <a href="{{ url_for('customer.transfer_funds') }}">Transfer Funds</a>
+        <br>
+        <a href="{{ url_for('customer.transfer_funds') }}" class="btn btn--action" style="background-color: #7e7f9a; width: 30%;">Transfer Funds</a>
       </div>
     </section>
   </main>

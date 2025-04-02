@@ -16,11 +16,10 @@
 
 {% block content %}
   <!-- Main content of the page -->
-  <main class="transfer-funds">
-    <h1 id="transfer-funds-heading">Transfer Funds</h1>
-    
+  <main class="accounts-page">
     <!-- Section for displaying all accounts -->
     <section class="accounts-section">
+      <h1 id="account-selection-heading">Transfer Funds</h1>
       <div class="accounts-container">
         <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
             {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
@@ -32,7 +31,7 @@
                 <h2>Destination Account</h2>
                 {{ form.dest_account.label }} {{ form.dest_account }}
             </article>
-            <div class="form-group">
+            <div class="form-group" style="color: white;">
                 <!-- Label for the deposit amount input field -->
                 <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
                 
@@ -44,7 +43,7 @@
                     Enter a valid amount in USD to transfer between your accounts.
                 </small>
             </div>
-            <button class='btn' type="submit" style="width: 25%;">Transfer</button>
+            <button class='btn btn--login' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Transfer</button>
         </form>
       </div>
     </section>

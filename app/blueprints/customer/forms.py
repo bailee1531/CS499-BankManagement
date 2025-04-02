@@ -8,8 +8,8 @@ from app.blueprints.sharedUtilities import (
 )
 
 class TransferForm(FlaskForm):
-    src_account = SelectField('Source Account', choices=[])
-    dest_account = SelectField('Destination Account', choices=[])
+    src_account = SelectField('', choices=[])
+    dest_account = SelectField('', choices=[])
     amount = DecimalField(
         'Transfer Amount ($)',
         validators=[DataRequired(), NumberRange(min=0, message="Amount must be positive.")]
