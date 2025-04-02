@@ -1,12 +1,9 @@
 {% extends "base.html" %}
-{% block meta_description %}{{ meta_description or "Manage your account settings securely." }}{% endblock %}
-{% block title %}{{ title or "UAH Bank - Settings" }}{% endblock %}
+
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 {% endblock %}
-{% block header_extra %}{% endblock %}
-
 {% block content %}
 <main>
   <section class="settings-container" aria-labelledby="settings-heading">
