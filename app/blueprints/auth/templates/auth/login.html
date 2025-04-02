@@ -1,52 +1,71 @@
+{# Extends the base template which includes the main layout and common HTML structure #}
 {% extends "base.html" %}
+
 {% block meta_description %}
-{{ meta_description or "Secure banking login for UAH Bank." }}
+  {{ meta_description or "Secure banking login for UAH Bank." }}
 {% endblock %}
+
+{# Title block for the browser/tab title #}
 {% block title %}
-{{ title or "UAH Bank - Login" }}
+  {{ title or "UAH Bank - Login" }}
 {% endblock %}
-{# Omit auth links on the login page #}
+
+{# Main content block containing the login form #}
 {% block content %}
 <main>
-    <section class="login-container" aria-labelledby="login-heading">
-        <h2 id="login-heading">{{ header_text or "Login" }}</h2>
-        <form action="{{ form_action or url_for('auth.login') }}" method="post" novalidate aria-describedby="login-instructions">
-            <p id="login-instructions" class="visually-hidden">
-                Enter your username and password to securely access your UAH Bank account.
-            </p>
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                <label for="username">Username</label>
-                {{ form.username() }}
-                {% if form.username.errors %}
-                <div class="error-message" id="username-error">
-                    {% for error in form.username.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                {{ form.password() }}
-                {% if form.password.errors %}
-                <div class="error-message" id="password-error">
-                    {% for error in form.password.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <a href="{{ forgot_password_url or '#' }}" class="forgot-password">Forgot Password?</a>
-            </div>
-            <button type="submit" name="new_or_returning" value="2" class="btn btn--login" aria-label="Log in to your UAH Bank account">
-                Login
-            </button>
-            <button type="button" class="btn" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';" aria-label="Sign up for a new UAH Bank account">
-                Sign Up
-            </button>
-        </form>
-    </section>
+  <section class="login-container" aria-labelledby="login-heading">
+    {# Heading for screen readers and visual users #}
+    <h2 id="login-heading">{{ header_text or "Login" }}</h2>
+
+    {# Login form, using POST method and Flask-WTF for CSRF protection #}
+    <form action="{{ form_action }}" method="post" novalidate aria-describedby="login-instructions">
+
+      {# CSRF hidden token for security #}
+      {{ form.hidden_tag() }}
+
+      {# Username input field with label and error display #}
+      <div class="form-group">
+        <label for="username">Username</label>
+        {{ form.username() }}
+        {% if form.username.errors %}
+          <div class="error-message" id="username-error">
+            {% for error in form.username.errors %}
+              <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      {# Password input field with label and error display #}
+      <div class="form-group">
+        <label for="password">Password</label>
+        {{ form.password() }}
+        {% if form.password.errors %}
+          <div class="error-message" id="password-error">
+            {% for error in form.password.errors %}
+              <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      {# Forgot password link #}
+      <div class="form-group">
+        <a href="{{ forgot_password_url or '#' }}" class="forgot-password">Forgot Password?</a>
+      </div>
+
+      {# Submit button for logging in #}
+      <button type="submit" name="new_or_returning" value="2" class="btn btn--login" aria-label="Log in to your account">
+        Login
+      </button>
+
+      {# Optional sign-up button, shown only if the flag is set #}
+      {% if show_signup_button %}
+        <button type="button" class="btn" onclick='window.location.href = {{ signup_url | tojson }};' aria-label="Sign up for a new account">
+          Sign Up
+        </button>
+      {% endif %}
+    </form>
+  </section>
 </main>
 {% endblock %}

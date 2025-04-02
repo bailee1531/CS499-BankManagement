@@ -2,9 +2,6 @@
 
 /*-------------------------------------------------
   Confirmation Page Container
-  - Centers the confirmation content using flexbox.
-  - Provides responsive padding using rem units.
-  - Applies a background color from a shared variable.
 --------------------------------------------------*/
 .confirmation-page {
     display: flex;
@@ -151,7 +148,6 @@
 }
 
 /*-------------------------------------------------
-  Mobile Responsiveness
   - Adjusts padding and button width for smaller screens.
 --------------------------------------------------*/
 @media (max-width: 37.5rem) {

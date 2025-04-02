@@ -151,4 +151,3 @@ def login_page_button_pressed(new_or_returning, type, username, password, *argv)
         else:
             oldID = employeeInfo.loc[employeeInfo['Username'] == username, 'EmployeeID'].iloc[0]
         return existing_account(oldID)
-    

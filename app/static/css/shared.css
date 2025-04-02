@@ -83,14 +83,16 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: var(--dark-bg); 
+    color: var(--white);
 }
-
 /* Header Logo */
 /* Style for the logo link within the header */
 .header__logo a {
     display: flex;
     align-items: center;
     font-weight: bold;
+    color: var(--white);
 }
 
 /* Set logo image dimensions and spacing */
@@ -109,12 +111,13 @@ header {
     flex-direction: column;
     /* Stack items vertically on mobile */
     gap: 0.625rem;
-    /* Space between navigation items */
+    align-items: center; /* Centers the nav buttons */
 }
+
 
 /* Set link color in the header navigation */
 .header__nav a {
-    color: var(--black);
+    color: var(--white);
 }
 
 /* Header Authentication */
@@ -158,7 +161,8 @@ header .header__auth .btn {
 .btn--sign-up {
     background: transparent;
     color: var(--black);
-    border: 1px solid var(--black);
+    border: 1px solid var(--white);
+    color: var(--white);
 }
 
 /* Ensure header auth buttons maintain width and margin settings */

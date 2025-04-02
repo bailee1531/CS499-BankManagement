@@ -1,16 +1,10 @@
 @import "shared.css";
 
-/* =======================================
-   Module-Specific Variables
-======================================= */
 :root {
     --bg-box: #3a3a3a;
     --accent-hover: #b52d3b;
 }
 
-/* =======================================
-   Accounts Page Layout Fixes
-======================================= */
 .accounts-page {
     display: flex;
     flex-direction: column;
@@ -121,6 +115,13 @@ fieldset.accounts-container {
     --animation-delay: 5;
 }
 
+.accounts-section h3 {
+    color: var(--white);
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    position: relative;
+}
+
 .account-box:hover {
     transform: scale(1.03);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
@@ -187,7 +188,7 @@ fieldset.accounts-container {
 }
 
 /* =======================================
-   Registration Call-to-Action
+   Registration Button
 ======================================= */
 .registration-cta {
     margin-top: 2rem;

@@ -17,7 +17,7 @@
       </button>
     </div>
 
-    <form id="settings-form" action="{{ form_action or url_for('auth.settings') }}" method="post" novalidate>
+    <form id="settings-form" action="{{ form_action or url_for('customer.settings') }}" method="post" novalidate>
       {{ form.hidden_tag() }}
 
       <!-- First Name -->
@@ -95,12 +95,6 @@
           {% endfor %}
         </div>
         {% endif %}
-      </div>
-
-      <!-- SSN Last 4 -->
-      <div class="form-group">
-        <label for="ssn_last4">SSN (Last 4 Digits)</label>
-        {{ form.ssn_last4(class="form-control", disabled=True) }}
       </div>
 
       <button type="submit" class="btn btn--update" id="update-btn" disabled>Update Settings</button>

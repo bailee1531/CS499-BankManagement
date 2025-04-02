@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block meta_description %}
+Welcome to Evergreen Bank. Your trusted partner in financial solutions.
+{% endblock %}
+{% block title %}
+Evergreen Bank - About Us
+{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
+{% endblock %}
+{% block content %}
+<main>
+    <!-- About Us Section -->
+    <section class="accounts-section" aria-labelledby="about-heading">
+        <h2 id="about-heading">About Us</h2>
+        <div class="accounts-container">
+            <p style="color: white; width: 75%;">
+                At Evergreen Bank, we're committed to fostering financial growth and freedom.
+                We believe in building strong, lasting relationships with our customers by providing personalized banking solutions.
+            </p>
+            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; pointer-events: none; padding-top: 8em;">
+                <h3>Our Mission</h3>
+                <p>
+                    Our mission is to empower individuals and businesses to achieve their financial goals through reliable and accessible banking services.
+                    We strive to be a trusted partner, offering sound finanical guidance and support every step of the way.
+                </p>
+            </article>
+            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; pointer-events: none; padding-top: 8em;">
+                <h3>Our Commitment</h3>
+                <p style="vertical-align: middle;">
+                    We understand that managing your finances can be complex. That's why we're here to provide clear, straightforward advice and support.
+                    Whether you're saving for your future, starting a business, or simply managing your daily finances, Evergreen Bank is here to help you flourish.
+                </p>
+            </article>
+            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; pointer-events: none;">
+                <h3>Our Values</h3>
+                <p>
+                    <b style="color: #c2e5a0;">Integrity</b>
+                    <br>
+                    We uphold the highest ethical standards in all of our 
+                </p>
+                <p>
+                    <b style="color: #c2e5a0;">Customer Focus</b>
+                    <br>
+                    Your financial well being is our top priority.
+                </p>
+                <p>
+                    <b style="color: #c2e5a0;">Community</b>
+                    <br>
+                    We are dedicated to supporting and strengthening the communities we serve.
+                </p>
+                <p>
+                    <b style="color: #c2e5a0;">Growth</b>
+                    <br>
+                    We believe in continuous improvement and sustainable financial growth for our customers and our bank.
+                </p>
+            </article>
+            <b style="color: white;">Join us at Evergreen Bank, where your financial future grows.</b>
+        </div>
+    </section>
+</main>
+{% endblock %} 

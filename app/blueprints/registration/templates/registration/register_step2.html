@@ -1,16 +1,34 @@
 {% extends "base.html" %}
-{% block meta_description %}Secure account registration for Evergreen Bank.{% endblock %}
-{% block title %}Evergreen Bank - Create Account{% endblock %}
+
+<!-- Meta description block for SEO -->
+{% block meta_description %}
+Secure account registration for Evergreen Bank.
+{% endblock %}
+
+<!-- Title block for the page -->
+{% block title %}
+Evergreen Bank - Create Account
+{% endblock %}
+
+<!-- Empty header block for additional headers if needed -->
 {% block header_extra %}{% endblock %}
+
 {% block content %}
+<!-- Main content of the page -->
 <main>
+    
+    <!-- Account registration container section -->
     <section class="register-container" aria-labelledby="register-heading">
         <h2 id="register-heading">Create Account</h2>
-        <form action="{{ url_for('auth.register_step2') }}" method="post" novalidate>
-            {{ form.hidden_tag() }}
+        
+        <!-- Form to register the user with the POST method -->
+        <form action="{{ url_for('registration.register_step2') }}" method="post" novalidate>
+            {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+            
             <!-- Account Credentials Section -->
             <div class="account-credentials">
                 <h3>Account Credentials</h3>
+                
                 <!-- Email Field -->
                 <div class="form-group">
                     <label for="email">Email Address *</label>
@@ -23,6 +41,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Confirm Email Field -->
                 <div class="form-group">
                     <label for="confirm_email">Confirm Email Address *</label>
@@ -35,6 +54,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Username Field -->
                 <div class="form-group">
                     <label for="username">Username *</label>
@@ -47,6 +67,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Password Field -->
                 <div class="form-group">
                     <label for="password">Password *</label>
@@ -59,6 +80,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Confirm Password Field -->
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password *</label>
@@ -72,9 +94,11 @@
                     {% endif %}
                 </div>
             </div>
+            
             <!-- Security Questions Section -->
             <div class="security-questions">
                 <h3>Security Questions</h3>
+                
                 <!-- Security Question 1 -->
                 <div class="form-group">
                     <label for="security_question_1">Security Question 1 *</label>
@@ -87,6 +111,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Security Answer 1 -->
                 <div class="form-group">
                     <label for="security_answer_1">Answer to Security Question 1 *</label>
@@ -99,6 +124,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Security Question 2 -->
                 <div class="form-group">
                     <label for="security_question_2">Security Question 2 *</label>
@@ -111,6 +137,7 @@
                     </div>
                     {% endif %}
                 </div>
+                
                 <!-- Security Answer 2 -->
                 <div class="form-group">
                     <label for="security_answer_2">Answer to Security Question 2 *</label>
@@ -124,8 +151,11 @@
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Submit button to create the account -->
             <button type="submit" class="btn btn--login">Create Account</button>
         </form>
     </section>
+
 </main>
 {% endblock %}

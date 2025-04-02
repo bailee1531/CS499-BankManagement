@@ -1,301 +1,233 @@
-import os
-import pandas as pd
-import hashlib
-from flask import (
-    Blueprint, render_template, redirect,
-    url_for, flash, session, current_app
-)
-from app.blueprints.auth.forms import (
-    LoginForm, 
-    RegistrationStep1Form, 
-    RegistrationStep2Form, 
-    RegistrationStep3Form, 
-    DepositForm,
-    SettingsForm
-)
-from scripts.customer import webLogin, openAcc, modifyInfo
+# ====================
+# Imports
+# ====================
 
-# Create the Flask blueprint for authentication-related routes.
+import pandas as pd
+import logging
+from typing import Tuple, Optional
+from flask import (
+    Blueprint, render_template, request, redirect,
+    url_for, flash, session
+)
+
+# App imports: Forms, business logic, and shared utilities
+from app.blueprints.auth.forms import LoginForm
+from scripts.customer import webLogin
+from app.blueprints.sharedUtilities import (
+    get_csv_path,
+    flash_success, flash_error
+)
+
+# ====================
+# Blueprint Setup
+# ====================
+
 auth_bp = Blueprint('auth', __name__, template_folder='templates')
 customer_bp = Blueprint('customer', __name__, template_folder='templates')
 
-# Constants for distinguishing between login types.
-NEW_ACCOUNT = 1
-LOGIN = 2
+# ====================
+# Constants
+# ====================
 
-# -----------------------------------------------------------------------------
-# Utility Functions
-# -----------------------------------------------------------------------------
-def get_customer_csv_path():
-    return os.path.join(current_app.root_path, '..', 'csvFiles', 'customers.csv')
-def get_person_csv_path():
-    return os.path.join(current_app.root_path, '..', 'csvFiles', 'persons.csv')
+NEW_ACCOUNT: int = 1
+LOGIN: int = 2
 
-def process_login(form, session_key, login_type):
-    if session_key in session:
-        flash("Already Logged In")
-        return url_for(f'accounts.{session_key}_dashboard'), None
+# ====================
+# Logger
+# ====================
 
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+logger = logging.getLogger(__name__)
 
-        if session_key == "user":
-            custPath = get_customer_csv_path()
-            try:
-                userInfo = pd.read_csv(custPath)
-                if 'Username' not in userInfo or 'CustomerID' not in userInfo:
-                    raise ValueError("Malformed customer CSV.")
-                customerID = userInfo.loc[userInfo['Username'] == username, 'CustomerID'].iloc[0]
-            except (IndexError, ValueError) as e:
-                flash("User not found or data error", "danger")
-                return None, str(e)
+# ====================
+# Helper Functions
+# ====================
 
-        user_type = "Customer" if session_key == "user" else "Employee"
-        login_result = webLogin.login_page_button_pressed(login_type, user_type, username, password)
-        if not login_result or login_result.get("status") == "error":
-            error_message = login_result.get("message", "Login failed") if login_result else "Login function returned None"
-            flash(error_message, "danger")
-            return None, error_message
+def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Process login form submission for different user types.
 
-        session[session_key] = username
-        if session_key == "user":
-            session["customerID"] = int(customerID)
+    Args:
+        form (LoginForm): The login form instance.
+        session_key (str): The session key to use ("customer", "teller", "admin").
+        login_type (int): The type of login attempt (LOGIN or NEW_ACCOUNT).
 
-        flash("Login Successful!", "success")
-        return url_for(f'accounts.{session_key}_dashboard'), None
+    Returns:
+        Tuple[Optional[str], Optional[str]]: 
+            - Redirection URL on success
+            - Error message on failure (if any)
+    """
+    # Prevent customer or employee from logging in again if already logged in
+    if session.get(session_key):
+        flash("Already Logged In", "warning")
+        # Dynamically create the dashboard URL based on the session_key
+        if session_key == "customer":
+            return url_for('customer.customer_dashboard'), None
+        elif session_key == "employee":
+            return url_for('employee.employee_dashboard'), None
+        else:
+            return None, "Unknown session type"
 
-    return None, None
+    # Guard clause for invalid form submission
+    if not form.validate_on_submit():
+        return None, None
 
-# -----------------------------------------------------------------------------
-# Authentication Routes
-# -----------------------------------------------------------------------------
-@auth_bp.route('/customer/login', methods=['GET', 'POST'])
-def login():
+    username: str = form.username.data
+    password: str = form.password.data
+
+    # Look up CustomerID if customer login
+    if session_key == "customer":
+        try:
+            customer_id: int = get_customer_id_by_username(username)
+        except (IndexError, ValueError) as e:
+            logger.error(f"Error retrieving customer ID for {username}: {e}")
+            flash_error("Customer not found or data error")
+            return None, str(e)
+
+    user_type: str = "Customer" if session_key == "customer" else "Employee"
+
+    # Attempt login
+    login_result = webLogin.login_page_button_pressed(login_type, user_type, username, password)
+    if not login_result or login_result.get("status") == "error":
+        error_message = login_result.get("message", "Login failed") if login_result else "Login function returned None"
+        flash_error(error_message)
+        return None, error_message
+
+    # Store login session data
+    session[session_key] = username
+    if session_key == "customer":
+        session["customer_id"] = int(customer_id)
+
+    flash_success("Login Successful!")
+    # Dynamically create the redirect URL based on the session_key
+    if session_key == "customer":
+        return url_for('customer.customer_dashboard'), None
+    elif session_key == "employee":
+        return url_for('employee.employee_dashboard'), None
+
+    return None, "Unknown session type"
+
+
+def handle_login(session_key: str, template_name: str) -> str:
+    """
+    General handler for rendering login form and processing login attempt.
+
+    Args:
+        session_key (str): Session key to store (customer, teller, admin).
+        template_name (str): Template to render.
+
+    Returns:
+        str: Redirect or rendered template.
+    """
     form = LoginForm()
-    redirect_url, error = process_login(form, "user", LOGIN)
+    next_url = request.args.get("next") or request.form.get("next")
+    redirect_url, error = process_login(form, session_key, LOGIN)
+
     if redirect_url:
-        return redirect(redirect_url)
-    return render_template('auth/login.html', form=form)
+        return redirect(next_url if next_url and next_url != "None" else redirect_url)
+
+    return render_template(template_name, form=form)
+
+def get_customer_id_by_username(username: str) -> int:
+    """
+    Look up CustomerID for a given username from the customer CSV.
+
+    Args:
+        username (str): The username to search for.
+
+    Returns:
+        int: The CustomerID.
+
+    Raises:
+        ValueError: If CSV is malformed.
+        IndexError: If username is not found.
+    """
+    customer_csv_path: str = get_csv_path("customers.csv")
+    user_info = pd.read_csv(customer_csv_path)
+
+    if 'Username' not in user_info.columns or 'CustomerID' not in user_info.columns:
+        raise ValueError("Malformed customer CSV: missing required columns.")
+
+    customer_row = user_info[user_info['Username'].str.lower() == username.lower()]
+    if customer_row.empty:
+        raise IndexError("Username not found in customer CSV.")
+
+    return int(customer_row['CustomerID'].iloc[0])
+
+# ====================
+# Routes
+# ====================
+
+@auth_bp.route('/customer/login', methods=['GET', 'POST'])
+def customer_login():
+    """
+    Customer login page and logic.
+
+    Returns:
+        Response: Redirect on success, login form on failure.
+    """
+    form = LoginForm()
+    next_url = request.args.get("next") or request.form.get("next")
+    redirect_url, error = process_login(form, "customer", LOGIN)
+    
+    if redirect_url:
+        return redirect(next_url or redirect_url)
+
+    return render_template("auth/login.html", form=form,
+                           title="UAH Bank - Login",
+                           header_text="Customer Login",
+                           login_instructions="Enter your username and password to securely access your UAH Bank account.",
+                           form_action=url_for('auth.customer_login'),
+                           show_signup_button=True,
+                           signup_url=url_for("registration.register_step1"))
 
 @auth_bp.route('/teller/login', methods=['GET', 'POST'])
 def teller_login():
+    """
+    Teller login page and logic.
+    """
     form = LoginForm()
+    next_url = request.args.get("next") or request.form.get("next")
     redirect_url, error = process_login(form, "teller", LOGIN)
+
     if redirect_url:
-        return redirect(redirect_url)
-    return render_template('auth/teller_login.html', form=form)
+        return redirect(next_url or redirect_url)
+
+    return render_template("auth/login.html", form=form,
+                           title="UAH Bank - Teller Login",
+                           header_text="Teller Login",
+                           login_instructions="Please enter your teller username and password to log in.",
+                           form_action=url_for('auth.teller_login'),
+                           forgot_password_url="#",  # Add proper URL later
+                           show_signup_button=False)
 
 @auth_bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    """
+    Admin login page and logic.
+    """
     form = LoginForm()
+    next_url = request.args.get("next") or request.form.get("next")
     redirect_url, error = process_login(form, "admin", LOGIN)
+
     if redirect_url:
-        return redirect(redirect_url)
-    return render_template('auth/admin_login.html', form=form)
+        return redirect(next_url or redirect_url)
 
-# -----------------------------------------------------------------------------
-# Customer Registration Routes
-# -----------------------------------------------------------------------------
-@auth_bp.route('/customer/register/step1', methods=['GET', 'POST'])
-def register_step1():
-    form = RegistrationStep1Form()
-    if form.validate_on_submit():
-        session['step1'] = {
-            'first_name': form.first_name.data,
-            'last_name': form.last_name.data,
-            'address': form.address.data,
-            'phone_number': form.phone_number.data,
-            'tax_id': form.tax_id.data,
-            'birthday': form.birthday.data,
-        }
-        return redirect(url_for('auth.register_step2'))
-    return render_template('auth/register_step1.html', form=form)
+    return render_template("auth/login.html", form=form,
+                           title="UAH Bank - Admin Login",
+                           header_text="Admin Login",
+                           login_instructions="Enter your administrator credentials to log in.",
+                           form_action=url_for('auth.admin_login'),
+                           forgot_password_url="#",  # Add proper URL later
+                           show_signup_button=False)
 
-@auth_bp.route('/customer/register/step2', methods=['GET', 'POST'])
-def register_step2():
-    form = RegistrationStep2Form()
-    if form.validate_on_submit():
-        session['step2'] = {
-            'username': form.username.data,
-            'password': form.password.data,
-            'email': form.email.data,
-            'security_question_1': form.security_question_1.data,
-            'security_answer_1': form.security_answer_1.data.lower(),
-            'security_question_2': form.security_question_2.data,
-            'security_answer_2': form.security_answer_2.data.lower(),
-        }
-        return redirect(url_for('auth.register_step3'))
-    return render_template('auth/register_step2.html', form=form)
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    """
+    Logout route: Clears session and redirects to home.
 
-@auth_bp.route('/customer/register/step3', methods=['GET', 'POST'])
-def register_step3():
-    form = RegistrationStep3Form()
-
-    if form.validate_on_submit():
-        step1_data = session.get('step1')
-        step2_data = session.get('step2')
-
-        if not step1_data or not step2_data:
-            flash("Your session has expired. Please complete the registration again.", "danger")
-            return redirect(url_for('auth.register_step1'))
-
-        session['account_type'] = form.account_type.data
-        return redirect(url_for('auth.finalize_registration'))
-
-    return render_template('auth/register_step3.html', form=form)
-
-@auth_bp.route('/customer/register/finalize', methods=['GET', 'POST'])
-def finalize_registration():
-    step1_data = session.get('step1')
-    step2_data = session.get('step2')
-    account_type = session.get('account_type')
-
-    if not step1_data or not step2_data or not account_type:
-        flash("Your session has expired. Please complete the registration again.", "danger")
-        return redirect(url_for('auth.register_step1'))
-
-    user_data = {**step1_data, **step2_data, 'account_type': account_type}
-    form = DepositForm()
-
-    if form.validate_on_submit():
-        deposit_amount = form.deposit_amount.data
-
-        try:
-            login_result = webLogin.login_page_button_pressed(
-            NEW_ACCOUNT,
-            "Customer",
-            user_data['username'],
-            user_data['password'],
-            user_data['first_name'], 
-            user_data['last_name'],  
-            user_data['address'],
-            user_data['email'],
-            user_data['phone_number'],
-            user_data['tax_id'], 
-            user_data['security_answer_1'],
-            user_data['security_answer_2'],
-        )
-
-            if login_result.get("status") == "error":
-                flash(login_result.get("message", "Registration failed"), "danger")
-                return redirect(url_for('auth.register_step1'))
-
-            custPath = get_customer_csv_path()
-            userInfo = pd.read_csv(custPath)
-            if 'Username' not in userInfo.columns:
-                raise ValueError(f"Expected column 'Username' in CSV but got: {list(userInfo.columns)}")
-            
-            customer_row = userInfo[userInfo['Username'].str.lower() == user_data['username'].lower()]
-            if customer_row.empty:
-                raise IndexError("Username not found in CSV.")
-
-            customerID = int(customer_row['CustomerID'].iloc[0])
-            session["customerID"] = customerID
-
-            newAccount = openAcc.open_account(
-                customerID,
-                user_data['account_type'],
-                deposit_amount
-            )
-
-            session['registration_finalized'] = True
-            session.pop('step1', None)
-            session.pop('step2', None)
-            session.pop('account_type', None)
-
-            return redirect(url_for('accounts.user_dashboard'))
-
-        except Exception as e:
-            flash(f"Registration failed: {str(e)}", "danger")
-            return render_template('auth/register_step4.html', account_type=account_type, form=form)
-
-    if session.get("registration_finalized"):
-        flash("Account already created. Please log in.", "info")
-        return redirect(url_for("auth.login"))
-
-    return render_template('auth/register_step4.html', account_type=account_type, form=form)
-
-@auth_bp.route('/settings', methods=['GET', 'POST'])
-def settings():
-    form = SettingsForm()
-    username = session.get("user")
-
-    if not username:
-        flash("You must be logged in to access settings.", "warning")
-        return redirect(url_for('auth.login'))
-
-    # Load user data from CSVs
-    custPath = get_customer_csv_path()
-    perPath = get_person_csv_path()
-
-    cust_df = pd.read_csv(custPath)
-    per_df = pd.read_csv(perPath)
-
-    try:
-        customer_id = cust_df.loc[cust_df['Username'] == username, 'CustomerID'].iloc[0]
-    except IndexError:
-        flash("User not found.", "danger")
-        return redirect(url_for('auth.login'))
-
-    person_idx = per_df.index[per_df['ID'] == customer_id].tolist()
-    if not person_idx:
-        flash("Customer data not found.", "danger")
-        return redirect(url_for('auth.login'))
-
-    idx = person_idx[0]
-
-    if form.validate_on_submit():
-        changes = {}
-        newUser = form.username.data.strip()
-
-        if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
-            changes['FirstName'] = form.first_name.data.strip()
-        if form.last_name.data.strip() != str(per_df.at[idx, 'LastName']).strip():
-            changes['LastName'] = form.last_name.data.strip()
-        if form.phone.data.strip() != str(per_df.at[idx, 'PhoneNum']).strip():
-            changes['PhoneNum'] = form.phone.data.strip()
-        if form.email.data.strip() != str(per_df.at[idx, 'Email']).strip():
-            changes['Email'] = form.email.data.strip()
-        if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
-            changes['Address'] = form.address.data.strip()
-        if newUser != username:
-            # Update in persons.csv
-            per_df.at[idx, 'Username'] = newUser
-            per_df.to_csv(perPath, index=False)
-
-            # Update in customers.csv
-            cust_df.loc[cust_df['Username'] == username, 'Username'] = newUser
-            cust_df.to_csv(custPath, index=False)
-
-            session['user'] = newUser  # update session
-        if form.password.data.strip():
-            hashed_pw = hashlib.sha512(form.password.data.strip().encode()).hexdigest()
-            changes['Password'] = hashed_pw
-
-        if changes:
-            messages = []
-            success = True
-            for key, value in changes.items():
-                result = modifyInfo.modify_info(customer_id, {key: value})
-                messages.append(result["message"])
-                if result["status"] != "success":
-                    success = False
-            flash(" | ".join(messages), "success" if success else "danger")
-        else:
-            flash("No changes were made.", "info")
-
-        return redirect(url_for('auth.settings'))
-
-    # Pre-fill form values
-    form.first_name.data = per_df.at[idx, 'FirstName']
-    form.last_name.data = per_df.at[idx, 'LastName']
-    form.phone.data = per_df.at[idx, 'PhoneNum']
-    form.email.data = per_df.at[idx, 'Email']
-    form.address.data = per_df.at[idx, 'Address']
-    form.username.data = username
-    # Extract last 4 of SSN
-    ssn = per_df.at[idx, 'SSN'] if 'SSN' in per_df.columns else ""
-    form.ssn_last4.data = str(ssn)[-4:] if pd.notna(ssn) and len(str(ssn)) >= 4 else ""
-
-    return render_template("settings.html", form=form, title="User Settings")
+    Returns:
+        Response: Redirect to home.
+    """
+    session.clear()
+    flash_success("You have been logged out.")
+    return redirect(url_for('home'))

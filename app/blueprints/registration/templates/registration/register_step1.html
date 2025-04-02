@@ -1,13 +1,30 @@
 {% extends "base.html" %}
-{% block meta_description %}Secure account registration for Evergreen Bank.{% endblock %}
-{% block title %}Evergreen Bank - Create Account{% endblock %}
+
+<!-- Meta description block for SEO -->
+{% block meta_description %}
+Secure account registration for Evergreen Bank.
+{% endblock %}
+
+<!-- Title block for the page -->
+{% block title %}
+Evergreen Bank - Create Account
+{% endblock %}
+
+<!-- Empty header block for additional headers if needed -->
 {% block header_extra %}{% endblock %}
+
 {% block content %}
+<!-- Main content of the page -->
 <main>
+    
+    <!-- Account registration container section -->
     <section class="register-container" aria-labelledby="register-heading">
         <h2 id="register-heading">Create Account</h2>
-        <form action="{{ url_for('auth.register_step1') }}" method="post" novalidate>
-            {{ form.hidden_tag() }}
+        
+        <!-- Form to register the user with the POST method -->
+        <form action="{{ url_for('registration.register_step1') }}" method="post" novalidate>
+            {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+            
             <!-- First Name Field -->
             <div class="form-group">
                 <label for="first_name">First Name *</label>
@@ -20,6 +37,7 @@
                 </div>
                 {% endif %}
             </div>
+            
             <!-- Last Name Field -->
             <div class="form-group">
                 <label for="last_name">Last Name *</label>
@@ -32,6 +50,7 @@
                 </div>
                 {% endif %}
             </div>
+            
             <!-- Address Field -->
             <div class="form-group">
                 <label for="address">Address *</label>
@@ -44,6 +63,7 @@
                 </div>
                 {% endif %}
             </div>
+            
             <!-- Phone Number Field -->
             <div class="form-group">
                 <label for="phone_number">Phone Number *</label>
@@ -56,6 +76,7 @@
                 </div>
                 {% endif %}
             </div>
+            
             <!-- Tax ID Field -->
             <div class="form-group">
                 <label for="tax_id">Social Security Number (Tax ID) *</label>
@@ -68,6 +89,7 @@
                 </div>
                 {% endif %}
             </div>
+            
             <!-- Birthday Field -->
             <div class="form-group">
                 <label for="birthday">Birthday *</label>
@@ -80,13 +102,19 @@
                 </div>
                 {% endif %}
             </div>
-            <button type="submit" class="btn btn--register" onclick="window.location.href='{{ signup_url or url_for('auth.register_step1') }}';">
+            
+            <!-- Submit button for moving to the next registration step -->
+            <button type="submit" class="btn btn--register" onclick="window.location.href='{{ signup_url or url_for('registration.register_step1') }}';">
                 Next Step
             </button>
-            <button type="button" class="btn btn--login" onclick="window.location.href='{{ url_for('auth.login') }}';">
+            
+            <!-- Button for redirecting to the login page -->
+            <button type="button" class="btn btn--login" onclick="window.location.href='{{ url_for('auth.customer_login') }}';">
                 Login
             </button>
         </form>
     </section>
+
 </main>
 {% endblock %}
+
