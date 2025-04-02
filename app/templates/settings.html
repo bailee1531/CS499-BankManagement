@@ -20,6 +20,18 @@
     <form id="settings-form" action="{{ form_action or url_for('auth.settings') }}" method="post" novalidate>
       {{ form.hidden_tag() }}
 
+      <!-- First Name -->
+      <div class="form-group">
+        <label for="first_name">First Name</label>
+        {{ form.first_name(class="form-control", disabled=True) }}
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-group">
+        <label for="last_name">Last Name</label>
+        {{ form.last_name(class="form-control", disabled=True) }}
+      </div>
+    
       <!-- Phone -->
       <div class="form-group">
         <label for="phone">Phone Number</label>
@@ -46,19 +58,6 @@
         {% endif %}
       </div>
 
-      <!-- New Password -->
-      <div class="form-group">
-        <label for="password">New Password</label>
-        {{ form.password(class="form-control", disabled=True) }}
-        {% if form.password.errors %}
-        <div class="error-message">
-          {% for error in form.password.errors %}
-          <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-      </div>
-
       <!-- Address -->
       <div class="form-group">
         <label for="address">Address</label>
@@ -72,15 +71,37 @@
         {% endif %}
       </div>
 
-      {% with messages = get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        {{ form.username(class="form-control", disabled=True) }}
+        {% if form.username.errors %}
+        <div class="error-message">
+          {% for error in form.username.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
-      {% endwith %}
+
+      <!-- New Password -->
+      <div class="form-group">
+        <label for="password">New Password</label>
+        {{ form.password(class="form-control", disabled=True) }}
+        {% if form.password.errors %}
+        <div class="error-message">
+          {% for error in form.password.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- SSN Last 4 -->
+      <div class="form-group">
+        <label for="ssn_last4">SSN (Last 4 Digits)</label>
+        {{ form.ssn_last4(class="form-control", disabled=True) }}
+      </div>
 
       <button type="submit" class="btn btn--update" id="update-btn" disabled>Update Settings</button>
     </form>

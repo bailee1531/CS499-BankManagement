@@ -245,47 +245,57 @@ def settings():
 
     idx = person_idx[0]
 
-    # if form.validate_on_submit():
-        # changes = {}
-
-        # if form.phone.data.strip() != str(per_df.at[idx, 'PhoneNum']).strip():
-        #     changes['PhoneNum'] = form.phone.data.strip()
-        # if form.email.data.strip() != str(per_df.at[idx, 'Email']).strip():
-        #     changes['Email'] = form.email.data.strip()
-        # if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
-        #     changes['Address'] = form.address.data.strip()
-        # if form.password.data.strip():
-        #     hashed_pw = hashlib.sha512(form.password.data.strip().encode()).hexdigest()
-        #     changes['Password'] = hashed_pw
-
-        # if changes:
-        #     messages = []
-        #     success = True
-        #     for key, value in changes.items():
-        #         result = modifyInfo.modify_info(customer_id, {key: value})
-        #         messages.append(result["message"])
-        #         if result["status"] != "success":
-        #             success = False
-        #     flash(" | ".join(messages), "success" if success else "danger")
-        # else:
-        #     flash("No changes were made.", "info")
-
-        # return redirect(url_for('auth.settings'))
     if form.validate_on_submit():
-        print("Form validated!")
-        result = modifyInfo.modify_info(customer_id, {'PhoneNum': '111-111-1111'})
-        print("DEBUG RESULT:", result)
-        flash(result["message"], "success" if result["status"] == "success" else "danger")
+        changes = {}
+        newUser = form.username.data.strip()
+
+        if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
+            changes['FirstName'] = form.first_name.data.strip()
+        if form.last_name.data.strip() != str(per_df.at[idx, 'LastName']).strip():
+            changes['LastName'] = form.last_name.data.strip()
+        if form.phone.data.strip() != str(per_df.at[idx, 'PhoneNum']).strip():
+            changes['PhoneNum'] = form.phone.data.strip()
+        if form.email.data.strip() != str(per_df.at[idx, 'Email']).strip():
+            changes['Email'] = form.email.data.strip()
+        if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
+            changes['Address'] = form.address.data.strip()
+        if newUser != username:
+            # Update in persons.csv
+            per_df.at[idx, 'Username'] = newUser
+            per_df.to_csv(perPath, index=False)
+
+            # Update in customers.csv
+            cust_df.loc[cust_df['Username'] == username, 'Username'] = newUser
+            cust_df.to_csv(custPath, index=False)
+
+            session['user'] = newUser  # update session
+        if form.password.data.strip():
+            hashed_pw = hashlib.sha512(form.password.data.strip().encode()).hexdigest()
+            changes['Password'] = hashed_pw
+
+        if changes:
+            messages = []
+            success = True
+            for key, value in changes.items():
+                result = modifyInfo.modify_info(customer_id, {key: value})
+                messages.append(result["message"])
+                if result["status"] != "success":
+                    success = False
+            flash(" | ".join(messages), "success" if success else "danger")
+        else:
+            flash("No changes were made.", "info")
+
         return redirect(url_for('auth.settings'))
-    else:
-        print("Form did NOT validate.")
-        print("Form errors:", form.errors)
-
-
 
     # Pre-fill form values
+    form.first_name.data = per_df.at[idx, 'FirstName']
+    form.last_name.data = per_df.at[idx, 'LastName']
     form.phone.data = per_df.at[idx, 'PhoneNum']
     form.email.data = per_df.at[idx, 'Email']
     form.address.data = per_df.at[idx, 'Address']
+    form.username.data = username
+    # Extract last 4 of SSN
+    ssn = per_df.at[idx, 'SSN'] if 'SSN' in per_df.columns else ""
+    form.ssn_last4.data = str(ssn)[-4:] if pd.notna(ssn) and len(str(ssn)) >= 4 else ""
 
     return render_template("settings.html", form=form, title="User Settings")

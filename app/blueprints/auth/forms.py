@@ -145,8 +145,12 @@ class DepositForm(FlaskForm):
 # SettingsForm: Customer can modify personal information.
 # -----------------------------------------------------------------------------
 class SettingsForm(FlaskForm):
+    first_name = StringField('First Name', validators=[Optional(), Length(max=50)])
+    last_name = StringField('Last Name', validators=[Optional(), Length(max=50)])
     phone = StringField('Phone', validators=[Optional(), Regexp(r'^\d{3}-\d{3}-\d{4}$')])
-    password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
     email = StringField('Email', validators=[Optional(), Email()])
     address = StringField('Address', validators=[Optional(), Length(max=100)])
+    username = StringField('Username', validators=[Optional(), Length(min=3, max=25)])
+    password = PasswordField('New Password', validators=[Optional(), Length(min=8)])    
+    ssn_last4 = StringField('SSN (Last 4)', render_kw={"readonly": True})  # Display only
     submit = SubmitField('Update Settings')
