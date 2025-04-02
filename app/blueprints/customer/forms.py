@@ -7,6 +7,9 @@ from app.blueprints.sharedUtilities import (
     flash_error
 )
 
+# -----------------------------------------------------------------------------
+# TransferForm: Form for transferring funds.
+# -----------------------------------------------------------------------------
 class TransferForm(FlaskForm):
     src_account = SelectField('', choices=[])
     dest_account = SelectField('', choices=[])
@@ -16,6 +19,14 @@ class TransferForm(FlaskForm):
     )
 
 def choose_account():
+    """
+    Populates the dropdown fields with valid accounts.
+
+    Returns:
+    --------
+    form: obj
+        Form object to be referenced
+    """
     form = TransferForm()
     customer_id: int = get_logged_in_customer()  # Get the logged-in customer's ID
     try:
@@ -24,6 +35,7 @@ def choose_account():
         choices = []
         # Iterate through the customer accounts and create a list of account information
         for _, row in customer_accounts_df.iterrows():
+            # Only shows valid account types in the drop down
             if row["AccountType"] in ["Checking", "Savings", "Money Market"]:
                choices.append((str(row["AccountID"]), f"{row['AccountType']} {row['AccountID']}"))
         form.src_account.choices = choices

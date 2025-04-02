@@ -77,9 +77,19 @@ def account_detail(account_id: int) -> Response:
         # If there is an error retrieving account details, show an error message and redirect
         flash_error("Error retrieving account details.")
 
+
 @customer_bp.route('/account/transfer', methods=['GET', 'POST'])
 @login_required('customer_id')
 def transfer_funds() -> Response:
+    """
+    Display two dropdowns. One for the source account and one for the destination account.
+
+    Retrieves and displays the ID and type for each checking, savings, and money market account.
+
+    Returns:
+    --------
+    Response: Rendered template with account details or redirection on error.
+    """
     form = TransferForm()
     form = choose_account()
     amount = form.amount.data
