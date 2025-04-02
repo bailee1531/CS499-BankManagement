@@ -21,5 +21,6 @@ class SettingsForm(FlaskForm):
     email = StringField('Email', validators=[Optional(), Email()])
     address = StringField('Address', validators=[Optional(), Length(max=100)])
     username = StringField('Username', validators=[Optional(), Length(min=3, max=25)])
+    current_password = PasswordField('Current Password', validators=[Optional(), Length(min=8)])
     password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
     submit = SubmitField('Update Settings')

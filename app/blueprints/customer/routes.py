@@ -1,7 +1,8 @@
 import pandas as pd
-import hashlib
+import os
+from Crypto.PublicKey import ECC
 from flask import ( Blueprint, render_template, Response,
-    redirect, url_for, flash, session
+    redirect, url_for, flash, session, current_app
 )
 from app.blueprints.sharedUtilities import (
     get_csv_path, get_logged_in_customer,
@@ -86,7 +87,7 @@ def settings():
     username = session.get("user")
     if not username:
         flash("You must be logged in to access settings.", "warning")
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.customer_login'))
 
     # Load user data from CSVs
     cust_df = pd.read_csv(get_csv_path("customers.csv"))
@@ -96,12 +97,12 @@ def settings():
         customer_id = cust_df.loc[cust_df['Username'] == username, 'CustomerID'].iloc[0]
     except IndexError:
         flash_error("User not found.")
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.customer_login'))
 
     person_idx = per_df.index[per_df['ID'] == customer_id].tolist()
     if not person_idx:
         flash_error("Customer data not found.")
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.customer_login'))
 
     idx = person_idx[0]
 
@@ -129,8 +130,38 @@ def settings():
             session['user'] = newUser
             changes['Username'] = newUser
         if form.password.data.strip():
-            hashed_pw = hashlib.sha512(form.password.data.strip().encode()).hexdigest()
-            changes['Password'] = hashed_pw
+            if not form.current_password.data.strip():
+                flash("Current password is required to update your password.", "danger")
+                return redirect(url_for('customer.settings'))
+
+            pem_path = os.path.abspath(os.path.join(current_app.root_path, "..", f"{customer_id}privatekey.pem"))
+            try:
+                with open(pem_path, 'rt') as f:
+                    key_data = f.read()
+                    key = ECC.import_key(key_data, form.current_password.data.strip())
+            except ValueError as ve:
+                flash("Current password is incorrect.", "danger")
+                print(f"[DEBUG] ECC import failed: {ve}")
+                return redirect(url_for('customer.settings'))
+            except Exception as e:
+                import traceback
+                flash("Error accessing private key file.", "danger")
+                print(f"[DEBUG] Unexpected error: {e}")
+                traceback.print_exc()
+                return redirect(url_for('customer.settings'))
+
+            # Re-encrypt with new password
+            encrypted = key.export_key(
+                format='PEM',
+                passphrase=form.password.data.strip(),
+                use_pkcs8=True,
+                protection='PBKDF2WithHMAC-SHA512AndAES256-CBC',
+                compress=True,
+                prot_params={'iteration_count': 210000}
+            )
+            with open(pem_path, 'wt') as f:
+                f.write(encrypted)
+            changes['Password'] = '***'
 
         if changes:
             messages = []

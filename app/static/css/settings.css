@@ -96,3 +96,12 @@ main {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* Improve readability of disabled inputs */
+input:disabled {
+  color: #e0e0e0;
+  opacity: 1;
+  cursor: not-allowed;
+  font-style: italic;
+}
+

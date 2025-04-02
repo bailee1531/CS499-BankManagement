@@ -94,6 +94,19 @@
         {% endif %}
       </div>
 
+      <!-- Current Password (for verifying password change) -->
+      <div class="form-group" id="current-password-group" style="display: none;">
+        <label for="current_password">Current Password</label>
+        {{ form.current_password(class="form-control", disabled=True) }}
+        {% if form.current_password.errors %}
+        <div class="error-message">
+          {% for error in form.current_password.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
       <button type="submit" class="btn btn--update" id="update-btn" disabled>Update Settings</button>
     </form>
   </section>
@@ -109,6 +122,21 @@
     });
 
     updateBtn.disabled = !updateBtn.disabled;
+  });
+
+  // Show "Current Password" if new password is being changed
+  const newPasswordInput = document.querySelector('input[name="password"]');
+  const currentPasswordGroup = document.getElementById('current-password-group');
+  const currentPasswordInput = document.querySelector('input[name="current_password"]');
+
+  newPasswordInput.addEventListener('input', () => {
+    if (newPasswordInput.value.length > 0) {
+      currentPasswordGroup.style.display = 'block';
+      currentPasswordInput.disabled = false;
+    } else {
+      currentPasswordGroup.style.display = 'none';
+      currentPasswordInput.disabled = true;
+    }
   });
 </script>
 {% endblock %}
