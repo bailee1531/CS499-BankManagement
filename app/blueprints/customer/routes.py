@@ -110,11 +110,11 @@ def settings():
         newUser = form.username.data.strip()
 
         if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
-            changes['FirstName'] = form.first_name.data.strip()
+            changes['First Name'] = form.first_name.data.strip()
         if form.last_name.data.strip() != str(per_df.at[idx, 'LastName']).strip():
-            changes['LastName'] = form.last_name.data.strip()
+            changes['Last Name'] = form.last_name.data.strip()
         if form.phone.data.strip() != str(per_df.at[idx, 'PhoneNum']).strip():
-            changes['PhoneNum'] = form.phone.data.strip()
+            changes['Phone Number'] = form.phone.data.strip()
         if form.email.data.strip() != str(per_df.at[idx, 'Email']).strip():
             changes['Email'] = form.email.data.strip()
         if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
@@ -127,6 +127,7 @@ def settings():
             cust_df.to_csv(get_csv_path("customers.csv"), index=False)
 
             session['user'] = newUser
+            changes['Username'] = newUser
         if form.password.data.strip():
             hashed_pw = hashlib.sha512(form.password.data.strip().encode()).hexdigest()
             changes['Password'] = hashed_pw
