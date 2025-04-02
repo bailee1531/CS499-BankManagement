@@ -32,7 +32,9 @@
           </a>
         {% endfor %}
         <br>
+        {% if accounts|length > 1 %}
         <a href="{{ url_for('customer.transfer_funds') }}" class="btn btn--action" style="background-color: #7e7f9a; width: 30%;">Transfer Funds</a>
+        {% endif %}
       </div>
     </section>
   </main>
