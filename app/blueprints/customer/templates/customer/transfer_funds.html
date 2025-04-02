@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-  Evergreen Bank - Transfer Funds
+  Transfer Funds
 {% endblock %}
 
 {% block meta_description %}
@@ -18,19 +18,21 @@
   <!-- Main content of the page -->
   <main class="accounts-page">
     <!-- Section for displaying all accounts -->
-    <section class="accounts-section">
+    <section class="accounts-section" style="width: 75%;">
       <h1 id="account-selection-heading">Transfer Funds</h1>
       <div class="accounts-container">
         <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
             {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
-            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
-                <h2>Source Account</h2>
+            <div style="display: flex; justify-content: space-around;">
+              <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; margin: 1.5rem;">
+                <h2>From</h2>
                 {{ form.src_account.label }} {{ form.src_account() }}
-            </article>
-            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
-                <h2>Destination Account</h2>
+              </article>
+              <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; margin: 1.5rem;">
+                <h2>To</h2>
                 {{ form.dest_account.label }} {{ form.dest_account }}
-            </article>
+              </article>
+            </div>
             <div class="form-group" style="color: white;">
                 <!-- Label for the deposit amount input field -->
                 <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
