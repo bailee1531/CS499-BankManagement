@@ -1,18 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}
-  <!-- Title for the page displayed in the browser tab -->
   Account Dashboard - Coming Soon
 {% endblock %}
 
 {% block meta_description %}
-  <!-- Meta description for SEO purposes -->
-  Your personalized Evergreen Bank dashboard is on the way. Check back soon for account insights and tools.
+  Your personalized Evergreen Bank dashboard
 {% endblock %}
 
 {% block head_extra %}
-  <!-- Additional head content, includes the CSS link for the user dashboard -->
-  {{ super() }}  <!-- Calls the parent template's head content -->
+  {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
 {% endblock %}
 
@@ -35,6 +32,7 @@
             </span>
           </a>
         {% endfor %}
+        <a href="{{ url_for('customer.transfer_funds') }}">Transfer Funds</a>
       </div>
     </section>
   </main>

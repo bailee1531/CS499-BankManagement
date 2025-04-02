@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Evergreen Bank - Transfer Funds
+{% endblock %}
+
+{% block meta_description %}
+  Transfer your money to a different account.
+{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+  <!-- Main content of the page -->
+  <main class="transfer-funds">
+    <h1 id="transfer-funds-heading">Transfer Funds</h1>
+    
+    <!-- Section for displaying all accounts -->
+    <section class="accounts-section">
+      <div class="accounts-container">
+        <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
+            <h2>Source Account</h2>
+            <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
+                {{ srcForm.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+                {{ srcForm.group_id.label }} {{ srcForm.group_id() }}
+            </form>
+        </article>
+        <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
+            <h2>Destination Account</h2>
+            <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
+                {{ destForm.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+                {{ destForm.group_id.label }} {{ destForm.group_id() }}
+            </form>
+        </article>
+        <button class='btn' type="submit" style="width: 25%;">Transfer</button>
+      </div>
+    </section>
+  </main>
+{% endblock %}
