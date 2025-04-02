@@ -11,6 +11,7 @@
 {% block head_extra %}
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -21,21 +22,30 @@
     <!-- Section for displaying all accounts -->
     <section class="accounts-section">
       <div class="accounts-container">
-        <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
-            <h2>Source Account</h2>
-            <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
-                {{ srcForm.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
-                {{ srcForm.group_id.label }} {{ srcForm.group_id() }}
-            </form>
-        </article>
-        <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
-            <h2>Destination Account</h2>
-            <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
-                {{ destForm.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
-                {{ destForm.group_id.label }} {{ destForm.group_id() }}
-            </form>
-        </article>
-        <button class='btn' type="submit" style="width: 25%;">Transfer</button>
+        <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
+            {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
+                <h2>Source Account</h2>
+                {{ form.src_account.label }} {{ form.src_account() }}
+            </article>
+            <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none;">
+                <h2>Destination Account</h2>
+                {{ form.dest_account.label }} {{ form.dest_account }}
+            </article>
+            <div class="form-group">
+                <!-- Label for the deposit amount input field -->
+                <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
+                
+                <!-- Deposit amount input field with additional attributes for accessibility and styling -->
+                {{ form.amount(size=32, **{'class': 'form-control', 'id': form.amount.id, 'aria-describedby': 'deposit-help'}) }}
+                
+                <!-- Help text for deposit field -->
+                <small id="deposit-help" class="visually-hidden">
+                    Enter a valid amount in USD to transfer between your accounts.
+                </small>
+            </div>
+            <button class='btn' type="submit" style="width: 25%;">Transfer</button>
+        </form>
       </div>
     </section>
   </main>

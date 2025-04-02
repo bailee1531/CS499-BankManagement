@@ -79,4 +79,4 @@ def transferFunds(srcAccID: int, destAccID: int, amount: Decimal) -> dict:
             deposit(srcAccID, amount)  # Refund the withdrawn amount
             return {"status": "error", "message": "Deposit failed. Transaction rolled back."}
     else:
-        return {"status": "error", "message": "Withdrawal failed. Transfer aborted."}
+        return {"status": "error", "message": withdraw_result.get("message")}

@@ -1,48 +1,37 @@
 # Importing necessary libraries from Flask-WTF and WTForms
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+from wtforms import SelectField, DecimalField
+from wtforms.validators import DataRequired, NumberRange
 from app.blueprints.sharedUtilities import (
     get_logged_in_customer, get_customer_accounts,
     flash_error
 )
 
-class AccountsForm(FlaskForm):
-    group_id = SelectField(u'Accounts', choices=[])
+class TransferForm(FlaskForm):
+    src_account = SelectField('Source Account', choices=[])
+    dest_account = SelectField('Destination Account', choices=[])
+    amount = DecimalField(
+        'Transfer Amount ($)',
+        validators=[DataRequired(), NumberRange(min=0, message="Amount must be positive.")]
+    )
 
-def choose_src():
+def choose_account():
+    form = TransferForm()
     customer_id: int = get_logged_in_customer()  # Get the logged-in customer's ID
-    srcForm = AccountsForm()
     try:
         # Retrieve customer accounts data
         customer_accounts_df = get_customer_accounts(customer_id)
-        srcChoices = []
+        choices = []
         # Iterate through the customer accounts and create a list of account information
         for _, row in customer_accounts_df.iterrows():
-            if row["AccountType"] in ["checking", "savings", "money market"]:
-               srcChoices.append((str(row["AccountID"]), f"{row['AccountType']} {row['AccountID']}"))
-        srcForm.group_id.choices = srcChoices
-        return srcForm
+            if row["AccountType"] in ["Checking", "Savings", "Money Market"]:
+               choices.append((str(row["AccountID"]), f"{row['AccountType']} {row['AccountID']}"))
+        form.src_account.choices = choices
+        form.dest_account.choices = choices
+        return form
     except Exception as e:
         # If there is an error while retrieving the accounts, show an error message
         flash_error("Error retrieving account information.")
-        srcForm.group_id.choices = []  # Set an empty list for accounts on error
-        return srcForm
-    
-def choose_dest():
-    customer_id: int = get_logged_in_customer()  # Get the logged-in customer's ID
-    destForm = AccountsForm()
-    try:
-        # Retrieve customer accounts data
-        customer_accounts_df = get_customer_accounts(customer_id)
-        destChoices = []
-        # Iterate through the customer accounts and create a list of account information
-        for _, row in customer_accounts_df.iterrows():
-            if row["AccountType"] in ["checking", "savings", "money market"]:
-               destChoices.append((str(row["AccountID"]), f"{row['AccountType']} {row['AccountID']}"))
-        destForm.group_id.choices = destChoices
-        return destForm
-    except Exception as e:
-        # If there is an error while retrieving the accounts, show an error message
-        flash_error("Error retrieving account information.")
-        destForm.group_id.choices = []  # Set an empty list for accounts on error
-        return destForm
+        form.src_account.choices = []  # Set an empty list for accounts on error
+        form.dest_account.choices = []
+        return form

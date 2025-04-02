@@ -7,7 +7,7 @@ from app.blueprints.sharedUtilities import (
     get_customer_accounts, 
     login_required, flash_error, flash_success
 )
-from app.blueprints.customer.forms import AccountsForm, choose_src, choose_dest
+from app.blueprints.customer.forms import TransferForm, choose_account
 
 # Create a Blueprint for the customer-related routes
 customer_bp = Blueprint('customer', __name__, template_folder='templates')
@@ -80,20 +80,21 @@ def account_detail(account_id: int) -> Response:
 @customer_bp.route('/account/transfer', methods=['GET', 'POST'])
 @login_required('customer_id')
 def transfer_funds() -> Response:
-    srcForm = AccountsForm()
-    destForm = AccountsForm()
-    srcForm = choose_src()
-    destForm = choose_dest()
-    if srcForm.validate_on_submit():
+    form = TransferForm()
+    form = choose_account()
+    amount = form.amount.data
+
+    if form.validate_on_submit():
         try:
-            src_account = srcForm.group_id.data
-            # transfer_result = fundTransfer.transferFunds(src_account, dest_account, amount=10.0)
-            # if transfer_result.get("status") == "error":
-            #     flash_error(transfer_result.get("message", "Transfer Failed"))
-            #     return redirect(url_for("customer.customer_dashboard"))
-            # flash_success(transfer_result.get("message", "Transfer Complete"))
-            # return redirect(url_for("customer.customer_dashboard"))
+            src_account = int(form.src_account.data)
+            dest_account = int(form.dest_account.data)
+            transfer_result = fundTransfer.transferFunds(src_account, dest_account, amount)
+            if transfer_result.get("status") == "error":
+                flash_error(transfer_result.get("message", "Transfer Failed"))
+                return redirect(url_for("customer.customer_dashboard"))
+            flash_success(transfer_result.get("message", "Transfer Complete"))
+            return redirect(url_for("customer.customer_dashboard"))
         except Exception as e:
             # If there is an error retrieving account details, show an error message and redirect
-            flash_error("Error retrieving account details.")
-    return render_template("customer/transfer_funds.html", srcForm=srcForm, destForm=destForm)
+            flash_error(f"Error retrieving account details. {str(e)}")
+    return render_template("customer/transfer_funds.html", form=form)
