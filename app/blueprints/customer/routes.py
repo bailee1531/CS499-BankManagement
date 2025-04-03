@@ -98,9 +98,6 @@ def settings():
         if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
             changes['Address'] = form.address.data.strip()
         if newUser != username:
-            per_df.at[idx, 'Username'] = newUser
-            per_df.to_csv(get_csv_path("persons.csv"), index=False)
-
             cust_df.loc[cust_df['CustomerID'] == customer_id, 'Username'] = newUser
             cust_df.to_csv(get_csv_path("customers.csv"), index=False)
 
