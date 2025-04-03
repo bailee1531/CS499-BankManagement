@@ -68,6 +68,7 @@ def account_overview(account_id: int) -> Response:
             return redirect(url_for("customer.customer_dashboard"))
 
         account = account_row.iloc[0].to_dict()
+        account["AccountID"] = account_row.iloc[0]["AccountID"]  # ✅ Add this line
         account["account_type"] = account.get("AccountType", "").upper()
         account["curr_bal"] = account.get("CurrBal", 0)
 

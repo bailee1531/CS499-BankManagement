@@ -6,8 +6,12 @@
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/account_overview.css') }}">
   <script src="{{ url_for('static', filename='js/collapsible_sections.js') }}" defer></script>
+  <script>
+    const transactionApiUrl = "{{ url_for('customer.get_transactions', account_id=account.AccountID) }}";
+  </script>
   <script src="{{ url_for('static', filename='js/update-transactions.js') }}" defer></script>
 {% endblock %}
+
 
 {% block content %}
 <main class="account-page">
