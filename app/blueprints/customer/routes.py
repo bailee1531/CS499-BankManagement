@@ -86,6 +86,7 @@ def settings():
     if form.validate_on_submit():
         changes = {}
         newUser = form.username.data.strip()
+        username_changed = False
 
         if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
             changes['FirstName'] = form.first_name.data.strip()
@@ -102,7 +103,7 @@ def settings():
             cust_df.to_csv(get_csv_path("customers.csv"), index=False)
 
             session['customer'] = newUser
-            changes['Username'] = newUser
+            username_changed = True
         if form.password.data.strip():
             if not form.current_password.data.strip():
                 flash_error("Current password is required to update your password.")
@@ -137,14 +138,16 @@ def settings():
                 f.write(encrypted)
             changes['Password'] = '***'
 
-        if changes:
+        if changes or username_changed:
             messages = []
-            success = True
+            
+            if username_changed:
+                messages.append(f"Username successfully updated to {newUser}.")
+
             for key, value in changes.items():
                 result = modifyInfo.modify_info(customer_id, {key: value})
                 messages.append(result["message"])
-                if result["status"] != "success":
-                    success = False
+
             flash_success(" | ".join(messages))
         else:
             flash_error("No changes were made.")
