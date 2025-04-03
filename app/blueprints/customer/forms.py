@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectField, SubmitField
-from wtforms.validators import DataRequired, NumberRange
+from wtforms import DecimalField, SelectField, SubmitField, StringField, PasswordField
+from wtforms.validators import DataRequired, NumberRange, Optional, Length, Email, Regexp
 from app.blueprints.sharedUtilities import (
     get_logged_in_customer, get_customer_accounts,
     flash_error
@@ -82,3 +82,17 @@ def choose_account():
         form.src_account.choices = []  # Set an empty list for accounts on error
         form.dest_account.choices = []
         return form
+    
+# -----------------------------------------------------------------------------
+# SettingsForm: Customer can modify personal information.
+# -----------------------------------------------------------------------------
+class SettingsForm(FlaskForm):
+    first_name = StringField('First Name', validators=[Optional(), Length(max=50)])
+    last_name = StringField('Last Name', validators=[Optional(), Length(max=50)])
+    phone = StringField('Phone', validators=[Optional(), Regexp(r'^\d{3}-\d{3}-\d{4}$')])
+    email = StringField('Email', validators=[Optional(), Email()])
+    address = StringField('Address', validators=[Optional(), Length(max=100)])
+    username = StringField('Username', validators=[Optional(), Length(min=3, max=25)])
+    current_password = PasswordField('Current Password', validators=[Optional(), Length(min=8)])
+    password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
+    submit = SubmitField('Update Settings')

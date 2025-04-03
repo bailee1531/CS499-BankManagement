@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+{% endblock %}
+{% block content %}
+<main>
+  <section class="settings-container" aria-labelledby="settings-heading">
+    <div class="form-header">
+      <h2 id="settings-heading">User Settings</h2>
+      <button type="button" class="edit-button" id="edit-toggle" title="Edit">
+        <i class="material-icons">edit</i>
+      </button>
+    </div>
+
+    <form id="settings-form" action="{{ form_action or url_for('customer.settings') }}" method="post" novalidate>
+      {{ form.hidden_tag() }}
+
+      <!-- First Name -->
+      <div class="form-group">
+        <label for="first_name">First Name</label>
+        {{ form.first_name(class="form-control", disabled=True) }}
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-group">
+        <label for="last_name">Last Name</label>
+        {{ form.last_name(class="form-control", disabled=True) }}
+      </div>
+
+      <!-- Phone -->
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        {{ form.phone(class="form-control", disabled=True) }}
+        {% if form.phone.errors %}
+        <div class="error-message">
+          {% for error in form.phone.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        {{ form.email(class="form-control", disabled=True) }}
+        {% if form.email.errors %}
+        <div class="error-message">
+          {% for error in form.email.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Address -->
+      <div class="form-group">
+        <label for="address">Address</label>
+        {{ form.address(class="form-control", disabled=True) }}
+        {% if form.address.errors %}
+        <div class="error-message">
+          {% for error in form.address.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        {{ form.username(class="form-control", disabled=True) }}
+        {% if form.username.errors %}
+        <div class="error-message">
+          {% for error in form.username.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- New Password -->
+      <div class="form-group">
+        <label for="password">New Password</label>
+        {{ form.password(class="form-control", disabled=True) }}
+        {% if form.password.errors %}
+        <div class="error-message">
+          {% for error in form.password.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Current Password (for verifying password change) -->
+      <div class="form-group" id="current-password-group" style="display: none;">
+        <label for="current_password">Current Password</label>
+        {{ form.current_password(class="form-control", disabled=True) }}
+        {% if form.current_password.errors %}
+        <div class="error-message">
+          {% for error in form.current_password.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn--update" id="update-btn" disabled>Update Settings</button>
+    </form>
+  </section>
+</main>
+
+<script>
+  document.getElementById('edit-toggle').addEventListener('click', () => {
+    const inputs = document.querySelectorAll('#settings-form input:not([type="hidden"])');
+    const updateBtn = document.getElementById('update-btn');
+
+    inputs.forEach(input => {
+      input.disabled = !input.disabled;
+    });
+
+    updateBtn.disabled = !updateBtn.disabled;
+  });
+
+  // Show "Current Password" if new password is being changed
+  const newPasswordInput = document.querySelector('input[name="password"]');
+  const currentPasswordGroup = document.getElementById('current-password-group');
+  const currentPasswordInput = document.querySelector('input[name="current_password"]');
+
+  newPasswordInput.addEventListener('input', () => {
+    if (newPasswordInput.value.length > 0) {
+      currentPasswordGroup.style.display = 'block';
+      currentPasswordInput.disabled = false;
+    } else {
+      currentPasswordGroup.style.display = 'none';
+      currentPasswordInput.disabled = true;
+    }
+  });
+</script>
+{% endblock %}
