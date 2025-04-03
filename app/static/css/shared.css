@@ -20,10 +20,16 @@
     /* Dark background color for footer or other sections */
     --accent: #d9534f;
     /* Accent color for highlights and interactive elements */
+    --light-accent: #7e7f9a;
+    /* Less vibrant accent */
     --white: #ffffff;
     /* White color variable */
     --black: #000000;
     /* Black color variable */
+    --success: #2f712d;
+    /*Green Color For Flashing Good Messages*/
+    --danger: #f90404;
+    /*Red Color For Flshing Bad Messages.*/
     --border-radius: 0.3125rem;
     /* Standard border radius for buttons and inputs */
     --container-border-radius: 0.625rem;
@@ -275,13 +281,25 @@ footer {
 
 /* Flash Messages */
 /* Styling for alert messages (e.g., notifications) */
+
+/* Flash Messages: Generic alert styling remains */
 .flash-messages .alert {
-    background-color: var(--accent);
-    color: var(--white);
     padding: 0.75rem 1rem;
-    border: 1px solid var(--accent);
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
+    color: var(--white);
+}
+
+/* Success messages (flash green) */
+.flash-messages .alert-success {
+    background-color: var(--success);
+    border: 1px solid var(--success);
+}
+
+/* Error messages (flash red) */
+.flash-messages .alert-danger {
+    background-color: var(--danger);
+    border: 1px solid var(--danger);
 }
 
 /* Main Content Area */
@@ -319,9 +337,9 @@ main {
 .error-message {
     background-color: #ffbaba;
     /* Light red background */
-    border: 0.0625rem solid #d8000c;
+    border: 0.0625rem solid --danger;
     /* Red border */
-    color: #d8000c;
+    color: var(--danger);
     /* Red text */
     padding: 0.625rem;
     margin-bottom: 1.25rem;

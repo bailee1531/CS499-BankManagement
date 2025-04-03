@@ -39,9 +39,9 @@ def personal_accounts() -> Response:
             return redirect(url_for("auth.customer_login", next=request.url))
 
         valid_types = {
-            "checking": "Regular Checking Account",
-            "savings": "Savings Account",
-            "money-market": "Money Market Account"
+            "Checking": "Checking Account",
+            "Savings": "Savings Account",
+            "Money Market": "Money Market Account"
         }
 
         if account_type not in valid_types:

@@ -1,75 +1,201 @@
 import pandas as pd
-from flask import Blueprint, render_template, Response, redirect, url_for
-from app.blueprints.sharedUtilities import (
-    get_csv_path, get_logged_in_customer,
-    get_customer_accounts, 
-    login_required, flash_error
+from decimal import Decimal
+from datetime import datetime
+from flask import (
+    Blueprint, render_template, redirect, url_for, jsonify, request, Response
 )
 
-# Create a Blueprint for the customer-related routes
+from scripts.makeDeposit import deposit
+from scripts.withdrawMoney import withdraw
+from scripts.fundTransfer import transferFunds
+from .forms import WithdrawForm, TransferForm, DepositForm, choose_account
+from app.blueprints.sharedUtilities import (
+    get_csv_path, get_logged_in_customer, get_customer_accounts,
+    login_required, flash_error, flash_success
+)
+
 customer_bp = Blueprint('customer', __name__, template_folder='templates')
+
+# ---------------------------
+# Helper Functions
+# ---------------------------
+
+def build_account_choices(accounts_df):
+    return [
+        (str(row["AccountID"]), f"{row['AccountType']} - Balance: ${row['CurrBal']:.2f}")
+        for _, row in accounts_df.iterrows()
+    ]
+
+
+# ---------------------------
+# Dashboard
+# ---------------------------
 
 @customer_bp.route('/Dashboard')
 @login_required("customer_id")
 def customer_dashboard() -> Response:
-    """
-    Render the user's dashboard displaying their accounts.
-
-    Retrieves the customer's account information from the database and displays it on the dashboard.
-
-    Returns:
-        Response: Rendered template for the user's dashboard with account details.
-    """
-    customer_id: int = get_logged_in_customer()  # Get the logged-in customer's ID
-    
+    customer_id = get_logged_in_customer()
     try:
-        # Retrieve customer accounts data
-        customer_accounts_df = get_customer_accounts(customer_id)
+        accounts_df = get_customer_accounts(customer_id)
+        accounts_list = [
+            {
+                "account_id": row["AccountID"],
+                "account_type": row["AccountType"].upper(),
+                "curr_bal": row["CurrBal"]
+            }
+            for _, row in accounts_df.iterrows()
+        ]
+    except Exception as e:
+        flash_error("Error retrieving account information.")
         accounts_list = []
 
-        # Iterate through the customer accounts and create a list of account information
-        for _, row in customer_accounts_df.iterrows():
-            accounts_list.append({
-                "account_id": row["AccountID"],
-                "account_type": row["AccountType"],
-                "curr_bal": row["CurrBal"]
-            })
-    except Exception as e:
-        # If there is an error while retrieving the accounts, show an error message
-        flash_error("Error retrieving account information.")
-        accounts_list = []  # Set an empty list for accounts on error
-
-    # Render the customer dashboard template with the list of accounts
     return render_template("customer/customer_dashboard.html", accounts=accounts_list)
 
-@customer_bp.route('/account/<int:account_id>')
+# ---------------------------
+# Account Overview
+# ---------------------------
+
+@customer_bp.route('/account-overview/<int:account_id>')
 @login_required("customer_id")
-def account_detail(account_id: int) -> Response:
-    """
-    Display detailed information for a specific account.
-
-    Retrieves and displays the details for a particular account by its account ID.
-
-    Args:
-        account_id (int): The ID of the account to display.
-
-    Returns:
-        Response: Rendered template with account details or redirection on error.
-    """
+def account_overview(account_id: int) -> Response:
     try:
-        # Load account data from CSV file
-        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-        
-        # Find the specific account row based on the account ID
+        customer_id = get_logged_in_customer()
+        accounts_df = get_customer_accounts(customer_id)
+
         account_row = accounts_df[accounts_df["AccountID"] == account_id]
-        
-        # If the account is not found, show an error and redirect to the dashboard
         if account_row.empty:
             flash_error("Account not found.")
             return redirect(url_for("customer.customer_dashboard"))
-        
-        # Convert the account row to a dictionary for easy access in the template
+
         account = account_row.iloc[0].to_dict()
+        account["account_type"] = account.get("AccountType", "").upper()
+        account["curr_bal"] = account.get("CurrBal", 0)
+
+        accounts_list = accounts_df.to_dict("records")  # for use in `accounts|length`
+
+        return render_template("customer/account_overview.html",
+                               account=account,
+                               accounts=accounts_list,
+                               current_transactions=[],
+                               past_transactions=[])
+
     except Exception as e:
-        # If there is an error retrieving account details, show an error message and redirect
         flash_error("Error retrieving account details.")
+        return redirect(url_for("customer.customer_dashboard"))
+
+
+# ---------------------------
+# API: Transactions
+# ---------------------------
+
+@customer_bp.route('/api/transactions/<int:account_id>')
+@login_required("customer_id")
+def get_transactions(account_id: int):
+    try:
+        df = pd.read_csv(get_csv_path("transactions.csv"))
+        df["AccountID"] = df["AccountID"].astype(int)
+        df = df[df["AccountID"] == account_id]
+
+        if df.empty:
+            return jsonify({"current_transactions": [], "past_transactions": []})
+
+        df["TransDate"] = pd.to_datetime(df["TransDate"], errors="coerce")
+        df = df.sort_values("TransDate")
+        today = datetime.now().replace(hour=0, minute=0)
+
+        to_dict_list = lambda d: d.apply(lambda row: {
+            "description": row["TransType"],
+            "amount": row["Amount"],
+            "TransDate": row["TransDate"].strftime("%Y-%m-%d") if pd.notnull(row["TransDate"]) else ""
+        }, axis=1).tolist()
+
+        return jsonify({
+            "current_transactions": to_dict_list(df[df["TransDate"] > today]),
+            "past_transactions": to_dict_list(df[df["TransDate"] <= today])
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Error retrieving transactions: {str(e)}"}), 500
+
+# ---------------------------
+# Deposit
+# ---------------------------
+
+@customer_bp.route('/deposit', methods=['GET', 'POST'])
+@login_required("customer_id")
+def deposit_money():
+    customer_id = get_logged_in_customer()
+    form = DepositForm()
+
+    try:
+        accounts_df = get_customer_accounts(customer_id)
+        form.account_id.choices = build_account_choices(accounts_df)
+    except Exception:
+        flash_error("Error retrieving account information.")
+
+    if form.validate_on_submit():
+        result = deposit(int(form.account_id.data), form.amount.data)
+        if result["status"] != "success":
+            flash_error(result["message"])
+        else:
+            return redirect(url_for("customer.account_overview", account_id=form.account_id.data))
+
+    return render_template("customer/deposit.html", form=form)
+
+# ---------------------------
+# Withdraw
+# ---------------------------
+
+@customer_bp.route('/withdraw', methods=['GET', 'POST'])
+@login_required("customer_id")
+def withdraw_money():
+    customer_id = get_logged_in_customer()
+    form = WithdrawForm()
+
+    try:
+        accounts_df = get_customer_accounts(customer_id)
+        form.account_id.choices = build_account_choices(accounts_df)
+    except Exception:
+        flash_error("Error retrieving account information.")
+
+    if form.validate_on_submit():
+        result = withdraw(int(form.account_id.data), form.amount.data)
+        if result["status"] != "success":
+            flash_error(result["message"])
+        else:
+            return redirect(url_for("customer.account_overview", account_id=form.account_id.data))
+
+    return render_template("customer/withdraw.html", form=form)
+
+# ---------------------------
+# Transfer
+# ---------------------------
+
+@customer_bp.route('/account/transfer', methods=['GET', 'POST'])
+@login_required('customer_id')
+def transfer_funds() -> Response:
+    """
+    Display two dropdowns. One for the source account and one for the destination account.
+    Retrieves and displays the ID and type for each checking, savings, and money market account.
+    Returns:
+    --------
+    Response: Rendered template with account details or redirection on error.
+    """
+    form = TransferForm()
+    form = choose_account()
+    amount = form.amount.data
+
+    if form.validate_on_submit():
+        try:
+            src_account = int(form.src_account.data)
+            dest_account = int(form.dest_account.data)
+            transfer_result = transferFunds(src_account, dest_account, amount)
+            if transfer_result.get("status") == "error":
+                flash_error(transfer_result.get("message", "Transfer Failed"))
+                return redirect(url_for("customer.customer_dashboard"))
+            flash_success(transfer_result.get("message", "Transfer Complete"))
+            return redirect(url_for("customer.customer_dashboard"))
+        except Exception as e:
+            # If there is an error retrieving account details, show an error message and redirect
+            flash_error(f"Error retrieving account details. {str(e)}")
+    return render_template("customer/transfer_funds.html", form=form)

@@ -167,15 +167,15 @@ def register_step3():
 
         # Set session variables for a successful registration
         session["customer_id"] = customer_id
-        session["user"] = registration["username"]
+        session["customer"] = registration["username"]
 
         # Open the specific account type (e.g., travel visa)
-        if registration['account_type'] == 'travel_visa':
+        if registration['account_type'] == 'Travel_Visa':
             try:
                 createCreditCard.openCreditCardAccount(customer_id)
                 flash_success("Travel visa account opened successfully!")
                 session.pop('registration', None)
-                return redirect(url_for('accounts.user_dashboard'))
+                return redirect(url_for('customer.customer_dashboard'))
             except Exception as e:
                 flash_error(f"Unable to open travel visa account: {str(e)}")
                 return redirect(url_for('registration.register_step1'))
@@ -189,7 +189,7 @@ def register_step3():
 
     return render_template('registration/register_step3.html', form=form)
 
-@register_bp.route('/deposit', methods=['GET', 'POST'])
+@register_bp.route('/deposit-registration', methods=['GET', 'POST'])
 def deposit_form():
     """
     Route to handle deposit form submission for opening an account.

@@ -7,30 +7,27 @@
 
 {% block meta_description %}
   <!-- Meta description for SEO purposes -->
-  Your personalized Evergreen Bank dashboard is on the way. Check back soon for account insights and tools.
+  Evergreen Bank dashboard
 {% endblock %}
 
 {% block head_extra %}
   <!-- Additional head content, includes the CSS link for the user dashboard -->
   {{ super() }}  <!-- Calls the parent template's head content -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
 {% endblock %}
 
 {% block content %}
   <!-- Main content of the page -->
   <main class="accounts-page">
-    <h1 id="account-selection-heading">Your Accounts</h1>
-    
-    <!-- Section for displaying all accounts -->
     <section class="accounts-section">
+      <h2 id="account-selection-heading">Your Accounts</h2>
       <div class="accounts-container">
         <!-- Loop over each account in 'accounts' and display details -->
         {% for account in accounts %}
-          <a href="{{ url_for('customer.customer_dashboard', account_id=account.account_id) }}" class="account-box">
-            <h3>{{ account.account_type }}</h3> <!-- Account type (e.g., checking, savings) -->
-            <p>Account ID: {{ account.account_id }}</p> <!-- Unique identifier for the account -->
+          <a href="{{ url_for('customer.account_overview', account_id=account.account_id) }}" class="account-box">
+            <h3>{{ account.account_type }}</h3>
+            <p>Account ID: {{ account.account_id }}</p>
             <span class="account-balance">
-              <!-- Display the account balance formatted to 2 decimal places -->
               ${{ '%.2f' | format(account.curr_bal) }}
             </span>
           </a>
@@ -39,3 +36,7 @@
     </section>
   </main>
 {% endblock %}
+
+
+
+

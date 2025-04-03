@@ -1,0 +1,145 @@
+@import "shared.css";
+
+:root {
+    --bg-box: #3a3a3a;
+    --accent-hover: #b52d3b;
+}
+
+/* Page Layout */
+.account-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem;
+}
+
+/* Account Summary Styling */
+.account-summary {
+    background-color: var(--dark-bg);
+    padding: 3rem;
+    text-align: center;
+    max-width: 1000px;
+    width: 100%;
+    margin-bottom: 3rem;
+    border-radius: var(--container-border-radius);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Styling for the account name */
+.account-summary h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 1rem;
+}
+
+/* Total Balance Styling */
+.account-summary h2 {
+    color: var(--white);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Transaction Buttons */
+.transaction-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* Collapsible Transactions Section */
+.transactions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Styling for Collapsible Transaction Boxes */
+.transactions-box {
+    background-color: var(--bg-box);
+    color: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--container-border-radius);
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.2);
+    margin-top: 1.5rem;
+}
+
+.transactions-box h3 {
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: var(--white);
+}
+
+/* Unstyled list for transactions */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    text-align: left;
+    margin-bottom: 0.75rem;
+}
+
+/* New styling for transaction items */
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.transaction-date {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-right: 1rem;
+}
+
+.transaction-info {
+  font-size: 1.1rem;
+}
+
+/* Account Button Styling */
+.account-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: var(--accent);
+    color: var(--white);
+    font-size: 1.25rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.account-btn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-3px);
+}
+
+.account-btn.selected,
+.account-btn:focus {
+    background-color: var(--accent-hover);
+    transform: translateY(-4px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    outline: none;
+}
+

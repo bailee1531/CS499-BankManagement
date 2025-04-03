@@ -58,6 +58,26 @@
     color: #f0f0f0;
 }
 
+
+/* Style for select elements in the deposit form */
+.deposit-form select.form-control {
+  width: 100%;
+  padding: 0.625rem; /* 10px */
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  transition: border-color 0.3s ease;
+  background-color: #fff; /* Set your desired background */
+  color: #333; /* Set your desired text color */
+}
+
+/* Focus state for the select element */
+.deposit-form select.form-control:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+
 /*-------------------------------------------------
   Form Styling (Deposit Form)
 --------------------------------------------------*/

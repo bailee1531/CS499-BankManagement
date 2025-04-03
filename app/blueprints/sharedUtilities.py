@@ -103,12 +103,12 @@ def flash_success(message):
 # ---------------------------
 # Decorators
 # ---------------------------
-def login_required(session_key="user"):
+def login_required(session_key="customer"):
     """
     Decorator to ensure that a user is logged in before accessing a route.
 
     Args:
-        session_key (str): The session key to check for the user's login status (default is 'user').
+        session_key (str): The session key to check for the user's login status (default is 'customer').
 
     Returns:
         function: The wrapped function that requires the user to be logged in.
