@@ -111,11 +111,11 @@ def settings():
         newUser = form.username.data.strip()
 
         if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
-            changes['First Name'] = form.first_name.data.strip()
+            changes['FirstName'] = form.first_name.data.strip()
         if form.last_name.data.strip() != str(per_df.at[idx, 'LastName']).strip():
-            changes['Last Name'] = form.last_name.data.strip()
+            changes['LastName'] = form.last_name.data.strip()
         if form.phone.data.strip() != str(per_df.at[idx, 'PhoneNum']).strip():
-            changes['Phone Number'] = form.phone.data.strip()
+            changes['PhoneNum'] = form.phone.data.strip()
         if form.email.data.strip() != str(per_df.at[idx, 'Email']).strip():
             changes['Email'] = form.email.data.strip()
         if form.address.data.strip() != str(per_df.at[idx, 'Address']).strip():
