@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block meta_description %}Oops. Something Went Off Trail.{% endblock %}
+{% block title %}Evergreen Bank - Not Found{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="accounts-page">
+    <section class="accounts-section" style="border-radius: 25px;">
+        <img src="{{ url_for('static', filename='images/exclamation.svg') }}" alt="Exclamation Point" style="margin: none;">
+        <h3 style="text-align: center; color:white;">Oops. Something went off trail.</h3>
+        <p style="color: white;">We are sending out the search party to get things back on the right path.</p>
+    </section>
+</main>
+{% endblock %}
