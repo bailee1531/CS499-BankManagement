@@ -1,6 +1,7 @@
 # Bailee Segars
 from scripts.transactionLog import generate_transaction_ID
 from decimal import Decimal
+from datetime import date
 import pandas as pd
 import os
 
@@ -28,9 +29,9 @@ def directDeposit(accID, amount) -> dict:
     # Creates dataframe with csv data
     # Gets row for requested customer
     accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
-    logPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
+    transPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/transactions.csv'))
     accInfo = pd.read_csv(accPath)
-    logInfo = pd.read_csv(logPath)
+    transInfo = pd.read_csv(transPath)
 
     if accID not in accInfo['AccountID'].values:
         return {"status": "error", "message": f"Source account {accID} not found."}
@@ -51,16 +52,17 @@ def directDeposit(accID, amount) -> dict:
     accInfo.to_csv(accPath, index=False)
 
     # Generate transaction ID and log the transaction
-    transactionID = generate_transaction_ID(logInfo)
-    newLog = {
+    transactionID = generate_transaction_ID(transInfo)
+    newTrans = {
+        'TransactionID': transactionID,
         'AccountID': accID,
-        'CustomerID': custID,
         'TransactionType': 'Direct Deposit',
         'Amount': Decimal(amount).quantize(Decimal('0.00')),
-        'TransactionID': transactionID
+        'TransDate': date.today()
     }
-    logInfo.loc[len(accInfo)] = newLog
-    logInfo.to_csv(logPath, index=False)
+
+    transInfo.loc[len(accInfo)] = newTrans
+    transInfo.to_csv(transPath, index=False)
 
     return {"status": "success", "message": f"{amount} deposited to account {accID}."}
 
@@ -88,9 +90,9 @@ def deposit(accID, amount) -> dict:
     # Creates dataframe with csv data
     # Gets row for requested customer
     accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
-    logPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
+    transPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/transactions.csv'))
     accInfo = pd.read_csv(accPath)
-    logInfo = pd.read_csv(logPath)
+    transInfo = pd.read_csv(transPath)
 
     if accID not in accInfo['AccountID'].values:
         return {"status": "error", "message": f"Destination account {accID} not found."}
@@ -119,15 +121,17 @@ def deposit(accID, amount) -> dict:
     accInfo.at[accIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
 
-    transactionID = generate_transaction_ID(logInfo)
-    newLogEntry = pd.DataFrame([{
+    # Generate transaction ID and log the transaction
+    transactionID = generate_transaction_ID(transInfo)
+    newTrans = {
+        'TransactionID': transactionID,
         'AccountID': accID,
-        'CustomerID': custID,
         'TransactionType': transaction_type,
         'Amount': Decimal(amount).quantize(Decimal('0.00')),
-        'TransactionID': transactionID
-    }])
+        'TransDate': date.today()
+    }
 
-    newLogEntry.to_csv(logPath, index=False, mode='a', header=not os.path.exists(logPath))
+    transInfo.loc[len(accInfo)] = newTrans
+    transInfo.to_csv(transPath, index=False)
 
     return {"status": "success", "message": f"{amount} deposited to account {accID}."}

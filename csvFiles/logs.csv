@@ -1,1 +1,1 @@
-AccountID,CustomerID,TransactionType,Amount,TransactionID
+LogID,UserID,LogMessage
