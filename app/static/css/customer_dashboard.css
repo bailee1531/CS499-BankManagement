@@ -1,16 +1,11 @@
 @import "shared.css";
 
-/* =======================================
-   Module-Specific Variables
-======================================= */
 :root {
+  /* Module-Specific Variables */
   --account-bg: #3a3a3a;       /* Background color for account boxes */
   --account-hover: #b52d3b;    /* Hover accent color for account boxes */
 }
 
-/* =======================================
-   Accounts Page Layout
-======================================= */
 .accounts-page {
   display: flex;
   flex-direction: column;
@@ -25,9 +20,6 @@
   color: var(--white);
 }
 
-/* =======================================
-   Accounts Section Wrapper
-======================================= */
 .accounts-section {
   background-color: var(--dark-bg);
   padding: 2rem;
@@ -37,9 +29,6 @@
   margin: 0 auto;
 }
 
-/* =======================================
-   Account Boxes Layout
-======================================= */
 .accounts-container {
   display: flex;
   flex-wrap: wrap;
@@ -47,9 +36,7 @@
   justify-content: center;
 }
 
-/* =======================================
-   Individual Account Box
-======================================= */
+/* Updated Individual Account Box Styling with Animation */
 .account-box {
   background-color: var(--account-bg);
   color: var(--white);
@@ -60,7 +47,20 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
   text-decoration: none;
+
+  /* Animation: start hidden and slide up */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s forwards;
+  animation-delay: calc(var(--animation-delay, 0) * 0.1s);
 }
+
+/* Staggered animation delays */
+.accounts-container .account-box:nth-child(1) { --animation-delay: 1; }
+.accounts-container .account-box:nth-child(2) { --animation-delay: 2; }
+.accounts-container .account-box:nth-child(3) { --animation-delay: 3; }
+.accounts-container .account-box:nth-child(4) { --animation-delay: 4; }
+.accounts-container .account-box:nth-child(5) { --animation-delay: 5; }
 
 .account-box:hover {
   transform: scale(1.03);
@@ -74,6 +74,10 @@
   transition: color 0.3s ease;
 }
 
+.account-box:hover h3 {
+  color: var(--account-hover);
+}
+
 .account-box p {
   margin-bottom: 1rem;
   font-size: 1rem;
@@ -83,4 +87,12 @@
 .account-box .account-balance {
   font-size: 1.2rem;
   font-weight: bold;
+}
+
+/* Fade-in Up Animation */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

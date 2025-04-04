@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Account Overview{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/account_overview.css') }}">
+  <script src="{{ url_for('static', filename='js/collapsible_sections.js') }}" defer></script>
+  <script>
+    const transactionApiUrl = "{{ url_for('customer.get_transactions', account_id=account.AccountID) }}";
+  </script>
+  <script src="{{ url_for('static', filename='js/update-transactions.js') }}" defer></script>
+{% endblock %}
+
+
+{% block content %}
+<main class="account-page">
+  <div class="account-summary">
+    <!-- Display Account Name using updated h1 styling -->
+    <h1>{{ account.account_type }}</h1>
+    
+    <!-- Display Total Account Balance with two decimal places -->
+    <h2>Total Balance: $<span id="accountBalance">{{ "{:.2f}".format(account.curr_bal | default(0)) }}</span></h2>
+
+   <!-- Deposit, Withdrawal, and Transfer Buttons -->
+    <div class="transaction-buttons">
+      <button id="depositBtn" class="account-btn" type="button" onclick="window.location.href='/deposit';">Deposit</button>
+      <button id="withdrawalBtn" class="account-btn" type="button" onclick="window.location.href='/withdraw';">Withdraw</button>
+      {% if accounts|length > 1 %}
+      <a id="transferBtn" class="account-btn" href="{{ url_for('customer.transfer_funds') }}">Transfer</a>
+      {% endif %}
+
+    </div>
+
+    
+    <!-- Collapsible Sections for Transactions -->
+    <div class="transactions-section">
+      <!-- Current Transactions Section -->
+      <button class="account-btn toggle-btn" data-target="current-transactions" data-label="Current Transactions">
+        Show Current Transactions
+      </button>
+      <section id="current-transactions" class="transactions-box" style="display: none;">
+        <h3>Current Transactions (Past 30 Days)</h3>
+        {% if current_transactions %}
+          <ul id="current-transactions-list">
+            {% for txn in current_transactions %}
+              <li class="transaction-item">
+                <div class="transaction-date">{{ txn.TransDate or 'N/A' }}</div>
+                <div class="transaction-info">{{ txn.description }} - ${{ "{:.2f}".format(txn.amount) }}</div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p id="current-transactions-list">No current transactions available.</p>
+        {% endif %}
+      </section>
+      
+      <!-- Past Transactions Section -->
+      <button class="account-btn toggle-btn" data-target="past-transactions" data-label="Past Transactions">
+        Show Past Transactions
+      </button>
+      <section id="past-transactions" class="transactions-box" style="display: none;">
+        <h3>Past Transactions (Older than 30 Days)</h3>
+        {% if past_transactions %}
+          <ul id="past-transactions-list">
+            {% for txn in past_transactions %}
+              <li class="transaction-item">
+                <div class="transaction-date">{{ txn.TransDate or 'N/A' }}</div>
+                <div class="transaction-info">{{ txn.description }} - ${{ "{:.2f}".format(txn.amount) }}</div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p id="past-transactions-list">No past transactions available.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

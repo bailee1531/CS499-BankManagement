@@ -5,16 +5,16 @@ This module uses the application factory pattern to create an instance of the Fl
 It then runs the development server if this module is executed as the main program.
 """
 
+import os
 from app import create_app  # Import the application factory function from the app module
 
-# Create an instance of the Flask application by calling the factory function
+# Create an instance of the Flask application
 app = create_app()
 
 if __name__ == '__main__':
-    # Run the Flask development server in debug mode.
-    # Debug mode enables hot reloading and provides detailed error messages.
+    # For local debugging:
     app.run(debug=True)
-    
-    # Uncomment the following line to run the server on all available IP addresses at port 5000.
-    # This is useful if you want the app to be accessible from other machines on your network.
-    # app.run(debug=True, host='0.0.0.0', port=5000)
+
+    # For deployment on Render (binds to 0.0.0.0 and uses the PORT environment variable)
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(debug=False, host='0.0.0.0', port=port)

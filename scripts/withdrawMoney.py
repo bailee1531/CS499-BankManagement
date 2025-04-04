@@ -45,7 +45,7 @@ def withdraw(accID, amount) -> dict:
     currentBal = Decimal(accInfo.at[accIndex, 'CurrBal'])
 
     # Account type and balance validation
-    if accType != 'Checking' and accType != 'Savings':
+    if accType != 'Checking' and accType != 'Savings' and accType != 'Money Market':
         return {"status": "error", "message": f"Incorrect account type selected. Cannot withdraw {amount} from account {accID}."}
     if amount > currentBal:
         return {"status": "error", "message": f"Insufficient funds. Cannot withdraw {amount} from account {accID}."}

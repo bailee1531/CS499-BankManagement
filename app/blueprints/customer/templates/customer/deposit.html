@@ -1,0 +1,54 @@
+{# Extend the base layout #}
+{% extends "base.html" %}
+
+{# Page title #}
+{% block title %}Account Overview{% endblock %}
+
+{# Additional CSS specific to this page #}
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{# Main content section #}
+{% block content %}
+<div class="confirmation-page">
+  <div class="thank-you-section">
+    <h2>Deposit Funds</h2>
+    <p class="instruction-text">
+      Please fill out the form below to deposit funds into your account.
+    </p>
+
+    {# Display any form validation errors #}
+    {% if form.errors %}
+      <ul class="form-errors">
+        {% for field, errors in form.errors.items() %}
+          {% for error in errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {# Deposit form #}
+    <form class="deposit-form" method="POST" action="{{ url_for('customer.deposit_money') }}">
+      {{ form.hidden_tag() }}
+
+      {# Account selection dropdown #}
+      <div class="form-group">
+        {{ form.account_id.label }}
+        {{ form.account_id(class="form-control") }}
+      </div>
+
+      {# Amount input field #}
+      <div class="form-group">
+        {{ form.amount.label }}
+        {{ form.amount(class="form-control", placeholder="Enter amount") }}
+      </div>
+
+      {# Submit button #}
+      {{ form.submit(class="submit-btn") }}
+    </form>
+  </div>
+</div>
+{% endblock %}

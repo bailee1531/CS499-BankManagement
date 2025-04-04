@@ -8,6 +8,7 @@ from flask_wtf import FlaskForm
 from wtforms import DecimalField, IntegerField, SubmitField
 from wtforms.validators import DataRequired, NumberRange
 
+
 # -----------------------------------------------------------------------------
 # MortgageForm: Form for submitting a mortgage application.
 # -----------------------------------------------------------------------------

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Transfer Funds
+{% endblock %}
+
+{% block meta_description %}
+  Transfer your money to a different account.
+{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/customer_dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+{% endblock %}
+
+{% block content %}
+  <!-- Main content of the page -->
+  <main class="accounts-page">
+    <!-- Section for displaying all accounts -->
+    <section class="accounts-section" style="width: 75%;">
+      <h1 id="account-selection-heading">Transfer Funds</h1>
+      <div class="accounts-container">
+        <form action="{{ url_for('customer.transfer_funds') }}" method="post" novalidate>
+            {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+            <div style="display: flex; justify-content: space-around;">
+              <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; margin: 1.5rem;">
+                <h2>From</h2>
+                {{ form.src_account.label }} {{ form.src_account() }}
+              </article>
+              <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; margin: 1.5rem;">
+                <h2>To</h2>
+                {{ form.dest_account.label }} {{ form.dest_account }}
+              </article>
+            </div>
+            <div class="form-group" style="color: white;">
+                <!-- Label for the deposit amount input field -->
+                <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
+
+                <!-- Deposit amount input field with additional attributes for accessibility and styling -->
+                {{ form.amount(size=32, **{'class': 'form-control', 'id': form.amount.id, 'aria-describedby': 'deposit-help'}) }}
+
+                <!-- Help text for deposit field -->
+                <small id="deposit-help" class="visually-hidden">
+                    Enter a valid amount in USD to transfer between your accounts.
+                </small>
+            </div>
+            <button class='submit-btn' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Transfer</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}
