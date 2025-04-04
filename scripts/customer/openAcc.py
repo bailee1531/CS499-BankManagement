@@ -42,6 +42,9 @@ def open_account(custID, accType, depositAmnt):
     accPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
     accInfo = pd.read_csv(accPath)
 
+    log_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/logs.csv'))
+    log_df = pd.read_csv(log_path)
+
     if depositAmnt >= 0:
         accID = generate_account_ID(accInfo)
 
@@ -62,6 +65,16 @@ def open_account(custID, accType, depositAmnt):
         accInfo.loc[len(accInfo)] = newAccRow
         accInfo['CurrBal'] = accInfo['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         accInfo.to_csv(accPath, index=False)
+
+        log_id = random.randint(1299, 5999)
+        while log_id in log_df['LogID'].values:
+            log_id = random.randint(1299, 5999)
+
+        newLog = {'LogID': log_id, 'UserID': custID, 'LogMessage': f'Opened {accType} Account'}
+        log_df.loc[len(log_df)] = newLog
+
+        log_df.to_csv(log_path, index=False)
+
         return {"status": "success", "message": f"{accType} account {accID} created."}
     else:
         return {"status": "error", "message": "Cannot open an account with a negative deposit."}
