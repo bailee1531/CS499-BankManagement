@@ -2,7 +2,6 @@
 import pandas as pd
 import random
 import os
-from scripts.customer.webLogin import login_page_button_pressed
 
 def create_teller(firstName, lastName):
     """
@@ -27,20 +26,4 @@ def create_teller(firstName, lastName):
     
     employeeInfo.loc[len(employeeInfo)] = newEmployeeRow
     employeeInfo.to_csv(employeePath, index=False)
-
-    # PEM key for teller account
-    login_page_button_pressed(
-    1,               # new_or_returning
-    "Teller",        # type
-    username,        # username
-    str(employeeID), # password
-    firstName,
-    lastName,
-    "N/A",
-    "teller@email.com",
-    "000-000-0000",
-    "123-45-6789",
-    "What is your favorite?",
-    "Nothing."
-)
 
