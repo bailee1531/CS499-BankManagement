@@ -70,7 +70,3 @@ def useCreditCard(accID, amount) -> dict:
     transInfo.to_csv(transPath, index=False)
 
     return {"status": "success", "message": f"Charged ${amount} to credit card account {accID}."}
-
-result = useCreditCard(6371, Decimal('500.00'))
-
-print(result)
