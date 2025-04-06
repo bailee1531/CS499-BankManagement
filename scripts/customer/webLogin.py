@@ -59,6 +59,7 @@ def login_page_button_pressed(new_or_returning, type, username, password, *argv)
                 - `iteration_count`: Repeatedly uses KDF algorithm to slow down brute force attacks. 210000 is recommended for PBKDF2 with SHA512
         """
         key = ECC.generate(curve='p256') # See DSS for information on p256 curve type
+        pem_passphrase = str(userID) if type == 'Teller' else password
         with open(f'{userID}privatekey.pem', 'wt') as f:
             data = key.export_key(format='PEM',
                                 passphrase=password,
@@ -117,6 +118,7 @@ def login_page_button_pressed(new_or_returning, type, username, password, *argv)
         with open(f'{userID}privatekey.pem', 'rt') as f:
             try:
                 data = f.read()
+                pem_passphrase = str(userID) if type == 'Teller' else password
                 key = ECC.import_key(data, password)
             except ValueError:
                 return {"status": "error", "message": "Incorrect username or password. Please try again"}

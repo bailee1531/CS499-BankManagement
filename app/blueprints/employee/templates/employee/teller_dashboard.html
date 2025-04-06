@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
+{% endblock %}
+
+{% block title %}Teller Dashboard{% endblock %}
+
+{% block content %}
+<div class="teller-dashboard">
+  <h1>Customer Management</h1>
+
+  <div class="teller-controls">
+    <input type="text" id="searchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+  </div>
+
+  <!-- Grid of customer cards -->
+  <div class="customer-grid" id="customerGrid">
+    {% for customer in customers %}
+    <div class="customer-card" onclick="openCustomerModal('{{ customer.CustomerID }}', '{{ customer.Username }}', '{{ customer.Password }}', '{{ customer.AccountNumber }}', '{{ customer.Interest1099INT }}')">
+      <div class="avatar"></div>
+      <div class="customer-info">
+        <strong>{{ customer.Username }}</strong>
+        <p>Account #: {{ customer.AccountNumber }}</p>
+        <p>1099-INT: ${{ customer.Interest1099INT }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div id="customerModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCustomerModal()">&times;</span>
+    <h2>Customer Info</h2>
+    <p><strong>Username:</strong> <span id="modalUsername"></span></p>
+    <p><strong>Password:</strong> <span id="modalPassword"></span></p>
+    <p><strong>Account #:</strong> <span id="modalAccount"></span></p>
+    <p><strong>1099-INT:</strong> $<span id="modal1099"></span></p>
+    <input type="text" id="editUsernameInput" placeholder="New Username">
+    <div class="modal-buttons">
+      <button onclick="submitUsernameEdit()">Edit Username</button>
+      <button onclick="submitCustomerDelete()">Delete Customer</button>
+    </div>
+    <hr>
+    <div class="modal-buttons">
+      <button onclick="openTransactionModal('deposit')">Deposit</button>
+      <button onclick="openTransactionModal('withdraw')">Withdraw</button>
+      <button onclick="openTransactionModal('transfer')">Transfer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction Modal -->
+<div id="transactionModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeTransactionModal()">&times;</span>
+    <h2 id="transactionTypeTitle">Transaction</h2>
+    <input type="number" id="transactionAmount" placeholder="Amount ($)">
+    <input type="text" id="targetAccount" placeholder="Target Account (for transfers only)">
+    <button onclick="submitTransaction()">Submit</button>
+  </div>
+</div>
+
+<script>
+let currentCustomerID = null;
+let transactionType = null;
+
+function filterCustomers() {
+  const input = document.getElementById("searchBar").value.toLowerCase();
+  const cards = document.querySelectorAll(".customer-card");
+  cards.forEach(card => {
+    const name = card.querySelector("strong").innerText.toLowerCase();
+    const account = card.querySelector("p").innerText.toLowerCase();
+    card.classList.toggle("hidden", !name.includes(input) && !account.includes(input));
+  });
+}
+
+function openCustomerModal(id, username, password, account, interest) {
+  currentCustomerID = id;
+  document.getElementById("modalUsername").textContent = username;
+  document.getElementById("modalPassword").textContent = password;
+  document.getElementById("modalAccount").textContent = account;
+  document.getElementById("modal1099").textContent = interest;
+  document.getElementById("editUsernameInput").value = "";
+  document.getElementById("customerModal").style.display = "flex";
+}
+
+function closeCustomerModal() {
+  document.getElementById("customerModal").style.display = "none";
+}
+
+function openTransactionModal(type) {
+  transactionType = type;
+  document.getElementById("transactionTypeTitle").textContent = type.charAt(0).toUpperCase() + type.slice(1);
+  document.getElementById("transactionAmount").value = "";
+  document.getElementById("targetAccount").style.display = (type === 'transfer') ? "block" : "none";
+  document.getElementById("transactionModal").style.display = "flex";
+}
+
+function closeTransactionModal() {
+  document.getElementById("transactionModal").style.display = "none";
+}
+
+function submitUsernameEdit() {
+  const newUsername = document.getElementById("editUsernameInput").value.trim();
+  if (!newUsername) return alert("Please enter a new username.");
+  fetch("/employee/edit-customer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerID: currentCustomerID, newUsername })
+  }).then(res => res.json()).then(data => {
+    if (data.success) location.reload();
+    else alert("Failed to edit username: " + data.message);
+  });
+}
+
+function submitCustomerDelete() {
+  if (!confirm("Are you sure you want to delete this customer?")) return;
+  fetch("/employee/delete-customer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerID: currentCustomerID })
+  }).then(res => res.json()).then(data => {
+    if (data.success) location.reload();
+    else alert("Failed to delete customer: " + data.message);
+  });
+}
+
+function submitTransaction() {
+  const amount = document.getElementById("transactionAmount").value;
+  const target = document.getElementById("targetAccount").value;
+  fetch(`/employee/${transactionType}-customer`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerID: currentCustomerID, amount, target })
+  }).then(res => res.json()).then(data => {
+    if (data.success) location.reload();
+    else alert("Transaction failed: " + data.message);
+  });
+}
+</script>
+{% endblock %}

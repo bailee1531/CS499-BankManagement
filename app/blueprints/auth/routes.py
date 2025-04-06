@@ -198,7 +198,7 @@ def teller_login():
                            form_action=url_for('auth.teller_login'),
                            forgot_password_url="#",  # Add proper URL later
                            show_signup_button=False)
-
+'''
 @auth_bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     """
@@ -218,7 +218,7 @@ def admin_login():
                            form_action=url_for('auth.admin_login'),
                            forgot_password_url="#",  # Add proper URL later
                            show_signup_button=False)
-
+'''
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
     """
