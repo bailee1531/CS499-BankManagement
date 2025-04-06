@@ -1,5 +1,4 @@
-# Sierra Yerges# scripts/useCreditCard.py
-
+# Sierra Yerges
 import pandas as pd
 from decimal import Decimal
 from datetime import date
