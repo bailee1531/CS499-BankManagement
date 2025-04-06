@@ -25,6 +25,7 @@
         <p>Account #: {{ customer.AccountNumber }}</p>
         <p>1099-INT: ${{ customer.Interest1099INT }}</p>
       </div>
+      <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
     </div>
     {% endfor %}
   </div>
@@ -64,9 +65,24 @@
   </div>
 </div>
 
+<!-- Open Account Modal -->
+<div id="openAccountModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAccountModal()">&times;</span>
+    <h2>Open New Account</h2>
+    <select id="accountType">
+      <option value="Savings">Savings</option>
+      <option value="Money Market">Money Market</option>
+    </select>
+    <input type="number" id="initialDeposit" placeholder="Initial Deposit">
+    <button onclick="submitAccountOpen()">Open</button>
+  </div>
+</div>
+
 <script>
 let currentCustomerID = null;
 let transactionType = null;
+let openAccountCustomerID = null;
 
 function filterCustomers() {
   const input = document.getElementById("searchBar").value.toLowerCase();
@@ -139,6 +155,32 @@ function submitTransaction() {
   }).then(res => res.json()).then(data => {
     if (data.success) location.reload();
     else alert("Transaction failed: " + data.message);
+  });
+}
+
+function openAccountModal(id) {
+  openAccountCustomerID = id;
+  document.getElementById("accountType").value = "Savings";
+  document.getElementById("initialDeposit").value = "";
+  document.getElementById("openAccountModal").style.display = "flex";
+}
+
+function closeAccountModal() {
+  document.getElementById("openAccountModal").style.display = "none";
+}
+
+function submitAccountOpen() {
+  const type = document.getElementById("accountType").value;
+  const deposit = parseFloat(document.getElementById("initialDeposit").value);
+  if (isNaN(deposit)) return alert("Enter a valid deposit amount.");
+
+  fetch("/employee/open-account", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerID: openAccountCustomerID, accountType: type, depositAmount: deposit })
+  }).then(res => res.json()).then(data => {
+    if (data.success) location.reload();
+    else alert("Failed to open account: " + data.message);
   });
 }
 </script>

@@ -69,11 +69,17 @@ def create_teller_route():
     first = data.get("firstName", "").strip()
     last = data.get("lastName", "").strip()
 
-    if first and last:
+    if not first or not last:
+        return jsonify(success=False, message="Missing first or last name"), 400
+
+    try:
         create_teller(first, last)
         return jsonify(success=True)
-    else:
-        return jsonify(success=False, message="Missing first or last name"), 400
+    except Exception as e:
+        # Log the error and send back the message
+        print(f"[ERROR] Failed to create teller: {e}")
+        return jsonify(success=False, message=str(e)), 500
+
 
 @employee_bp.route("/edit-teller", methods=["POST"])
 def edit_teller():

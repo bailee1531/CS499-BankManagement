@@ -63,6 +63,8 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
             return url_for('customer.customer_dashboard'), None
         elif session_key == "employee":
             return url_for('employee.employee_dashboard'), None
+        elif session_key == "teller":
+            return url_for('employee.teller_dashboard'), None
         else:
             return None, "Unknown session type"
 
@@ -102,6 +104,8 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
         return url_for('customer.customer_dashboard'), None
     elif session_key == "employee":
         return url_for('employee.employee_dashboard'), None
+    elif session_key == "teller":
+        return url_for('employee.teller_dashboard'), None
 
     return None, "Unknown session type"
 
