@@ -109,14 +109,10 @@ def deposit(accID, amount) -> dict:
 
     # Completes deposit and updates csv file
     if accType in ['Credit Card', 'Mortgage Loan']:
-        currentBal -= Decimal(amount).quantize(Decimal('0.00'))
         if accType == 'Credit Card':
             transaction_type = 'Payment to Credit Card'
         else:
             transaction_type = 'Payment to Mortgage Loan'
-    else:
-        transaction_type = 'Deposit'
-        currentBal += Decimal(amount).quantize(Decimal('0.00'))
     accInfo['CreditLimit'] = accInfo['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accInfo.at[accIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
