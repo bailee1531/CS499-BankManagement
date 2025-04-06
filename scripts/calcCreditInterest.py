@@ -27,6 +27,7 @@ def calculateCreditInterest():
     # Load account data
     accountsData = pd.read_csv(accountsPath)
     accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     # Load transaction data
     transData = pd.read_csv(transPath)
 
@@ -40,7 +41,6 @@ def calculateCreditInterest():
         unpaidBalance = Decimal(str(account['CurrBal']))
         apr = Decimal(str(account['APR']))
         accID = account['AccountID']
-        accType = account['AccountType']
 
         monthlyInterestRate = apr / Decimal(100) / Decimal(12)
 

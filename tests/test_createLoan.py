@@ -23,14 +23,21 @@ class TestCreateMortgageLoanAccount(unittest.TestCase):
         accounts.csv, customers.csv, logs.csv.
         """
         return [
-            accounts if accounts is not None else pd.DataFrame(columns=[
-                "AccountID", "CustomerID", "AccountType", "CurrBal", "DateOpened", "CreditLimit", "APR"
-            ]),
-            customer_data if customer_data is not None else pd.DataFrame(columns=[
-                "Username", "CustomerID", "APRRangeID"
-            ]),
+            accounts if accounts is not None else self.default_accounts_df(),
+            customer_data if customer_data is not None else pd.DataFrame(columns=["Username", "CustomerID", "APRRangeID"]),
             log_data if log_data is not None else pd.DataFrame(columns=["LogID", "UserID", "LogMessage"])
         ]
+
+    def default_accounts_df(self):
+        return pd.DataFrame([{
+            "AccountID": 9999,
+            "CustomerID": 0,
+            "AccountType": "Mortgage Loan",
+            "CurrBal": "0.00",
+            "DateOpened": "2025-01-01",
+            "CreditLimit": "",
+            "APR": "0.00"
+        }])
 
     @patch("scripts.createLoan.pd.read_csv")
     @patch("scripts.createLoan.pd.DataFrame.to_csv")
@@ -44,6 +51,7 @@ class TestCreateMortgageLoanAccount(unittest.TestCase):
         - Transaction is logged in logs.csv.
         """
         mock_read_csv.side_effect = self.mock_csvs(
+            accounts=self.default_accounts_df(),
             customer_data=pd.DataFrame([{"Username": "alice", "CustomerID": 123, "APRRangeID": 2}])
         )
         result = createMortgageLoanAccount(123, Decimal("-250000.00"), 30)
@@ -62,6 +70,7 @@ class TestCreateMortgageLoanAccount(unittest.TestCase):
         - Proper error response.
         """
         mock_read_csv.side_effect = self.mock_csvs(
+            accounts=self.default_accounts_df(),
             customer_data=pd.DataFrame(columns=["Username", "CustomerID", "APRRangeID"])
         )
         result = createMortgageLoanAccount(999, Decimal("-150000.00"), 15)
@@ -79,6 +88,7 @@ class TestCreateMortgageLoanAccount(unittest.TestCase):
         - System handles it without crashing.
         """
         mock_read_csv.side_effect = self.mock_csvs(
+            accounts=self.default_accounts_df(),
             customer_data=pd.DataFrame([{"Username": "bob", "CustomerID": 124, "APRRangeID": 1}])
         )
         result = createMortgageLoanAccount(124, Decimal("0.00"), 15)
@@ -115,6 +125,7 @@ class TestCreateMortgageLoanAccount(unittest.TestCase):
         - Output message includes correct APR.
         """
         mock_read_csv.side_effect = self.mock_csvs(
+            accounts=self.default_accounts_df(),
             customer_data=pd.DataFrame([{"Username": "leo", "CustomerID": 126, "APRRangeID": 4}])
         )
         result = createMortgageLoanAccount(126, Decimal("-180000.00"), 20)

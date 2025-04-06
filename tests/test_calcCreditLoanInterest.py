@@ -28,11 +28,12 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
             "CustomerID": 315,        # Associated customer ID
             "AccountType": "Mortgage Loan",  # Account type for filtering
             "CurrBal": "-300000.00",   # Outstanding loan balance
+            "CreditLimit": "0.00",        # Empty credit limit
             "APR": "6.75"             # Annual Percentage Rate for interest calculation
         }])
 
         # Mock empty log file
-        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "CreditLimit", "TransactionID"])
 
         # Assign mock data to read_csv calls
         mock_read_csv.side_effect = lambda path: mock_accounts_df if "accounts.csv" in path else mock_logs_df
@@ -74,11 +75,12 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
             "CustomerID": 315,        # Associated customer ID
             "AccountType": "Mortgage Loan",  # Account type for filtering
             "CurrBal": "0.00",   # Outstanding loan balance
+            "CreditLimit": "0.00",        # Empty credit limit
             "APR": "6.75"             # Annual Percentage Rate for interest calculation
         }])
 
         # Mock empty log file
-        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "CreditLimit", "TransactionID"])
 
         # Assign mock data to read_csv calls
         mock_read_csv.side_effect = lambda path: mock_accounts_df if "accounts.csv" in path else mock_logs_df
@@ -111,10 +113,11 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
             "CustomerID": 315,        # Associated customer ID
             "AccountType": "Mortgage Loan",  # Account type for filtering
             "CurrBal": "200.00",   # Outstanding loan balance
+            "CreditLimit": "0.00",        # Empty credit limit
             "APR": "6.75"             # Annual Percentage Rate for interest calculation
         }])
         # Mock empty log file
-        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "CreditLimit", "TransactionID"])
 
         # Assign mock data to read_csv calls
         mock_read_csv.side_effect = lambda path: mock_accounts_df if "accounts.csv" in path else mock_logs_df
