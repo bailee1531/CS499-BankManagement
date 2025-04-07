@@ -27,7 +27,7 @@ def openCreditCardAccount(customerID: int) -> dict:
     # Get absolute path for customer.csv file
     customerPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/customers.csv'))
     # Get absolute path for transactions.csv file
-    log_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/logs.csv'))
+    log_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
 
     # Load all existing log data
     log_df = pd.read_csv(log_path)
