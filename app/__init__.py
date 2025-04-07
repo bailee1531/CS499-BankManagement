@@ -48,7 +48,7 @@ def create_app(test_config=None):
     app.register_blueprint(register_bp)  
 
     # Register the employee blueprint (handles employee stuff)
-    from app.blueprints.employee.route import employee_bp
+    from app.blueprints.employee.routes import employee_bp
     app.register_blueprint(employee_bp, url_prefix="/employee")
 
 

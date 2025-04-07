@@ -1,8 +1,9 @@
 import os
 import pandas as pd
 from Crypto.PublicKey import ECC
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, Response
 from app.blueprints.auth.forms import LoginForm
+from app.blueprints.customer.forms import DepositForm, WithdrawForm
 from app.blueprints.sharedUtilities import (
     get_csv_path, login_required, flash_error, flash_success
 )
@@ -13,7 +14,7 @@ from scripts.customer import modifyInfo
 from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
 from scripts.withdrawMoney import withdraw as withdraw_money
 from scripts.fundTransfer import transferFunds as transfer_funds
-from .form import TellerSettingsForm, AdminSettingsForm
+from .forms import TellerSettingsForm, AdminSettingsForm
 
 # Blueprint for employee routes
 employee_bp = Blueprint('employee', __name__, template_folder='templates')
@@ -207,17 +208,21 @@ def delete_customer():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
 
-@employee_bp.route("/deposit", methods=["POST"])
-def record_deposit():
+@employee_bp.route("/deposit", methods=["GET", "POST"])
+def record_deposit() -> Response:
     data = request.get_json()
     account_id = data.get("accountId")
-    amount = float(data.get("amount"))
+    form = DepositForm()
 
-    try:
-        make_deposit(account_id, amount)
-        return jsonify(success=True)
-    except Exception as e:
-        return jsonify(success=False, message=str(e)), 500
+    if form.validate_on_submit():
+        result = make_deposit(account_id, form.amount.data)
+        if result["status"] != "success":
+            flash_error(result["message"])
+        else:
+            return redirect(url_for("employee.teller_dashboard"))
+        
+    return render_template("employee/teller_dashboard.html", form=form)
+
 
 @employee_bp.route("/withdraw", methods=["POST"])
 def record_withdrawal():

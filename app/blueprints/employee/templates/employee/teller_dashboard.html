@@ -3,6 +3,7 @@
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
 {% endblock %}
 
 {% block title %}Teller Dashboard{% endblock %}
@@ -62,11 +63,19 @@
 <!-- Transaction Modal -->
 <div id="transactionModal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeTransactionModal()">&times;</span>
+    <!-- <span class="close" onclick="closeTransactionModal()">&times;</span> -->
     <h2 id="transactionTypeTitle">Transaction</h2>
-    <input type="number" id="transactionAmount" placeholder="Amount ($)">
-    <input type="text" id="targetAccount" placeholder="Target Account (for transfers only)">
-    <button onclick="submitTransaction()">Submit</button>
+    <form action="{{ url_for('employee.teller_dashboard') }}" method="post" novalidate>
+      {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+      <div class="form-group" style="color: white">
+        <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
+        {{ form.amount(size=32, **{'class': 'form-control', 'id': form.amount.id, 'aria-describedby': 'deposit-help'}) }}
+        <small id="deposit-help" class="visually-hidden">
+          Enter a valid amount in USD to transfer between your accounts.
+        </small>
+      </div>
+      <button class='submit-btn' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Deposit</button>
+    </form>
   </div>
 </div>
 
