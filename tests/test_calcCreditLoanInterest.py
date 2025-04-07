@@ -27,12 +27,13 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
             "AccountID": 14233,       # Unique loan account identifier
             "CustomerID": 315,        # Associated customer ID
             "AccountType": "Mortgage Loan",  # Account type for filtering
-            "CurrBal": "300000.00",   # Outstanding loan balance
+            "CurrBal": "-300000.00",   # Outstanding loan balance
+            "CreditLimit": "0.00",        # Empty credit limit
             "APR": "6.75"             # Annual Percentage Rate for interest calculation
         }])
 
         # Mock empty log file
-        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "CreditLimit", "TransactionID"])
 
         # Assign mock data to read_csv calls
         mock_read_csv.side_effect = lambda path: mock_accounts_df if "accounts.csv" in path else mock_logs_df
@@ -41,12 +42,12 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
         results = calculateCreditInterest()
 
         # Expected interest calculation for mortgage loan
-        expected_interest = Decimal("300000.00") * (Decimal("6.75") / Decimal("100") / Decimal("12"))
-        expected_interest = expected_interest.quantize(Decimal("0.00"))
+        expected_interest = Decimal("-300000.00") * (Decimal("6.75") / Decimal("100") / Decimal("12"))
+        expected_interest = abs(expected_interest.quantize(Decimal("0.00")))
 
         # Verify updated balance
         new_balance = Decimal(mock_accounts_df.loc[mock_accounts_df['AccountID'] == 14233, 'CurrBal'].values[0])
-        self.assertEqual(new_balance, Decimal("300000.00") + expected_interest)
+        self.assertEqual(new_balance, Decimal("-300000.00") - expected_interest)
 
         # Verify that the interest transaction was logged
         self.assertIn(
@@ -74,11 +75,12 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
             "CustomerID": 315,        # Associated customer ID
             "AccountType": "Mortgage Loan",  # Account type for filtering
             "CurrBal": "0.00",   # Outstanding loan balance
+            "CreditLimit": "0.00",        # Empty credit limit
             "APR": "6.75"             # Annual Percentage Rate for interest calculation
         }])
 
         # Mock empty log file
-        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "CreditLimit", "TransactionID"])
 
         # Assign mock data to read_csv calls
         mock_read_csv.side_effect = lambda path: mock_accounts_df if "accounts.csv" in path else mock_logs_df
@@ -88,21 +90,19 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
 
         # Ensure no interest transaction is recorded
         self.assertNotIn(
-            {"status": "success", "message": "Interest applied"},
-            results
-        )
+            {"status": "success", "message": "Interest applied"}, results)
 
         # Ensure to_csv was called but no changes should be made
         mock_to_csv.assert_called()
 
     @patch("scripts.calcCreditInterest.pd.read_csv")
     @patch("scripts.calcCreditInterest.pd.DataFrame.to_csv")
-    def test_no_interest_on_negative_balance(self, mock_to_csv, mock_read_csv):
+    def test_no_interest_on_overpaid_mortgage(self, mock_to_csv, mock_read_csv):
         """
-        Test that no interest is applied to mortgage loans with a negative balance (overpayment scenario).
+        Test that no interest is applied to mortgage loans with a positive balance (overpayment scenario).
 
         This test ensures:
-        - If a loan has a negative balance (meaning the user overpaid their bill),
+        - If a loan has a positive balance (meaning the user overpaid their bill),
           no interest should be charged.
         - The function should not log an interest charge for overpaid accounts.
         - The function still calls `to_csv()` to maintain transaction logging consistency.
@@ -112,11 +112,12 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
             "AccountID": 14233,       # Unique loan account identifier
             "CustomerID": 315,        # Associated customer ID
             "AccountType": "Mortgage Loan",  # Account type for filtering
-            "CurrBal": "0.00",   # Outstanding loan balance
+            "CurrBal": "200.00",   # Outstanding loan balance
+            "CreditLimit": "0.00",        # Empty credit limit
             "APR": "6.75"             # Annual Percentage Rate for interest calculation
         }])
         # Mock empty log file
-        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        mock_logs_df = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "CreditLimit", "TransactionID"])
 
         # Assign mock data to read_csv calls
         mock_read_csv.side_effect = lambda path: mock_accounts_df if "accounts.csv" in path else mock_logs_df
@@ -126,9 +127,7 @@ class TestCreditLoanInterestCalculation(unittest.TestCase):
 
         # Ensure no interest transaction is recorded
         self.assertNotIn(
-            {"status": "success", "message": "Interest applied"},
-            results
-        )
+            {"status": "success", "message": "Interest applied"}, results)
 
         # Ensure to_csv was called but no changes should be made
         mock_to_csv.assert_called()

@@ -71,7 +71,7 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
         "AccountID": accountID,
         "CustomerID": customerID,
         "AccountType": "Mortgage Loan",
-        "CurrBal": Decimal(loanAmount).quantize(Decimal('0.00')),
+        "CurrBal": -Decimal(loanAmount).quantize(Decimal('0.00')),
         "DateOpened": startDate,
         "CreditLimit": None,
         "APR": interestRate
@@ -83,7 +83,10 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
         accountsData = newLoanDf
     else:
         accountsData = pd.concat([accountsData, newLoanDf], ignore_index=True)
-
+    accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(
+        lambda x: Decimal(str(x)).quantize(Decimal('0.00')) if pd.notna(x) and str(x) not in ["", "None"] else None
+    )
     accountsData.to_csv(accountsPath, index=False)
 
     log_id = random.randint(1299, 5999)
