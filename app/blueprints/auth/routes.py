@@ -47,22 +47,23 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
 
     Args:
         form (LoginForm): The login form instance.
-        session_key (str): The session key to use ("customer", "teller", "admin").
+        session_key (str): The session key to use ("customer", "teller", or "admin").
         login_type (int): The type of login attempt (LOGIN or NEW_ACCOUNT).
 
     Returns:
-        Tuple[Optional[str], Optional[str]]: 
+        Tuple[Optional[str], Optional[str]]:
             - Redirection URL on success
             - Error message on failure (if any)
     """
-    # Prevent customer or employee from logging in again if already logged in
+    # Prevent user from logging in again if already logged in
     if session.get(session_key):
         flash("Already Logged In", "warning")
-        # Dynamically create the dashboard URL based on the session_key
         if session_key == "customer":
             return url_for('customer.customer_dashboard'), None
-        elif session_key == "employee":
-            return url_for('employee.employee_dashboard'), None
+        elif session_key == "teller":
+            return url_for('employee.teller_dashboard'), None
+        elif session_key == "admin":
+            return url_for('employee.admin_dashboard'), None
         else:
             return None, "Unknown session type"
 
@@ -82,9 +83,17 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
             flash_error("Customer not found or data error")
             return None, str(e)
 
-    user_type: str = "Customer" if session_key == "customer" else "Employee"
+    # Determine user type for authentication
+    if session_key == "customer":
+        user_type: str = "Customer"
+    elif session_key == "teller":
+        user_type: str = "Teller"
+    elif session_key == "admin":
+        user_type: str = "Admin"
+    else:
+        return None, "Unknown session type"
 
-    # Attempt login
+    # Attempt login using external login function
     login_result = webLogin.login_page_button_pressed(login_type, user_type, username, password)
     if not login_result or login_result.get("status") == "error":
         error_message = login_result.get("message", "Login failed") if login_result else "Login function returned None"
@@ -97,13 +106,16 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
         session["customer_id"] = int(customer_id)
 
     flash_success("Login Successful!")
-    # Dynamically create the redirect URL based on the session_key
+    # Redirect to the appropriate dashboard based on the role
     if session_key == "customer":
         return url_for('customer.customer_dashboard'), None
-    elif session_key == "employee":
-        return url_for('employee.employee_dashboard'), None
+    elif session_key == "teller":
+        return url_for('employee.teller_dashboard'), None
+    elif session_key == "admin":
+        return url_for('employee.admin_dashboard'), None
 
     return None, "Unknown session type"
+
 
 
 def handle_login(session_key: str, template_name: str) -> str:

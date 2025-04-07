@@ -117,8 +117,14 @@ def login_required(session_key="customer"):
         @wraps(f)
         def wrapper(*args, **kwargs):
             if not session.get(session_key):
-                flash("Login required", "danger")
-                return redirect(url_for("auth.customer_login", next=request.url))
+                flash_error("Login required")
+                # Redirect to the appropriate login based on session_key.
+                if session_key == "admin":
+                    return redirect(url_for("auth.admin_login", next=request.url))
+                elif session_key == "teller":
+                    return redirect(url_for("auth.teller_login", next=request.url))
+                else:
+                    return redirect(url_for("auth.customer_login", next=request.url))
             return f(*args, **kwargs)
         return wrapper
     return decorator
