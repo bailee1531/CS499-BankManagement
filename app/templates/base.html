@@ -51,9 +51,19 @@
                 Dashboard
             </a>
             <!-- Settings Button -->
+            {% if 'customer' in session %}
             <a href="{{ url_for('customer.settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                 Settings
             </a>
+            {% elif 'teller' in session %}
+                <a href="{{ url_for('employee.teller_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Settings
+                </a>
+            {% elif 'admin' in session %}
+                <a href="{{ url_for('employee.admin_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Settings
+                </a>
+            {% endif %}
             <!-- Logout Button -->
             <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
                 <button type="submit" class="btn btn--login">Logout</button>
