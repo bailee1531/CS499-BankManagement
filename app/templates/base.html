@@ -47,9 +47,19 @@
         <div class="header__auth">
             {% if 'customer' in session or 'teller' in session or 'admin' in session %}
             <!-- Dashboard Button -->
+            {% if 'customer' in session %}
             <a href="{{ url_for('customer.customer_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                 Dashboard
             </a>
+            {% elif 'teller' in session %}
+                <a href="{{ url_for('employee.teller_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Dashboard
+                </a>
+            {% elif 'admin' in session %}
+                <a href="{{ url_for('employee.admin_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Dashboard
+                </a>
+            {% endif %}
             <!-- Settings Button -->
             {% if 'customer' in session %}
             <a href="{{ url_for('customer.settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">

@@ -259,6 +259,7 @@ def teller_settings():
         changes = {}
         newUser = form.username.data.strip()
         username_changed = False
+        password_changed = False
 
         if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
             changes['FirstName'] = form.first_name.data.strip()
@@ -308,21 +309,24 @@ def teller_settings():
             )
             with open(pem_path, 'wt') as f:
                 f.write(encrypted)
-            changes['Password'] = '***'
+            password_changed = True
 
-        if changes or username_changed:
-            messages = []
-            
-            if username_changed:
-                messages.append(f"Username successfully updated to {newUser}.")
+        messages = []
 
-            for key, value in changes.items():
-                result = modifyInfo.modify_info(teller_id, {key: value})
-                messages.append(result["message"])
+        if username_changed:
+            messages.append(f"Username successfully updated to {newUser}.")
+        if password_changed:
+            messages.append("Password successfully updated.")
 
+        for key, value in changes.items():
+            result = modifyInfo.modify_info(teller_id, {key: value})
+            messages.append(result["message"])
+
+        if messages:
             flash_success(" | ".join(messages))
         else:
             flash_error("No changes were made.")
+
 
         return redirect(url_for('employee.teller_settings'))
 
@@ -366,9 +370,10 @@ def admin_settings():
     idx = person_idx[0]
 
     if form.validate_on_submit():
-        changes = {}
+        password_changed = False
 
         if form.password.data.strip():
+
             if not form.current_password.data.strip():
                 flash_error("Current password is required to update your password.")
                 return redirect(url_for('employee.admin_settings'))
@@ -400,15 +405,13 @@ def admin_settings():
             )
             with open(pem_path, 'wt') as f:
                 f.write(encrypted)
-            changes['Password'] = '***'
+            password_changed = True
 
-        if changes:
-            messages = []
-            
-            for key, value in changes.items():
-                result = modifyInfo.modify_info(admin_id, {key: value})
-                messages.append(result["message"])
+        messages = []
+        if password_changed:
+            messages.append(f"Password successfully updated.")
 
+        if messages:
             flash_success(" | ".join(messages))
         else:
             flash_error("No changes were made.")
