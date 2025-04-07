@@ -132,22 +132,7 @@ def teller_dashboard():
     except Exception as e:
         customers = []
         flash(f"Error loading customers: {e}", "danger")
-
-    # Initialize DepositForm
-    form = DepositForm()
-
-    # Load accounts and populate form choices
-    try:
-        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-        form.account_id.choices = [
-            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
-            for _, acc in accounts_df.iterrows()
-        ]
-    except Exception as e:
-        form.account_id.choices = []
-        flash(f"Error loading account options: {e}", "danger")
-
-    return render_template("employee/teller_dashboard.html", customers=customers, form=form)
+        
     # Initialize DepositForm
     form = DepositForm()
 
