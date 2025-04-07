@@ -106,8 +106,9 @@
   font-weight: bold;
   color: white;
   text-decoration: none;
-  background: none;
-  border: none;
+  background-color: #7e7f9a;
+  border-radius: 6px;
+  border: 1px solid #ccc;
   cursor: pointer;
   z-index: 1001;
 }
@@ -143,7 +144,7 @@
 
 /* --- Buttons --- */
 .modal-content button {
-  background-color: #b92410;
+  background-color: #7e7f9a;
   color: white;
   padding: 0.6rem 1.2rem;
   border: none;
