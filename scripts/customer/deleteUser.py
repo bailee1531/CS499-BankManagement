@@ -1,5 +1,6 @@
 # Sierra Yerges
 import os
+import random
 import pandas as pd
 from Crypto.PublicKey import ECC
 
@@ -9,6 +10,7 @@ employees_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(_
 persons_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/persons.csv'))
 accounts_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/accounts.csv'))
 bills_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/bills.csv'))
+log_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/logs.csv'))
 
 
 def delete_user_button_pressed(user_type: str, user_id: int, password: str = None, is_admin: bool = False) -> dict:
@@ -38,6 +40,7 @@ def delete_user_button_pressed(user_type: str, user_id: int, password: str = Non
         persons_df = pd.read_csv(persons_path)
         accounts_df = pd.read_csv(accounts_path)
         bills_df = pd.read_csv(bills_path)
+        log_df = pd.read_csv(log_path)
     except Exception as e:
         return {"status": "error", "message": f"Failed to load required files: {e}"}
 
@@ -87,5 +90,14 @@ def delete_user_button_pressed(user_type: str, user_id: int, password: str = Non
             os.remove(pem_path)
         except Exception as e:
             return {"status": "error", "message": f"Failed to delete PEM file: {e}"}
+    
+    log_id = random.randint(1299, 5999)
+    while log_id in log_df['LogID'].values:
+        log_id = random.randint(1299, 5999)
+
+    newLog = {'LogID': log_id, 'UserID': user_id, 'LogMessage': 'Deleted User Account'}
+    log_df.loc[len(log_df)] = newLog
+
+    log_df.to_csv(log_path, index=False)
 
     return {"status": "success", "message": f"{user_type} account {user_id} successfully deleted."}

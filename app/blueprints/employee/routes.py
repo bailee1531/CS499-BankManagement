@@ -3,7 +3,6 @@ import pandas as pd
 from Crypto.PublicKey import ECC
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, Response
 from app.blueprints.auth.forms import LoginForm
-from app.blueprints.customer.forms import DepositForm, WithdrawForm
 from app.blueprints.sharedUtilities import (
     get_csv_path, login_required, flash_error, flash_success
 )
@@ -14,7 +13,7 @@ from scripts.customer import modifyInfo
 from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
 from scripts.withdrawMoney import withdraw as withdraw_money
 from scripts.fundTransfer import transferFunds as transfer_funds
-from .forms import TellerSettingsForm, AdminSettingsForm
+from .forms import TellerSettingsForm, AdminSettingsForm, DepositForm
 
 # Blueprint for employee routes
 employee_bp = Blueprint('employee', __name__, template_folder='templates')
@@ -127,15 +126,28 @@ def delete_teller():
 
 @employee_bp.route("/teller-dashboard")
 def teller_dashboard():
-    # Load customer data
-    customer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/customers.csv"))
+    df = pd.read_csv(get_csv_path("customers.csv"))
     try:
-        df = pd.read_csv(customer_path)
         customers = df.to_dict(orient="records")
     except Exception as e:
         customers = []
         flash(f"Error loading customers: {e}", "danger")
 
+    # Initialize DepositForm
+    form = DepositForm()
+
+    # Load accounts and populate form choices
+    try:
+        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+        form.account_id.choices = [
+            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
+            for _, acc in accounts_df.iterrows()
+        ]
+    except Exception as e:
+        form.account_id.choices = []
+        flash(f"Error loading account options: {e}", "danger")
+
+    return render_template("employee/teller_dashboard.html", customers=customers, form=form)
     # Initialize DepositForm
     form = DepositForm()
 
@@ -162,7 +174,16 @@ def edit_username():
         return jsonify(success=False, message="Missing fields"), 400
 
     try:
-        modify_username(customer_id, {"Username": new_username})
+        customer_id = int(customer_id)
+        customers_path = get_csv_path("customers.csv")
+        df = pd.read_csv(customers_path)
+
+        if customer_id not in df['CustomerID'].values:
+            return jsonify(success=False, message="Customer ID not found"), 404
+
+        df.loc[df['CustomerID'] == customer_id, 'Username'] = new_username
+        df.to_csv(customers_path, index=False)
+
         return jsonify(success=True)
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
@@ -205,6 +226,21 @@ def reset_customer_password_route():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
 
+@employee_bp.route("/check-accounts/<int:customer_id>", methods=["GET"])
+def check_customer_accounts(customer_id):
+    try:
+        accounts_path = get_csv_path("accounts.csv")
+        bills_path = get_csv_path("bills.csv")
+
+        accounts_df = pd.read_csv(accounts_path)
+        bills_df = pd.read_csv(bills_path)
+
+        has_accounts = not accounts_df[accounts_df['CustomerID'] == customer_id].empty
+        has_bills = not bills_df[bills_df['CustomerID'] == customer_id].empty
+
+        return jsonify(success=True, hasOpenAccountsOrBills=has_accounts or has_bills)
+    except Exception as e:
+        return jsonify(success=False, message=f"Error checking account status: {str(e)}"), 500
 
 @employee_bp.route("/delete-customer", methods=["POST"])
 def delete_customer():
@@ -237,7 +273,6 @@ def record_deposit() -> Response:
             return redirect(url_for("employee.teller_dashboard"))
         
     return render_template("employee/teller_dashboard.html", form=form)
-
 
 @employee_bp.route("/withdraw", methods=["POST"])
 def record_withdrawal():

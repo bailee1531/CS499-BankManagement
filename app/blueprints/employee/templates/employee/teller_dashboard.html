@@ -40,15 +40,15 @@
     <p><strong>Username:</strong> <span id="modalUsername"></span></p>
     <p><strong>Password:</strong> <span id="modalPassword"></span></p>
     <p><strong>Account #:</strong> <span id="modalAccount"></span></p>
-    <p><strong>1099-INT:</strong> $<span id="modal1099"></span></p>
+    <h3>Edit Username</h3>
     <input type="text" id="editUsernameInput" placeholder="New Username">
+    <button onclick="submitUsernameEdit()">Update Username</button>
     <hr>
     <h3>Reset Password</h3>
     <input type="password" id="oldPasswordInput" placeholder="Old Password">
     <input type="password" id="newPasswordInput" placeholder="New Password">
     <button onclick="resetCustomerPassword()">Reset Password</button>
     <div class="modal-buttons">
-      <button onclick="submitUsernameEdit()">Edit Username</button>
       <button onclick="submitCustomerDelete()">Delete Customer</button>
     </div>
     <hr>
@@ -108,12 +108,21 @@ function filterCustomers() {
   });
 }
 
+function setModalTextContent(ids, values) {
+  ids.forEach((id, index) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = values[index];
+  });
+}
+
 function openCustomerModal(id, username, password, account, interest) {
   currentCustomerID = id;
-  document.getElementById("modalUsername").textContent = username;
-  document.getElementById("modalPassword").textContent = password;
-  document.getElementById("modalAccount").textContent = account;
-  document.getElementById("modal1099").textContent = interest;
+
+  setModalTextContent(
+    ["modalUsername", "modalPassword", "modalAccount"],
+    [username, password, account, interest]
+  );
+
   document.getElementById("editUsernameInput").value = "";
   document.getElementById("customerModal").style.display = "flex";
 }
@@ -134,14 +143,26 @@ function closeTransactionModal(type) {
 
 function submitUsernameEdit() {
   const newUsername = document.getElementById("editUsernameInput").value.trim();
+
   if (!newUsername) return alert("Please enter a new username.");
-  fetch("/employee/edit-customer", {
+
+  fetch("/employee/edit-username", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerID: currentCustomerID, newUsername })
-  }).then(res => res.json()).then(data => {
-    if (data.success) location.reload();
-    else alert("Failed to edit username: " + data.message);
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      customerId: currentCustomerID,
+      newUsername: newUsername
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert("Failed to edit username: " + data.message);
+    }
   });
 }
 
@@ -169,14 +190,41 @@ function resetCustomerPassword() {
 
 function submitCustomerDelete() {
   if (!confirm("Are you sure you want to delete this customer?")) return;
-  fetch("/employee/delete-customer", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerID: currentCustomerID })
-  }).then(res => res.json()).then(data => {
-    if (data.success) location.reload();
-    else alert("Failed to delete customer: " + data.message);
-  });
+
+  // Step 1: Check if user still has active accounts or bills
+  fetch(`/employee/check-accounts/${currentCustomerID}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        alert("Could not check customer account status.");
+        return;
+      }
+
+      if (data.hasOpenAccountsOrBills) {
+        alert("This customer still has open accounts or unpaid bills. Please resolve them before deletion.");
+        return;
+      }
+
+      // Step 2: Proceed with deletion
+      fetch("/employee/delete-customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerID: currentCustomerID })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Customer successfully deleted.");
+          location.reload();
+        } else {
+          alert("Failed to delete customer: " + data.message);
+        }
+      });
+    })
+    .catch(err => {
+      alert("Error checking account status.");
+      console.error(err);
+    });
 }
 
 function submitTransaction() {

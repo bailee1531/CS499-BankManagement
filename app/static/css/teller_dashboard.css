@@ -1,135 +1,172 @@
-/* Teller Dashboard Base */
+@import url("shared.css");
+
+/* ================= Teller Dashboard Base ================= */
 .teller-dashboard {
-    max-width: 1000px;
-    margin: 2rem auto 6rem auto;
-    padding: 2rem;
-  }
-  
-  .teller-dashboard h1 {
-    color: #2e3c4e;
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
-  
-  .teller-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 2rem;
-    gap: 1rem;
-  }
-  
-  #searchBar {
-    flex: 1;
-    padding: 0 1rem;
-    height: 42px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    width: 60%;
-    box-sizing: border-box;
-  }
-  
-  /* Grid layout for customer cards */
-  .customer-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    min-height: 400px;
-  }
-  
-  .customer-card {
-    background-color: #f5f5f5;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    height: 150px;
-  }
-  
-  .customer-card:hover {
-    transform: translateY(-3px);
-  }
-  
-  .avatar {
-    width: 50px;
-    height: 50px;
-    background-color: #bbb;
-    border-radius: 50%;
-    margin-right: 1rem;
-    flex-shrink: 0;
-  }
-  
-  .customer-info {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  /* Modal Styles */
-  .modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-    position: relative;
-  }
-  
-  .modal-content input {
-    width: 100%;
-    padding: 0.6rem;
-    margin: 0.5rem 0;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .modal-content button {
-    background-color: #006644;
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 0.5rem;
-  }
-  
-  .modal-content button:hover {
-    background-color: #004c33;
-  }
-  
-  .modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .close {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.8rem;
-    font-size: 1.4rem;
-    cursor: pointer;
-    color: #333;
-  }
-  
+  max-width: 1000px;
+  margin: 2rem auto 6rem auto;
+  padding: 2rem;
+}
+
+.teller-dashboard h1 {
+  color: #2e3c4e;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.teller-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+#searchBar {
+  flex: 1;
+  padding: 0 1rem;
+  height: 42px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 60%;
+  box-sizing: border-box;
+}
+
+/* ================= Customer Card Grid ================= */
+.customer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  min-height: 400px;
+}
+
+.customer-card {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 150px;
+}
+
+.customer-card:hover {
+  transform: translateY(-3px);
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  background-color: #bbb;
+  border-radius: 50%;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ================= Modal Styles ================= */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* --- Modal Box Layout --- */
+.modal-content {
+  background: white;
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  width: 340px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* --- Inputs --- */
+.modal-content input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* --- Buttons --- */
+.modal-content button {
+  background-color: #006644;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.modal-content button:hover {
+  background-color: #004c33;
+}
+
+/* --- Button Group Container --- */
+.modal-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* --- Text Elements --- */
+.modal-content h2,
+.modal-content h3 {
+  margin: 0.5rem 0;
+  font-weight: 600;
+  color: #222;
+}
+
+.modal-content p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* --- Divider Line --- */
+.modal-content hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 1rem 0 0.5rem;
+}
+
+/* --- Close Button --- */
+.close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #333;
+}
