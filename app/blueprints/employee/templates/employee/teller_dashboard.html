@@ -60,14 +60,14 @@
   </div>
 </div>
 
-<!-- Transaction Modal -->
-<div id="transactionModal" class="modal">
-  <div class="modal-content">
-    <!-- <span class="close" onclick="closeTransactionModal()">&times;</span> -->
-    <h2 id="transactionTypeTitle">Transaction</h2>
+<!-- Deposit Modal -->
+<div id="depositModal" class="modal">
+  <div class="modal-content" style="background-color: #434343;">
+    <span class="close" onclick="closeTransactionModal('deposit')">&times;</span>
+    <h2 id="transactionTypeTitle" style="color: white;">Deposit</h2>
     <form action="{{ url_for('employee.teller_dashboard') }}" method="post" novalidate>
       {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
-      <div class="form-group" style="color: white">
+      <div class="form-group" style="color: white;">
         <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
         {{ form.amount(size=32, **{'class': 'form-control', 'id': form.amount.id, 'aria-describedby': 'deposit-help'}) }}
         <small id="deposit-help" class="visually-hidden">
@@ -123,15 +123,13 @@ function closeCustomerModal() {
 }
 
 function openTransactionModal(type) {
-  transactionType = type;
-  document.getElementById("transactionTypeTitle").textContent = type.charAt(0).toUpperCase() + type.slice(1);
-  document.getElementById("transactionAmount").value = "";
-  document.getElementById("targetAccount").style.display = (type === 'transfer') ? "block" : "none";
-  document.getElementById("transactionModal").style.display = "flex";
+  transactionType = type + "Modal";
+  document.getElementById(transactionType).style.display = "flex";
 }
 
-function closeTransactionModal() {
-  document.getElementById("transactionModal").style.display = "none";
+function closeTransactionModal(type) {
+  transactionType = type + "Modal";
+  document.getElementById(transactionType).style.display = "none";
 }
 
 function submitUsernameEdit() {

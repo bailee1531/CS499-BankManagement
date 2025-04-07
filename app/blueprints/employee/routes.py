@@ -127,6 +127,7 @@ def delete_teller():
 
 @employee_bp.route("/teller-dashboard")
 def teller_dashboard():
+    # Load customer data
     customer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/customers.csv"))
     try:
         df = pd.read_csv(customer_path)
@@ -135,7 +136,21 @@ def teller_dashboard():
         customers = []
         flash(f"Error loading customers: {e}", "danger")
 
-    return render_template("employee/teller_dashboard.html", customers=customers)
+    # Initialize DepositForm
+    form = DepositForm()
+
+    # Load accounts and populate form choices
+    try:
+        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+        form.account_id.choices = [
+            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
+            for _, acc in accounts_df.iterrows()
+        ]
+    except Exception as e:
+        form.account_id.choices = []
+        flash(f"Error loading account options: {e}", "danger")
+
+    return render_template("employee/teller_dashboard.html", customers=customers, form=form)
 
 @employee_bp.route("/edit-username", methods=["POST"])
 def edit_username():
