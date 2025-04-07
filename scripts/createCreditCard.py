@@ -26,6 +26,11 @@ def openCreditCardAccount(customerID: int) -> dict:
     accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     # Get absolute path for customer.csv file
     customerPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/customers.csv'))
+    # Get absolute path for transactions.csv file
+    log_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
+
+    # Load all existing log data
+    log_df = pd.read_csv(log_path)
     
     # Load all existing account data into a DataFrame
     customerData = pd.read_csv(customerPath)
@@ -83,6 +88,15 @@ def openCreditCardAccount(customerID: int) -> dict:
     else:
         accountsData = pd.concat([accountsData, newAccountDf], ignore_index=True)
     accountsData.to_csv(accountsPath, index=False)
+
+    log_id = random.randint(1299, 5999)
+    while log_id in log_df['LogID'].values:
+        log_id = random.randint(1299, 5999)
+
+    newLog = {'LogID': log_id, 'UserID': customerID, 'LogMessage': 'Opened a Credit Card'}
+    log_df.loc[len(log_df)] = newLog
+
+    log_df.to_csv(log_path, index=False)
 
     # Return a success message with account details
     return {"status": "success", "message": f"Credit card account {accountID} created with a {apr}% APR."}

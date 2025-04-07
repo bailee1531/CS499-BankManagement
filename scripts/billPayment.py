@@ -93,14 +93,14 @@ def processScheduledBills() -> list:
     """
     accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     billsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/bills.csv'))
-    logPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
+    transPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/transactions.csv'))
 
     if not os.path.exists(billsPath):
         return [{"status": "error", "message": "No scheduled bills to process."}]
 
     accountsData = pd.read_csv(accountsPath)
     billsData = pd.read_csv(billsPath)
-    logData = pd.read_csv(logPath)
+    transData = pd.read_csv(transPath)
 
     today = date.today()
     results = []
@@ -146,25 +146,25 @@ def processScheduledBills() -> list:
                     continue
                 # Allow payment by increasing credit card balance
                 accountsData.at[accIndex[0], 'CurrBal'] = balance + amount
-                transactionID = generate_transaction_ID(logData)
+                transactionID = generate_transaction_ID(transData)
                 success = True
             elif balance >= amount:
                 # Deduct payment from source account
                 accountsData.at[accIndex[0], 'CurrBal'] = balance - amount
-                transactionID = generate_transaction_ID(logData)
+                transactionID = generate_transaction_ID(transData)
                 success = True
             if success:
                 newDueDate = dueDate + timedelta(days=30)
                 billsData.at[index, 'DueDate'] = newDueDate.isoformat()
 
-                newLog = {
+                newTransaction = {
+                    'TransactionID': transactionID,
                     'AccountID': bill['PaymentAccID'],
-                    'CustomerID': bill['CustomerID'],
                     'TransactionType': f"Bill Payment to {bill['PayeeName']}",
                     'Amount': Decimal(amount).quantize(Decimal('0.00')),
-                    'TransactionID': transactionID
+                    'TransDate': date.today()
                 }
-                logData.loc[len(logData)] = newLog
+                transData.loc[len(transData)] = newTransaction
 
                 results.append({"status": "success", "message": f"Bill payment of ${amount} to {bill['PayeeName']} processed successfully. Due Date updated to {newDueDate}."})
             else:
@@ -175,7 +175,7 @@ def processScheduledBills() -> list:
     accountsData.to_csv(accountsPath, index=False)
     billsData['Amount'] = billsData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
     billsData.to_csv(billsPath, index=False)
-    logData['Amount'] = logData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
-    logData.to_csv(logPath, index=False)
+    transData['Amount'] = transData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
+    transData.to_csv(transPath, index=False)
 
     return results
