@@ -45,7 +45,6 @@
         <!-- Optional Authentication Links (Sign Up / Login) -->
         {% block header_extra %}
         <div class="header__auth">
-            {% if 'customer' in session or 'teller' in session or 'admin' in session %}
             <!-- Dashboard Button -->
             {% if 'customer' in session %}
             <a href="{{ url_for('customer.customer_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
