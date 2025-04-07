@@ -41,6 +41,11 @@
     <p><strong>Account #:</strong> <span id="modalAccount"></span></p>
     <p><strong>1099-INT:</strong> $<span id="modal1099"></span></p>
     <input type="text" id="editUsernameInput" placeholder="New Username">
+    <hr>
+    <h3>Reset Password</h3>
+    <input type="password" id="oldPasswordInput" placeholder="Old Password">
+    <input type="password" id="newPasswordInput" placeholder="New Password">
+    <button onclick="resetCustomerPassword()">Reset Password</button>
     <div class="modal-buttons">
       <button onclick="submitUsernameEdit()">Edit Username</button>
       <button onclick="submitCustomerDelete()">Delete Customer</button>
@@ -130,6 +135,28 @@ function submitUsernameEdit() {
   }).then(res => res.json()).then(data => {
     if (data.success) location.reload();
     else alert("Failed to edit username: " + data.message);
+  });
+}
+
+function resetCustomerPassword() {
+  const oldPassword = document.getElementById("oldPasswordInput").value.trim();
+  const newPassword = document.getElementById("newPasswordInput").value.trim();
+
+  if (!oldPassword || !newPassword) {
+    return alert("Please enter both the old and new passwords.");
+  }
+
+  fetch("/employee/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ 
+      customerID: currentCustomerID, 
+      oldPassword, 
+      newPassword 
+    })
+  }).then(res => res.json()).then(data => {
+    if (data.success) alert("Password reset successfully.");
+    else alert("Failed to reset password: " + data.message);
   });
 }
 

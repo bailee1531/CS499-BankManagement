@@ -151,6 +151,45 @@ def edit_username():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
 
+# ---------------------------
+#Reset Customer Password
+# ---------------------------
+@employee_bp.route("/reset-password", methods=["POST"])
+def reset_customer_password_route():
+    data = request.get_json()
+    customer_id = data.get("customerID")
+    old_password = data.get("oldPassword")
+    new_password = data.get("newPassword")
+
+    if not customer_id or not old_password or not new_password:
+        return jsonify(success=False, message="Customer ID, old password, and new password required."), 400
+
+    pem_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../", f"{customer_id}privatekey.pem"))
+
+    try:
+        with open(pem_path, 'rt') as f:
+            key_data = f.read()
+            key = ECC.import_key(key_data, old_password)
+
+        encrypted = key.export_key(
+            format='PEM',
+            passphrase=new_password,
+            use_pkcs8=True,
+            protection='PBKDF2WithHMAC-SHA512AndAES256-CBC',
+            compress=True,
+            prot_params={'iteration_count': 210000}
+        )
+
+        with open(pem_path, 'wt') as f:
+            f.write(encrypted)
+
+        return jsonify(success=True)
+    except ValueError:
+        return jsonify(success=False, message="Old password is incorrect."), 400
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
+
+
 @employee_bp.route("/delete-customer", methods=["POST"])
 def delete_customer():
     data = request.get_json()
