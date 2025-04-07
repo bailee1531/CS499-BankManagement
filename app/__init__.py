@@ -5,9 +5,8 @@ This module defines a factory function to create and configure a Flask applicati
 It sets up configuration values, registers blueprints, and defines a basic home route.
 """
 
-import os
 from datetime import timedelta
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 
 def create_app(test_config=None):
     """
@@ -63,6 +62,7 @@ def create_app(test_config=None):
         """
         Home route that renders the homepage.
         """
+        session.pop("employee_mode", None)
         return render_template("index.html")
 
     # Employee home route that renders the employee homepage
@@ -71,6 +71,7 @@ def create_app(test_config=None):
         """
         Employee Home route that renders the employee homepage.
         """
+        session["employee_mode"] = True
         return render_template("employee_home.html")
 
     return app

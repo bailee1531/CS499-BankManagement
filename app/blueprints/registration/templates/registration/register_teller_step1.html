@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+<!-- Meta description block for SEO -->
+{% block meta_description %}
+Secure account registration for Evergreen Bank.
+{% endblock %}
+
+<!-- Title block for the page -->
+{% block title %}
+Evergreen Bank - Create Account
+{% endblock %}
+
+<!-- Empty header block for additional headers if needed -->
+{% block header_extra %}{% endblock %}
+
+{% block content %}
+<!-- Main content of the page -->
+<main>
+    
+    <!-- Account registration container section -->
+    <section class="register-container" aria-labelledby="register-heading">
+        <h2 id="register-heading">
+            {% if session.get("employee_mode") %}Employee{% else %}Customer{% endif %} Sign Up
+        </h2>       
+        
+        <!-- Form to register the user with the POST method -->
+        <form action="{% if session.get('employee_mode') %}
+                  {{ url_for('registration.register_teller_step1') }}
+              {% else %}
+                  {{ url_for('registration.register_step1') }}
+              {% endif %}" method="post" novalidate>
+            {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
+            
+            <!-- First Name Field -->
+            <div class="form-group">
+                <label for="first_name">First Name *</label>
+                {{ form.first_name(class="form-control", placeholder="Enter your first name", autocomplete="given-name") }}
+                {% if form.first_name.errors %}
+                <div class="error-message">
+                    {% for error in form.first_name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Last Name Field -->
+            <div class="form-group">
+                <label for="last_name">Last Name *</label>
+                {{ form.last_name(class="form-control", placeholder="Enter your last name", autocomplete="family-name") }}
+                {% if form.last_name.errors %}
+                <div class="error-message">
+                    {% for error in form.last_name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Address Field -->
+            <div class="form-group">
+                <label for="address">Address *</label>
+                {{ form.address(class="form-control", placeholder="Enter your address") }}
+                {% if form.address.errors %}
+                <div class="error-message">
+                    {% for error in form.address.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Phone Number Field -->
+            <div class="form-group">
+                <label for="phone_number">Phone Number *</label>
+                {{ form.phone_number(class="form-control", placeholder="Enter your phone number", autocomplete="tel") }}
+                {% if form.phone_number.errors %}
+                <div class="error-message">
+                    {% for error in form.phone_number.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Tax ID Field -->
+            <div class="form-group">
+                <label for="tax_id">Social Security Number (Tax ID) *</label>
+                {{ form.tax_id(class="form-control", placeholder="Enter your SSN or Tax ID") }}
+                {% if form.tax_id.errors %}
+                <div class="error-message">
+                    {% for error in form.tax_id.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Birthday Field -->
+            <div class="form-group">
+                <label for="birthday">Birthday *</label>
+                {{ form.birthday(class="form-control", placeholder="Enter your birthday", autocomplete="bday") }}
+                {% if form.birthday.errors %}
+                <div class="error-message">
+                    {% for error in form.birthday.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Submit button for moving to the next registration step -->
+            <button type="submit" class="btn btn--register">
+                Next Step
+            </button>
+        </form>
+    </section>
+
+</main>
+{% endblock %}
+

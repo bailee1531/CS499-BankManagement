@@ -79,8 +79,12 @@
                 <button type="submit" class="btn btn--login">Logout</button>
             </form>
             {% else %}
-            <a href="{{ url_for('registration.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
-            <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+                {% if session.get("employee_mode") %}
+                    <a href="{{ url_for('registration.register_teller_step1') }}" class="btn btn--sign-up">Employee Sign Up</a>
+                {% else %}
+                    <a href="{{ url_for('registration.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
+                    <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+                {% endif %}
             {% endif %}
         </div>
         {% endblock %}
