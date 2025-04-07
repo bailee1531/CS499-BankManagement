@@ -47,20 +47,44 @@
         <div class="header__auth">
             {% if 'customer' in session or 'teller' in session or 'admin' in session %}
             <!-- Dashboard Button -->
+            {% if 'customer' in session %}
             <a href="{{ url_for('customer.customer_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                 Dashboard
             </a>
+            {% elif 'teller' in session %}
+                <a href="{{ url_for('employee.teller_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Dashboard
+                </a>
+            {% elif 'admin' in session %}
+                <a href="{{ url_for('employee.admin_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Dashboard
+                </a>
+            {% endif %}
             <!-- Settings Button -->
+            {% if 'customer' in session %}
             <a href="{{ url_for('customer.settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                 Settings
             </a>
+            {% elif 'teller' in session %}
+                <a href="{{ url_for('employee.teller_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Settings
+                </a>
+            {% elif 'admin' in session %}
+                <a href="{{ url_for('employee.admin_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                    Settings
+                </a>
+            {% endif %}
             <!-- Logout Button -->
             <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
                 <button type="submit" class="btn btn--login">Logout</button>
             </form>
             {% else %}
-            <a href="{{ url_for('registration.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
-            <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+                {% if session.get("employee_mode") %}
+                    <a href="{{ url_for('registration.register_teller_step1') }}" class="btn btn--sign-up">Employee Sign Up</a>
+                {% else %}
+                    <a href="{{ url_for('registration.register_step1') }}" class="btn btn--sign-up">Sign Up</a>
+                    <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+                {% endif %}
             {% endif %}
         </div>
         {% endblock %}

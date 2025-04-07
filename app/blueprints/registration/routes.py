@@ -229,3 +229,73 @@ def deposit_form():
         form=form,
         form_action=url_for('registration.deposit_form')
     )
+
+@register_bp.route("/register/teller-step1", methods=["GET", "POST"])
+def register_teller_step1():
+    # Same logic as customer step1, but only allow if session["employee_mode"] is True
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+    
+    form = RegistrationStep1Form()
+    if form.validate_on_submit():
+        # Store collected data in session
+        session['registration'] = {
+            'first_name': form.first_name.data,
+            'last_name': form.last_name.data,
+            'address': form.address.data,
+            'phone_number': form.phone_number.data,
+            'tax_id': form.tax_id.data,
+            'birthday': form.birthday.data,
+        }
+        return redirect(url_for('registration.register_teller_step2'))
+    return render_template('registration/register_teller_step1.html', form=form)
+
+@register_bp.route("/register/teller-step2", methods=["GET", "POST"])
+def register_teller_step2():
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+
+    form = RegistrationStep2Form()
+
+    if form.validate_on_submit():
+        registration = session.get('registration', {})
+        if not registration:
+            flash_error("Your session has expired. Please restart the registration process.")
+            return redirect(url_for('registration.register_teller_step1'))
+
+        # Check if the username already exists in employees.csv
+        usernames = pd.read_csv(get_csv_path("employees.csv"))['Username'].str.lower()
+        if form.username.data.lower() not in usernames.values:
+            flash_error("This username is not recognized. Please make sure an admin created your employee account first.")
+            return redirect(url_for('registration.register_teller_step1'))
+
+        # Combine step 1 and step 2 data into one call
+        result = webLogin.login_page_button_pressed(
+            NEW_ACCOUNT,
+            "Teller",
+            form.username.data,
+            form.password.data,
+            registration['first_name'],
+            registration['last_name'],
+            registration['address'],
+            form.email.data,
+            registration['phone_number'],
+            registration['tax_id'],
+            form.security_answer_1.data,
+            form.security_answer_2.data,
+        )
+
+        if result.get("status") != "success":
+            flash_error(result.get("message", "Registration failed."))
+            return redirect(url_for('registration.register_teller_step1'))
+
+        # Successful creation — log in and redirect
+        session.clear()
+        session['teller'] = form.username.data
+        session['role'] = 'teller'
+        session.pop("employee_mode", None)
+
+        flash_success("Welcome to your dashboard!")
+        return redirect(url_for("employee.teller_dashboard"))
+
+    return render_template("registration/register_teller_step2.html", form=form)

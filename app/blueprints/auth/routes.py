@@ -63,6 +63,8 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
             return url_for('customer.customer_dashboard'), None
         elif session_key == "employee":
             return url_for('employee.employee_dashboard'), None
+        elif session_key == "teller":
+            return url_for('employee.teller_dashboard'), None
         else:
             return None, "Unknown session type"
 
@@ -102,6 +104,8 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
         return url_for('customer.customer_dashboard'), None
     elif session_key == "employee":
         return url_for('employee.employee_dashboard'), None
+    elif session_key == "teller":
+        return url_for('employee.teller_dashboard'), None
 
     return None, "Unknown session type"
 
@@ -198,7 +202,7 @@ def teller_login():
                            form_action=url_for('auth.teller_login'),
                            forgot_password_url="#",  # Add proper URL later
                            show_signup_button=False)
-
+'''
 @auth_bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     """
@@ -218,7 +222,7 @@ def admin_login():
                            form_action=url_for('auth.admin_login'),
                            forgot_password_url="#",  # Add proper URL later
                            show_signup_button=False)
-
+'''
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
     """

@@ -25,7 +25,7 @@ def calculateCreditInterest():
     # Load account data
     accountsData = pd.read_csv(accountsPath)
     accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
-    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    
     # Load transaction data
     transData = pd.read_csv(transPath)
 
@@ -50,6 +50,17 @@ def calculateCreditInterest():
         else:
             continue  # No interest applied to overpaid or settled balances
 
+            # Generate transaction ID and log interest accrual
+            transactionID = generate_transaction_ID(transData)
+            newLog = {
+                'TransactionID': transactionID,
+                'AccountID': accID,
+                'TransactionType': 'Interest Earned',
+                'Amount': Decimal(interest).quantize(Decimal('0.00')),
+                'TransDate': date.today()
+            }
+            transData.loc[len(transData)] = newLog
+        
         # Update balance
         accountsData.at[index, 'CurrBal'] = updatedBalance
 
@@ -72,7 +83,9 @@ def calculateCreditInterest():
     # Save updated balances
     accountsData.to_csv(accountsPath, index=False)
     # Log updated balances
+
     transData['Amount'] = transData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+
     transData.to_csv(transPath, index=False)
 
     return results
