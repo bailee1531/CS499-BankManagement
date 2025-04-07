@@ -87,6 +87,7 @@ def settings():
         changes = {}
         newUser = form.username.data.strip()
         username_changed = False
+        password_changed = False
 
         if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
             changes['FirstName'] = form.first_name.data.strip()
@@ -136,18 +137,20 @@ def settings():
             )
             with open(pem_path, 'wt') as f:
                 f.write(encrypted)
-            changes['Password'] = '***'
+            password_changed = True
 
-        if changes or username_changed:
-            messages = []
-            
-            if username_changed:
-                messages.append(f"Username successfully updated to {newUser}.")
+        messages = []
 
-            for key, value in changes.items():
-                result = modifyInfo.modify_info(customer_id, {key: value})
-                messages.append(result["message"])
+        if username_changed:
+            messages.append(f"Username successfully updated to {newUser}.")
+        if password_changed:
+            messages.append("Password successfully updated.")
 
+        for key, value in changes.items():
+            result = modifyInfo.modify_info(customer_id, {key: value})
+            messages.append(result["message"])
+
+        if messages:
             flash_success(" | ".join(messages))
         else:
             flash_error("No changes were made.")
