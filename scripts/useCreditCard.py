@@ -3,10 +3,7 @@ import pandas as pd
 from decimal import Decimal
 from datetime import date
 import os
-import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from scripts.transactionLog import generate_transaction_ID
+from transactionLog import generate_transaction_ID
 
 def useCreditCard(accID, amount) -> dict:
     """
