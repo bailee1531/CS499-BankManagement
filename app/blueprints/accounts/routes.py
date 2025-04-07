@@ -79,17 +79,6 @@ def credit_cards() -> Response:
 
         if card_to_open.lower() == 'travel-visa':
             try:
-                accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-
-                # Check if the user already has a credit card
-                existing_card = accounts_df[
-                    (accounts_df["CustomerID"] == customer_id) &
-                    (accounts_df["AccountType"] == "Credit Card")
-                ]
-                if not existing_card.empty:
-                    flash("You already have a Travel Visa credit card.", "warning")
-                    return redirect(url_for("accounts.credit_cards"))
-
                 # Create the credit card account
                 createCreditCard.openCreditCardAccount(customer_id)
                 flash_success("Travel Visa credit card opened successfully!")
