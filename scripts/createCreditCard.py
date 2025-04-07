@@ -75,7 +75,7 @@ def openCreditCardAccount(customerID: int) -> dict:
         "AccountID": accountID,
         "CustomerID": customerID,
         "AccountType": "Credit Card",
-        "CurrBal": 0.00,
+        "CurrBal": Decimal('0.00'),
         "DateOpened": date.today(),
         "CreditLimit": Decimal(limit).quantize(Decimal('0.00')),
         "APR": apr
@@ -87,13 +87,17 @@ def openCreditCardAccount(customerID: int) -> dict:
         accountsData = newAccountDf.copy()
     else:
         accountsData = pd.concat([accountsData, newAccountDf], ignore_index=True)
+    accountsData["CurrBal"] = accountsData["CurrBal"].apply(lambda x: f"{Decimal(x):.2f}")
+    accountsData["CreditLimit"] = accountsData["CreditLimit"].apply(lambda x: f"{Decimal(x):.2f}")
     accountsData.to_csv(accountsPath, index=False)
 
     log_id = random.randint(1299, 5999)
     while log_id in log_df['LogID'].values:
         log_id = random.randint(1299, 5999)
 
+
     newLog = {'LogID': log_id, 'UserID': customerID, 'LogMessage': 'Opened a Credit Card'}
+
     log_df.loc[len(log_df)] = newLog
 
     log_df.to_csv(log_path, index=False)

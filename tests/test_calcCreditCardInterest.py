@@ -34,7 +34,7 @@ class TestCreditCardInterestCalculation(unittest.TestCase):
             "AccountID": 5016,
             "CustomerID": 315,
             "AccountType": "Credit Card",
-            "CurrBal": "2500.00",
+            "CurrBal": "-2500.00",
             "CreditLimit": "5000.00",
             "APR": "24.99"
         }])
@@ -48,12 +48,12 @@ class TestCreditCardInterestCalculation(unittest.TestCase):
         results = calculateCreditInterest()
 
         # Expected monthly interest calculation
-        expected_interest = Decimal("2500.00") * (Decimal("24.99") / Decimal("100") / Decimal("12"))
-        expected_interest = expected_interest.quantize(Decimal("0.00"))
+        expected_interest = Decimal("-2500.00") * (Decimal("24.99") / Decimal("100") / Decimal("12"))
+        expected_interest = abs(expected_interest.quantize(Decimal("0.00")))
 
         # Verify that the balance includes the calculated interest
         new_balance = Decimal(mock_accounts_df.loc[mock_accounts_df['AccountID'] == 5016, 'CurrBal'].values[0])
-        self.assertEqual(new_balance, Decimal("2500.00") + expected_interest)
+        self.assertEqual(new_balance, Decimal("-2500.00") - expected_interest)
 
         # Verify that a log entry was created for the interest application
         self.assertIn(
@@ -117,7 +117,7 @@ class TestCreditCardInterestCalculation(unittest.TestCase):
             "AccountID": 5016,
             "CustomerID": 315,
             "AccountType": "Credit Card",
-            "CurrBal": "6000.00",
+            "CurrBal": "-6000.00",
             "CreditLimit": "5000.00",
             "APR": "24.99"
         }])
@@ -130,12 +130,12 @@ class TestCreditCardInterestCalculation(unittest.TestCase):
         results = calculateCreditInterest()
 
         # Expected monthly interest calculation
-        expected_interest = Decimal("6000.00") * (Decimal("24.99") / Decimal("100") / Decimal("12"))
-        expected_interest = expected_interest.quantize(Decimal("0.00"))
+        expected_interest = Decimal("-6000.00") * (Decimal("24.99") / Decimal("100") / Decimal("12"))
+        expected_interest = abs(expected_interest.quantize(Decimal("0.00")))
 
         # Verify that the new balance includes interest applied
         new_balance = Decimal(mock_accounts_df.loc[mock_accounts_df['AccountID'] == 5016, 'CurrBal'].values[0])
-        self.assertEqual(new_balance, Decimal("6000.00") + expected_interest)
+        self.assertEqual(new_balance, Decimal("-6000.00") - expected_interest)
 
         # Ensure interest was logged correctly
         self.assertIn(
@@ -148,7 +148,7 @@ class TestCreditCardInterestCalculation(unittest.TestCase):
 
     @patch("scripts.calcCreditInterest.pd.read_csv")
     @patch("scripts.calcCreditInterest.pd.DataFrame.to_csv")
-    def test_no_interest_on_negative_balance(self, mock_to_csv, mock_read_csv):
+    def test_no_interest_on_overpaid_credit_card(self, mock_to_csv, mock_read_csv):
         """
         Test that no interest is applied to credit cards with a negative balance (overpayment scenario).
 
@@ -163,7 +163,7 @@ class TestCreditCardInterestCalculation(unittest.TestCase):
             "AccountID": 5016,
             "CustomerID": 315,
             "AccountType": "Credit Card", 
-            "CurrBal": "-200.00",
+            "CurrBal": "200.00",
             "CreditLimit": "5000.00",
             "APR": "24.99"
         }])

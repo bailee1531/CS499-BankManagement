@@ -166,3 +166,18 @@ def mortgage_application():
         form=form,
         form_action=url_for('accounts.mortgage_application')
     )
+
+
+# -----------------------------------------------------------------------------
+# Route: /page-error
+# -----------------------------------------------------------------------------
+@accounts_bp.route('/page_error')
+def page_error():
+    """
+    Route for error page.
+
+    Returns:
+    --------
+    Response: Redirects to the error page.
+    """
+    return render_template("accounts/not_found.html")
