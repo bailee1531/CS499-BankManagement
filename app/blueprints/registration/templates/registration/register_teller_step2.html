@@ -65,7 +65,7 @@ Evergreen Bank - Create Account
                 <!-- Username Field -->
                 <div class="form-group">
                     <label for="username">Username *</label>
-                    {{ form.username(class="form-control", placeholder="Enter your username", autocomplete="username") }}
+                    {{ form.username(class="form-control", readonly=disable_username) }}
                     {% if form.username.errors %}
                     <div class="error-message">
                         {% for error in form.username.errors %}

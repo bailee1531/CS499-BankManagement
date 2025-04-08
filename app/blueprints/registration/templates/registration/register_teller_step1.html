@@ -34,27 +34,15 @@ Evergreen Bank - Create Account
             <!-- First Name Field -->
             <div class="form-group">
                 <label for="first_name">First Name *</label>
-                {{ form.first_name(class="form-control", placeholder="Enter your first name", autocomplete="given-name") }}
-                {% if form.first_name.errors %}
-                <div class="error-message">
-                    {% for error in form.first_name.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
+                {{ form.first_name(class="form-control", readonly=disable_name_fields) }}
+                ...
             </div>
-            
+
             <!-- Last Name Field -->
             <div class="form-group">
                 <label for="last_name">Last Name *</label>
-                {{ form.last_name(class="form-control", placeholder="Enter your last name", autocomplete="family-name") }}
-                {% if form.last_name.errors %}
-                <div class="error-message">
-                    {% for error in form.last_name.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
+                {{ form.last_name(class="form-control", readonly=disable_name_fields) }}
+                ...
             </div>
             
             <!-- Address Field -->

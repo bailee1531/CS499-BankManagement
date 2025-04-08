@@ -7,6 +7,7 @@ import logging
 
 # Import forms for registration and deposit
 from app.blueprints.registration.forms import (
+    TellerUsernameForm,
     RegistrationStep1Form, 
     RegistrationStep2Form, 
     RegistrationStep3Form, 
@@ -230,50 +231,93 @@ def deposit_form():
         form_action=url_for('registration.deposit_form')
     )
 
-@register_bp.route("/register/teller-step1", methods=["GET", "POST"])
-def register_teller_step1():
-    # Same logic as customer step1, but only allow if session["employee_mode"] is True
+@register_bp.route("/register/teller-username", methods=["GET", "POST"])
+def register_teller_username():
     if not session.get("employee_mode"):
         return redirect(url_for("home"))
-    
-    form = RegistrationStep1Form()
+
+    form = TellerUsernameForm()
+
     if form.validate_on_submit():
-        # Store collected data in session
+        # Read from employees.csv
+        df = pd.read_csv(get_csv_path("employees.csv"))
+        username_input = form.username.data.strip().lower()
+
+        # Match user by lowercased username
+        matched_user = df[df['Username'].str.lower() == username_input]
+
+        if matched_user.empty:
+            flash_error("This username is not recognized. Please ask your admin to create your account.")
+            return redirect(url_for('registration.register_teller_username'))
+
+        # Extract and split username into first and last names
+        user_row = matched_user.iloc[0]
+        full_username = user_row['Username']
+        first_name, last_name = full_username.split('.', 1)
+
+        first_name = first_name.capitalize()
+        last_name = last_name.capitalize()
+
+        # Save pre-filled data in session
         session['registration'] = {
-            'first_name': form.first_name.data,
-            'last_name': form.last_name.data,
+            'first_name': first_name,
+            'last_name': last_name,
+            'username': full_username
+        }
+
+        return redirect(url_for('registration.register_teller_step1'))
+
+    return render_template("registration/register_teller_username.html", form=form)
+
+@register_bp.route("/register/teller-step1", methods=["GET", "POST"])
+def register_teller_step1():
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+
+    registration = session.get("registration", {})
+    if "username" not in registration:
+        return redirect(url_for("registration.register_teller_username"))
+
+    form = RegistrationStep1Form()
+
+    if form.validate_on_submit():
+        session['registration'].update({
             'address': form.address.data,
             'phone_number': form.phone_number.data,
             'tax_id': form.tax_id.data,
             'birthday': form.birthday.data,
-        }
+        })
+        session.modified = True
         return redirect(url_for('registration.register_teller_step2'))
-    return render_template('registration/register_teller_step1.html', form=form)
+
+    # Pre-fill first and last name from session
+    form.first_name.data = registration.get("first_name", "")
+    form.last_name.data = registration.get("last_name", "")
+
+    return render_template('registration/register_teller_step1.html', form=form, disable_name_fields=True)
 
 @register_bp.route("/register/teller-step2", methods=["GET", "POST"])
 def register_teller_step2():
     if not session.get("employee_mode"):
         return redirect(url_for("home"))
 
+    registration = session.get('registration', {})
+    required_keys = ['first_name', 'last_name', 'username', 'address', 'phone_number', 'tax_id', 'birthday']
+
+    if not all(key in registration for key in required_keys):
+        flash_error("Your session has expired or is incomplete. Please restart the registration.")
+        return redirect(url_for('registration.register_teller_username'))
+
     form = RegistrationStep2Form()
 
+    # Pre-fill and disable username
+    form.username.data = registration['username']
+
     if form.validate_on_submit():
-        registration = session.get('registration', {})
-        if not registration:
-            flash_error("Your session has expired. Please restart the registration process.")
-            return redirect(url_for('registration.register_teller_step1'))
-
-        # Check if the username already exists in employees.csv
-        usernames = pd.read_csv(get_csv_path("employees.csv"))['Username'].str.lower()
-        if form.username.data.lower() not in usernames.values:
-            flash_error("This username is not recognized. Please make sure an admin created your employee account first.")
-            return redirect(url_for('registration.register_teller_step1'))
-
-        # Combine step 1 and step 2 data into one call
         result = webLogin.login_page_button_pressed(
             NEW_ACCOUNT,
             "Teller",
-            form.username.data,
+            registration['username'],  # Use from session
             form.password.data,
             registration['first_name'],
             registration['last_name'],
@@ -289,13 +333,11 @@ def register_teller_step2():
             flash_error(result.get("message", "Registration failed."))
             return redirect(url_for('registration.register_teller_step1'))
 
-        # Successful creation — log in and redirect
+        # Registration success
         session.clear()
-        session['teller'] = form.username.data
+        session['teller'] = registration['username']
         session['role'] = 'teller'
-        session.pop("employee_mode", None)
-
         flash_success("Welcome to your dashboard!")
         return redirect(url_for("employee.teller_dashboard"))
 
-    return render_template("registration/register_teller_step2.html", form=form)
+    return render_template("registration/register_teller_step2.html", form=form, disable_username=True)
