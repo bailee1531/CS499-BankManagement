@@ -282,18 +282,20 @@ function closeCustomerModal() {
 function openTransactionModal(type) {
   transactionType = type + "Modal";
   document.getElementById(transactionType).style.display = "flex";
-  document.getElementById(transactionType).querySelector('form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(this);
-    fetch("{{ url_for('employee.teller_dashboard') }}", {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" }, 
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-    });
+  fetch("/employee/teller-dashboard", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({formData})
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert("Transaction failed " + data.message);
+    }
   });
 }
 
