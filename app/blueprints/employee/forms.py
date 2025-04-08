@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
+from flask import request
 from wtforms import StringField, PasswordField, DecimalField, SelectField, SubmitField
 from wtforms.validators import Regexp, Optional, Length, Email, NumberRange, DataRequired
+from app.blueprints.sharedUtilities import get_customer_accounts, flash_error
 
 # -----------------------------------------------------------------------------
 # TellerSettingsForm: Tellers can modify their personal information.
@@ -56,3 +58,44 @@ class WithdrawForm(AccountTransactionForm):
     Form for withdrawing funds from a selected account.
     """
     submit: SubmitField = SubmitField('Withdraw')
+
+# -----------------------------------------------------------------------------
+# TransferForm: Form for transferring funds.
+# -----------------------------------------------------------------------------
+class TransferForm(FlaskForm):
+    src_account = SelectField('', choices=[])
+    dest_account = SelectField('', choices=[])
+    amount = DecimalField(
+        'Transfer Amount ($)',
+        validators=[DataRequired(), NumberRange(min=0, message="Amount must be positive.")]
+    )
+
+def choose_account():
+    """
+    Populates the dropdown fields with valid accounts.
+    Returns:
+    --------
+    form: obj
+        Form object to be referenced
+    """
+    form = TransferForm()
+    data = request.get_json()
+    customer_id = data.get("customerID")
+    try:
+        # Retrieve customer accounts data
+        customer_accounts_df = get_customer_accounts(customer_id)
+        choices = []
+        # Iterate through the customer accounts and create a list of account information
+        for _, row in customer_accounts_df.iterrows():
+            # Only shows valid account types in the drop down
+            if row["AccountType"] in ["Checking", "Savings", "Money Market"]:
+               choices.append((str(row["AccountID"]), f"{row['AccountType']} {row['AccountID']}"))
+        form.src_account.choices = choices
+        form.dest_account.choices = choices
+        return form
+    except Exception as e:
+        # If there is an error while retrieving the accounts, show an error message
+        flash_error("Error retrieving account information.")
+        form.src_account.choices = []  # Set an empty list for accounts on error
+        form.dest_account.choices = []
+        return form
