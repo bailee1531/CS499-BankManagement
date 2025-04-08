@@ -299,49 +299,57 @@ def delete_customer():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
 
-@employee_bp.route("/deposit", methods=["GET", "POST"])
+@employee_bp.route("/deposit", methods=["POST"])
 def record_deposit() -> Response:
     data = request.get_json()
     account_id = data.get("accountId")
-    dform = DepositForm()
+    amount = data.get("amount")
 
-    if dform.validate_on_submit():
+    dform = DepositForm(account_id, amount)
+
+    if dform.validate():
         result = make_deposit(account_id, dform.amount.data)
         if result["status"] != "success":
-            flash_error(result["message"])
+            return jsonify({"error": result["message"]}), 400
         else:
-            return redirect(url_for("employee.teller_dashboard"))
-        
-    return render_template("employee/teller_dashboard.html", form=dform)
+            return jsonify({"message": "Deposit successful"}), 200
+    else:
+        return jsonify({"errors": dform.errors}), 400
 
-# @employee_bp.route("/withdraw", methods=["POST"])
-# def record_withdrawal():
-#     data = request.get_json()
-#     account_id = data.get("accountId")
-#     wform = WithdrawForm()
+@employee_bp.route("/withdraw", methods=["POST"])
+def record_withdrawal():
+    data = request.get_json()
+    account_id = data.get("accountId")
+    amount = data.get("amount")
 
-#     if wform.validate_on_submit():
-#         result = withdraw_money(account_id, wform.amount.data)
-#         if result["status"] != "success":
-#             flash_error(result["message"])
-#         else:
-#             return redirect(url_for("employee.teller_dashboard"))
-        
-#     return render_template("employee/teller_dashboard.html", form=wform)
+    wform = WithdrawForm(account_id, amount)
 
-# @employee_bp.route("/transfer", methods=["POST"])
-# def record_transfer():
-#     tform = TransferForm()
-#     tform = choose_account()
+    if wform.validate():
+        result = withdraw_money(account_id, wform.amount.data)
+        if result["status"] != "success":
+            return jsonify({"error": result["message"]}), 400
+        else:
+            return jsonify({"message": "Withdrawal successful"}), 200
+    else:
+        return jsonify({"errors": wform.errors}), 400
 
-#     if tform.validate_on_submit():
-#         result = transfer_funds(int(tform.src_account.data), int(tform.dest_account.data), tform.amount.data)
-#         if result["status"] != "success":
-#             flash_error(result["message"])
-#         else:
-#             return redirect(url_for("employee.teller_dashboard"))
-        
-#     return render_template("employee/teller_dashboard.html", form=tform)
+@employee_bp.route("/transfer", methods=["POST"])
+def record_transfer():
+    data = request.get_json()
+    src_account = data.get("srcAccount")
+    dest_account = data.get("destAccount")
+    amount = data.get("amount")
+
+    tform = TransferForm(src_account=src_account, dest_account=dest_account, amount=amount)
+
+    if tform.validate():
+        result = transfer_funds(int(tform.src_account.data), int(tform.dest_account.data), tform.amount.data)
+        if result["status"] != "success":
+            return jsonify({"error": result["message"]}), 400
+        else:
+            return jsonify({"message": "Transfer successful"}), 200
+    else:
+        return jsonify({"errors": tform.errors}), 400
 
 @employee_bp.route("/teller-login", methods=["GET", "POST"])
 def teller_login():
