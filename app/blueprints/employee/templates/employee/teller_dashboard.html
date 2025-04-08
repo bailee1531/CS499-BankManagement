@@ -4,6 +4,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+
+<script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
+
 {% endblock %}
 
 {% block title %}Teller Dashboard{% endblock %}
@@ -27,6 +32,8 @@
         <p>1099-INT: ${{ customer.Interest1099INT }}</p>
       </div>
       <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
+      <button class="open-account-btn" onclick="event.stopPropagation(); openAccountsModal('{{ customer.CustomerID }}')">View Accounts</button>
+
     </div>
     {% endfor %}
   </div>
@@ -92,6 +99,28 @@
     <button onclick="submitAccountOpen()">Open</button>
   </div>
 </div>
+
+<!-- View Accounts & Transactions Modal -->
+<div id="viewAccountsModal" class="modal">
+  <div class="modal-content accounts-section">
+    <span class="close" onclick="closeAccountsModal()">&times;</span>
+    <h2>Customer Accounts</h2>
+
+    <ul id="accountList" class="accounts-container">
+      <!-- Account boxes will be injected here -->
+    </ul>
+
+    <div id="transactionSection" class="transaction-section hidden">
+      <h3 id="selectedAccountLabel">Transactions</h3>
+      <ul id="transactionList">
+        <!-- Transactions will be injected here -->
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
 
 <script>
 let currentCustomerID = null;
@@ -265,5 +294,10 @@ function submitAccountOpen() {
     else alert("Failed to open account: " + data.message);
   });
 }
+
+function closeAccountsModal() {
+  document.getElementById("viewAccountsModal").style.display = "none";
+}
+
 </script>
 {% endblock %}

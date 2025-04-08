@@ -79,6 +79,15 @@ def get_customer_accounts(customer_id):
     accounts_df = pd.read_csv(accounts_csv_path)
     return accounts_df[accounts_df["CustomerID"] == customer_id]
 
+def get_account_transactions(account_id):
+    transactions_path = get_csv_path("transactions.csv")
+    transactions_df = pd.read_csv(transactions_path)
+    print("Account IDs in CSV:", transactions_df["AccountID"].unique())
+    print("Filtering for Account ID:", account_id)
+
+    return transactions_df[transactions_df["AccountID"] == account_id]
+
+
 # ---------------------------
 # Flash Utilities
 # ---------------------------
