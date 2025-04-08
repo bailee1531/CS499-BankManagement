@@ -300,12 +300,12 @@ def delete_customer():
         return jsonify(success=False, message=str(e)), 500
 
 @employee_bp.route("/deposit", methods=["POST"])
-def record_deposit() -> Response:
+def record_deposit():
     data = request.get_json()
     account_id = data.get("accountId")
     amount = data.get("amount")
 
-    dform = DepositForm(account_id, amount)
+    dform = DepositForm()
 
     if dform.validate():
         result = make_deposit(account_id, dform.amount.data)
@@ -322,7 +322,7 @@ def record_withdrawal():
     account_id = data.get("accountId")
     amount = data.get("amount")
 
-    wform = WithdrawForm(account_id, amount)
+    wform = WithdrawForm()
 
     if wform.validate():
         result = withdraw_money(account_id, wform.amount.data)
@@ -340,7 +340,8 @@ def record_transfer():
     dest_account = data.get("destAccount")
     amount = data.get("amount")
 
-    tform = TransferForm(src_account=src_account, dest_account=dest_account, amount=amount)
+    tform = TransferForm()
+    tform = choose_account()
 
     if tform.validate():
         result = transfer_funds(int(tform.src_account.data), int(tform.dest_account.data), tform.amount.data)
