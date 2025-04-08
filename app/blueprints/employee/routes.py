@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import csv
 from Crypto.PublicKey import ECC
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, Response
 from app.blueprints.auth.forms import LoginForm
@@ -126,19 +127,37 @@ def delete_teller():
 
 @employee_bp.route("/teller-dashboard")
 def teller_dashboard():
-    df = pd.read_csv(get_csv_path("customers.csv"))
     try:
-        customers = df.to_dict(orient="records")
+        # Load all required CSVs
+        customers_df = pd.read_csv(get_csv_path("customers.csv"))
+        persons_df = pd.read_csv(get_csv_path("persons.csv"))
+        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+
+        # Convert IDs to int if needed for consistency
+        customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
+        persons_df["ID"] = persons_df["ID"].astype(int)
+        accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
+
+        # Merge customers + persons to get full profile
+        merged_df = pd.merge(customers_df, persons_df, left_on="CustomerID", right_on="ID", how="left")
+
+        # Get just one account per customer (e.g., first one)
+        account_map = accounts_df.groupby("CustomerID")["AccountID"].first().reset_index()
+        merged_df = pd.merge(merged_df, account_map, left_on="CustomerID", right_on="CustomerID", how="left")
+
+        # Rename AccountID column for clarity in the template
+        merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
+
+        # Final dict list for template
+        customers = merged_df.to_dict(orient="records")
+
     except Exception as e:
         customers = []
         flash(f"Error loading customers: {e}", "danger")
-        
-    # Initialize DepositForm
-    form = DepositForm()
 
-    # Load accounts and populate form choices
+    # Deposit form setup
+    form = DepositForm()
     try:
-        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
         form.account_id.choices = [
             (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
             for _, acc in accounts_df.iterrows()
@@ -210,6 +229,27 @@ def reset_customer_password_route():
         return jsonify(success=False, message="Old password is incorrect."), 400
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
+    
+@employee_bp.route("/get-accounts/<int:customer_id>")
+def get_accounts(customer_id):
+    accounts = []
+    try:
+        accounts_path = get_csv_path("accounts.csv")
+        with open(accounts_path, newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if int(row["CustomerID"]) == customer_id:
+                    accounts.append({
+                        "AccountID": row["AccountID"],
+                        "AccountType": row["AccountType"],
+                        "CurrBal": row["CurrBal"],
+                        "DateOpened": row["DateOpened"],
+                        "CreditLimit": row.get("CreditLimit", ""),
+                        "APR": row.get("APR", "")
+                    })
+        return jsonify(success=True, accounts=accounts)
+    except Exception as e:
+        return jsonify(success=False, message=str(e))
 
 @employee_bp.route("/check-accounts/<int:customer_id>", methods=["GET"])
 def check_customer_accounts(customer_id):
