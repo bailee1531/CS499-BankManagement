@@ -154,7 +154,7 @@ def teller_dashboard():
 
     except Exception as e:
         customers = []
-        flash(f"Error loading customers: {e}", "danger")
+        flash_error(f"Error loading customers: {e}", "danger")
 
     # Deposit form setup
     depositForm = DepositForm()
@@ -165,7 +165,7 @@ def teller_dashboard():
         ]
     except Exception as e:
         depositForm.account_id.choices = []
-        flash(f"Error loading deposit account options: {e}", "danger")
+        flash_error(f"Error loading deposit account options: {e}", "danger")
 
     # Withdraw form setup
     withdrawForm = WithdrawForm()
@@ -176,7 +176,7 @@ def teller_dashboard():
         ]
     except Exception as e:
         withdrawForm.account_id.choices = []
-        flash(f"Error loading withdrawal account options: {e}", "danger")
+        flash_error(f"Error loading withdrawal account options: {e}", "danger")
 
     # Transfer form setup
     transferForm = TransferForm()
@@ -194,7 +194,7 @@ def teller_dashboard():
     except Exception as e:
         transferForm.src_account.choices = []
         transferForm.dest_account.choices = []
-        flash(f"Error loading transfer account options: {e}", "danger")
+        flash_error(f"Error loading transfer account options: {e}", "danger")
 
     return render_template(
         "employee/teller_dashboard.html",
