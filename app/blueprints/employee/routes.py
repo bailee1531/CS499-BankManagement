@@ -125,7 +125,7 @@ def delete_teller():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
 
-@employee_bp.route("/teller-dashboard")
+@employee_bp.route("/teller-dashboard", methods=["GET", "POST"])
 def teller_dashboard():
     try:
         # Load all required CSVs
@@ -137,6 +137,7 @@ def teller_dashboard():
         customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
         persons_df["ID"] = persons_df["ID"].astype(int)
         accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
+        accounts_df["AccountID"] = accounts_df["AccountID"].astype(int) # Ensure AccountID is int
 
         # Merge customers + persons to get full profile
         merged_df = pd.merge(customers_df, persons_df, left_on="CustomerID", right_on="ID", how="left")
@@ -156,17 +157,52 @@ def teller_dashboard():
         flash(f"Error loading customers: {e}", "danger")
 
     # Deposit form setup
-    dform = DepositForm()
+    depositForm = DepositForm()
     try:
-        dform.account_id.choices = [
+        depositForm.account_id.choices = [
             (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
             for _, acc in accounts_df.iterrows()
         ]
     except Exception as e:
-        dform.account_id.choices = []
-        flash(f"Error loading account options: {e}", "danger")
+        depositForm.account_id.choices = []
+        flash(f"Error loading deposit account options: {e}", "danger")
 
-    return render_template("employee/teller_dashboard.html", customers=customers, form=dform)
+    # Withdraw form setup
+    withdrawForm = WithdrawForm()
+    try:
+        withdrawForm.account_id.choices = [
+            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
+            for _, acc in accounts_df.iterrows()
+        ]
+    except Exception as e:
+        withdrawForm.account_id.choices = []
+        flash(f"Error loading withdrawal account options: {e}", "danger")
+
+    # Transfer form setup
+    transferForm = TransferForm()
+    transferForm = choose_account()
+    amount = transferForm.amount.data
+    try:
+        transferForm.src_account.choices = [
+            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
+            for _, acc in accounts_df.iterrows()
+        ]
+        transferForm.dest_account.choices = [
+            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
+            for _, acc in accounts_df.iterrows()
+        ]
+    except Exception as e:
+        transferForm.src_account.choices = []
+        transferForm.dest_account.choices = []
+        flash(f"Error loading transfer account options: {e}", "danger")
+
+    return render_template(
+        "employee/teller_dashboard.html",
+        customers=customers,
+        deposit_form=depositForm,
+        withdraw_form=withdrawForm,
+        transfer_form=transferForm
+    )
 
 @employee_bp.route("/edit-username", methods=["POST"])
 def edit_username():
@@ -283,41 +319,21 @@ def delete_customer():
             return jsonify(success=False, message=result["message"]), 400
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
-    
-@employee_bp.route("/deposit", methods=["POST"])
-def record_deposit():
+
+@employee_bp.route("/deposit", methods=["GET", "POST"])
+def record_deposit() -> Response:
     data = request.get_json()
     account_id = data.get("accountId")
-    amount = data.get("amount")
+    dform = DepositForm()
 
-    if not account_id or not amount:
-        return jsonify({"status": "error", "message": "Account ID and amount are required."}), 400
-
-    # You might want to perform server-side validation on the amount as well
-    try:
-        amount = float(amount)
-        if amount <= 0:
-            return jsonify({"status": "error", "message": "Amount must be a positive number."}), 400
-    except ValueError:
-        return jsonify({"status": "error", "message": "Invalid amount format."}), 400
-
-    result = make_deposit(account_id, amount)
-    return jsonify(result)
-
-# @employee_bp.route("/deposit", methods=["GET", "POST"])
-# def record_deposit() -> Response:
-#     data = request.get_json()
-#     account_id = data.get("accountId")
-#     dform = DepositForm()
-
-#     if dform.validate_on_submit():
-#         result = make_deposit(account_id, dform.amount.data)
-#         if result["status"] != "success":
-#             flash_error(result["message"])
-#         else:
-#             return redirect(url_for("employee.teller_dashboard"))
+    if dform.validate_on_submit():
+        result = make_deposit(account_id, dform.amount.data)
+        if result["status"] != "success":
+            flash_error(result["message"])
+        else:
+            return redirect(url_for("employee.teller_dashboard"))
         
-#     return render_template("employee/teller_dashboard.html", form=dform)
+    return render_template("employee/teller_dashboard.html", form=dform)
 
 # @employee_bp.route("/withdraw", methods=["POST"])
 # def record_withdrawal():
