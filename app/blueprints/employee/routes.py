@@ -156,53 +156,32 @@ def teller_dashboard():
         customers = []
         flash_error(f"Error loading customers: {e}", "danger")
 
-    # Deposit form setup
     depositForm = DepositForm()
-    try:
-        depositForm.account_id.choices = [
-            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
-            for _, acc in accounts_df.iterrows()
-        ]
-    except Exception as e:
-        depositForm.account_id.choices = []
-        flash_error(f"Error loading deposit account options: {e}", "danger")
-
-    # Withdraw form setup
     withdrawForm = WithdrawForm()
-    try:
-        withdrawForm.account_id.choices = [
-            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
-            for _, acc in accounts_df.iterrows()
-        ]
-    except Exception as e:
-        withdrawForm.account_id.choices = []
-        flash_error(f"Error loading withdrawal account options: {e}", "danger")
-
-    # Transfer form setup
     transferForm = TransferForm()
     transferForm = choose_account()
-    amount = transferForm.amount.data
-    try:
-        transferForm.src_account.choices = [
-            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
-            for _, acc in accounts_df.iterrows()
-        ]
-        transferForm.dest_account.choices = [
-            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
-            for _, acc in accounts_df.iterrows()
-        ]
-    except Exception as e:
-        transferForm.src_account.choices = []
-        transferForm.dest_account.choices = []
-        flash_error(f"Error loading transfer account options: {e}", "danger")
 
-    return render_template(
-        "employee/teller_dashboard.html",
-        customers=customers,
-        deposit_form=depositForm,
-        withdraw_form=withdrawForm,
-        transfer_form=transferForm
-    )
+    if request.method == 'POST':
+        form_name = request.form.get('formName')
+
+        if form_name == 'depositForm':
+            account_id = request.form.get('accountID')
+            amount = request.form.get('amount')
+            make_deposit(account_id, amount)
+            return jsonify({'message': 'Deposit successful', 'type': 'deposit'}), 200
+        elif form_name == 'withdrawForm':
+            amount = request.form.get('amount')
+            account_id = request.form.get('accountID')
+            withdraw_money(account_id, amount)
+            return jsonify({'message': 'Withdrawal successful', 'type': 'withdraw'}), 200
+        elif form_name == 'transferForm':
+            src_account = request.form.get('src_account')
+            dest_account = request.form.get('dest_account')
+            amount = request.form.get('amount')
+            transfer_funds(src_account, dest_account, amount)
+            return jsonify({'message': 'Transfer successful', 'type': 'transfer'}), 200
+        else:
+            return jsonify({'error': 'Unknown form submission'}), 400
 
 @employee_bp.route("/edit-username", methods=["POST"])
 def edit_username():
