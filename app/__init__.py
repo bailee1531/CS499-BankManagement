@@ -6,7 +6,8 @@ It sets up configuration values, registers blueprints, and defines a basic home 
 """
 
 from datetime import timedelta
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, request, jsonify
+import secrets
 
 def create_app(test_config=None):
     """
@@ -22,7 +23,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     # Set a secret key for securely signing the session cookie
-    app.secret_key = "hello"  
+    app.secret_key = secrets.token_hex()
 
     # Configure the session lifetime (e.g., 30 minutes)
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
@@ -57,7 +58,7 @@ def create_app(test_config=None):
     # ---------------------------
     
     # Define a simple home route that renders the index.html template
-    @app.route('/')
+    @app.route('/h')
     def home():
         """
         Home route that renders the homepage.
@@ -73,5 +74,39 @@ def create_app(test_config=None):
         """
         session["employee_mode"] = True
         return render_template("employee_home.html")
+    
+    @app.errorhandler(403)
+    def page_not_found(e):
+        return render_template("page_error.html"), 403
+    
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("page_error.html"), 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(e):
+        # if a request has the wrong method to the API
+        if request.path.startswith('/api/'):
+            # we return a json saying so
+            return jsonify(message="Method Not Allowed"), 405
+        else:
+            # otherwise we return a generic site-wide 405 page
+            return render_template("page_error.html"), 405
+        
+    @app.errorhandler(415)
+    def page_not_found(e):
+        return render_template("page_error.html"), 415
+    
+    @app.errorhandler(500)
+    def page_not_found(e):
+        return render_template("page_error.html"), 500
+    
+    @app.errorhandler(502)
+    def page_not_found(e):
+        return render_template("page_error.html"), 502
+    
+    @app.errorhandler(503)
+    def page_not_found(e):
+        return render_template("page_error.html"), 503
 
     return app
