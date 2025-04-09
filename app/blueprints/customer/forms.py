@@ -1,12 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectField, SubmitField, StringField, PasswordField
-from wtforms.validators import DataRequired, NumberRange, Optional, Length, Email, Regexp
+from wtforms import DecimalField, SelectField, SubmitField, StringField, DateField, PasswordField
+from wtforms.validators import DataRequired, NumberRange, InputRequired, Optional, Length, Regexp, Email
 from app.blueprints.sharedUtilities import (
-    get_logged_in_customer, get_customer_accounts,
+    get_logged_in_customer,
+    get_customer_accounts, 
     flash_error
 )
-
-
 
 
 class AccountTransactionForm(FlaskForm):
@@ -14,12 +13,12 @@ class AccountTransactionForm(FlaskForm):
     Base form for common account transactions (Deposit/Withdraw).
     Includes account selection and amount field.
     """
-    account_id: SelectField = SelectField(
+    account_id = SelectField(
         'Select Account',
-        validators=[DataRequired()],
-        coerce=str  # Can change to int if account IDs are integers
+        coerce=int,  # Ensure selected value is cast to int
+        validators=[DataRequired()]
     )
-    amount: DecimalField = DecimalField(
+    amount = DecimalField(
         'Amount',
         places=2,  # Ensures 2 decimal places for currency
         validators=[
@@ -33,15 +32,14 @@ class DepositForm(AccountTransactionForm):
     """
     Form for making deposits to a selected account.
     """
-    submit: SubmitField = SubmitField('Deposit')
+    submit = SubmitField('Deposit')
 
 
 class WithdrawForm(AccountTransactionForm):
     """
     Form for withdrawing funds from a selected account.
     """
-    submit: SubmitField = SubmitField('Withdraw')
-
+    submit = SubmitField('Withdraw')
 
 # -----------------------------------------------------------------------------
 # TransferForm: Form for transferring funds.
@@ -83,6 +81,7 @@ def choose_account():
         form.dest_account.choices = []
         return form
     
+
 # -----------------------------------------------------------------------------
 # SettingsForm: Customer can modify personal information.
 # -----------------------------------------------------------------------------
@@ -96,3 +95,12 @@ class SettingsForm(FlaskForm):
     current_password = PasswordField('Current Password', validators=[Optional(), Length(min=8)])
     password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
     submit = SubmitField('Update Settings')
+
+class BillPaymentForm(FlaskForm):
+    bill_id = StringField("Bill ID", validators=[DataRequired()])
+    payee_name = StringField("Payee Name")
+    payee_address = StringField("Payee Address")
+    amount = DecimalField("Amount", validators=[DataRequired(), NumberRange(min=0.01)], places=2)
+    due_date = DateField("Due Date", format='%Y-%m-%d', validators=[InputRequired()])
+    paymentAccID = SelectField("Payment Account", choices=[], coerce=int)
+    submit = SubmitField("Pay Bill")

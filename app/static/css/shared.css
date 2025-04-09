@@ -280,8 +280,6 @@ footer {
 }
 
 /* Flash Messages */
-/* Styling for alert messages (e.g., notifications) */
-
 /* Flash Messages: Generic alert styling remains */
 .flash-messages .alert {
     padding: 0.75rem 1rem;
@@ -337,9 +335,9 @@ main {
 .error-message {
     background-color: #ffbaba;
     /* Light red background */
-    border: 0.0625rem solid --danger;
+    border: 0.0625rem solid #d8000c;
     /* Red border */
-    color: var(--danger);
+    color: #d8000c;
     /* Red text */
     padding: 0.625rem;
     margin-bottom: 1.25rem;

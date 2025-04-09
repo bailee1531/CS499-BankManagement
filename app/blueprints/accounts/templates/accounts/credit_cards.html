@@ -26,17 +26,26 @@ Evergreen Bank - Credit Cards
         <div class="accounts-container">
             {# Individual credit card offering #}
             <article class="account-box">
-                <h3>Travel Visa</h3>
+                <h3>Visa Credit Card</h3>
                 <p>Earn 2x rewards on travel, dining, and everyday purchases worldwide.</p>
 
-                {# Call-to-action button to open a Travel Visa card #}
-                <a href="/credit-cards?open=travel-visa"
+                {# Call-to-action button to open a credit card #}
+                <a href="/credit-cards?open=credit-card"
                    class="account-btn"
-                   aria-label="Open Travel Visa Credit Card">
-                   Open Travel Visa
+                   aria-label="Open Visa Credit Card">
+                   Open Visa Credit Card
                 </a>
             </article>
         </div>
+
+        {% if not session.get('customer') %}
+        <div class="registration-cta">
+            <p>Don't have an account yet?</p>
+            <a href="{{ url_for('registration.register_step1') }}" class="account-btn">
+                Register Now
+            </a>
+        </div>
+        {% endif %}
     </section>
 
 </main>

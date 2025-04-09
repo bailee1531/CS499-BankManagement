@@ -23,4 +23,4 @@ def accrue_interest(accType):
     monthlyRate = ((Decimal(0.04)/Decimal(12)) + 1) if accType == 'Savings' else ((Decimal(0.03)/Decimal(12)) + 1)
 
     accInfo['CurrBal'] = accInfo.apply(lambda row: Decimal(row['CurrBal']*monthlyRate).quantize(Decimal('0.00')) if row['AccountType'] == accType else row['CurrBal'], axis=1)
-    accInfo.to_csv(accPath)
+    accInfo.to_csv(accPath, index=False)

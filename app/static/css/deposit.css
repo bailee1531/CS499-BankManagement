@@ -132,13 +132,12 @@
    - Provides left padding for proper indentation.
 */
 .form-errors {
-    margin-top: 0.625rem;
-    /* 10px */
-    color: red;
-    list-style-type: disc;
-    padding-left: 1.25rem;
-    /* 20px */
+  list-style-type: none;
+  padding-left: 0;
+  color: red; /* optional styling */
+  margin-top: 1rem;
 }
+
 
 /*-------------------------------------------------
   Button Styling
@@ -183,4 +182,3 @@
         width: 100%;
     }
 }
-

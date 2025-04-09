@@ -35,7 +35,7 @@ class MortgageForm(FlaskForm):
         'Loan Amount ($)',
         validators=[
             DataRequired(), 
-            NumberRange(min=0, message="Loan amount must be positive.")
+            NumberRange(min=50, message="Loan amount must be positive.")
         ]
     )
 
@@ -43,7 +43,7 @@ class MortgageForm(FlaskForm):
         'Loan Term (Years)',
         validators=[
             DataRequired(), 
-            NumberRange(min=1, message="Loan term must be at least 1 year.")
+            NumberRange(min=1, max=50, message="Loan term must be at least 1 year.")
         ]
     )
 

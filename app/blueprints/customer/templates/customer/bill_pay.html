@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Pay Bill{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+  <script>
+    window.accountId = {{ account_id | tojson | safe }};
+  </script>
+  <script src="{{ url_for('static', filename='js/update-bill-amountl.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-page">
+  <div class="thank-you-section">
+    <h2>Bill Payment</h2>
+
+    {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+      {% if min_amount is not none %}
+        <p><strong>Minimum Bill Due:</strong> <span id="min-due-display">${{ "%.2f"|format(min_amount) }}</span></p>
+      {% else %}
+        <p><strong>Minimum Bill Due:</strong> No bills found.</p>
+      {% endif %}
+
+      {% if due_date %}
+        <p><strong>Bill Due Date:</strong> {{ due_date }}</p>
+      {% endif %}
+
+    {% endif %}
+
+    <form class="deposit-form" method="POST" action="{{ url_for('customer.pay_bill', account_id=account_id) }}">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        {{ form.bill_id.label }}
+        {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+          {{ form.bill_id(class="form-control", readonly=true, style="background-color: #e9ecef") }}
+        {% else %}
+          {{ form.bill_id(class="form-control") }}
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        {{ form.paymentAccID.label }}
+        {{ form.paymentAccID(class="form-control") }}
+      </div>
+      
+      
+
+      <div class="form-group">
+        {{ form.payee_name.label }}
+        {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+          {{ form.payee_name(class="form-control", readonly=true, style="background-color: #e9ecef") }}
+        {% else %}
+          {{ form.payee_name(class="form-control") }}
+        {% endif %}
+      </div>
+      
+      
+      <div class="form-group">
+        {{ form.payee_address.label }}
+        {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+
+          {{ form.payee_address(class="form-control", readonly=true, style="background-color: #e9ecef") }}
+        {% else %}
+          {{ form.payee_address(class="form-control") }}
+        {% endif %}
+      </div>      
+      
+
+      <div class="form-group">
+        {{ form.amount.label }}
+        {{ form.amount(class="form-control", placeholder="Enter amount") }}
+      </div>
+
+      <div class="form-group">
+        {{ form.due_date.label }}
+        {{ form.due_date(class="form-control", type="date") }}
+      </div>
+
+      {{ form.submit(class="submit-btn") }}
+    </form>
+  </div>
+</div>
+{% endblock %}

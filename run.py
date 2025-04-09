@@ -7,11 +7,16 @@ It then runs the development server if this module is executed as the main progr
 
 import os
 from app import create_app  # Import the application factory function from the app module
+from scheduler import start_scheduler
 
 # Create an instance of the Flask application
 app = create_app()
 
 if __name__ == '__main__':
+
+    # Start the scheduler
+    scheduler = start_scheduler()
+
     # For local debugging:
     # app.run(debug=True)
 

@@ -48,15 +48,19 @@
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin: 2rem auto 3rem; 
+    flex-wrap: wrap; 
 }
+
 
 /* Collapsible Transactions Section */
 .transactions-section {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    margin-bottom: 2rem; /* Add this line */
 }
+
 
 /* Styling for Collapsible Transaction Boxes */
 .transactions-box {
@@ -143,3 +147,34 @@ li {
     outline: none;
 }
 
+/* Extra Info Styling (APR and Credit Limit) */
+.extra-account-info {
+    background-color: var(--bg-box);
+    color: var(--white);
+    padding: 1.25rem 2rem;
+    margin: 2rem auto;
+    border-radius: var(--container-border-radius);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+    width: fit-content;
+    text-align: left;
+}
+
+.extra-account-info p {
+    font-size: 1.25rem;
+    margin: 0.5rem 0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--accent);
+    margin-right: 0.5rem;
+}
+
+.transaction-item {
+    flex-wrap: wrap;
+  }
+  .transaction-date,
+  .transaction-info {
+    flex: 1 1 100%;
+  }
+  

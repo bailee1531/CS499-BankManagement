@@ -4,3 +4,4 @@ email_validator
 pandas
 pycryptodome
 gunicorn
+APScheduler

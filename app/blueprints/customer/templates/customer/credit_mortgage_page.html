@@ -13,6 +13,9 @@
   </script>
   <script src="{{ url_for('static', filename='js/update-transactions.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/update-archive.js') }}" defer></script>
+  {% if account.AccountType == "Credit Card" %}
+  <script src="{{ url_for('static', filename='js/update-bill-amount.js') }}" defer></script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -21,57 +24,51 @@
     <h1>{{ account.AccountType }}</h1>
     <h2>Total Balance: $<span id="accountBalance">{{ "{:.2f}".format(account.CurrBal | default(0)) }}</span></h2>
 
+
+
     <!-- Account Details -->
     <div class="extra-account-info">
       <p><span class="info-label">Date Opened:</span> {{ account.DateOpened }}</p>
       <p><span class="info-label">Account ID:</span> {{ account.AccountID }}</p>
-      {% if account.account_type in ["Savings", "Money Market"] and extra_info.apr is defined and extra_info.apr is not none %}
+      <p><span class="info-label">Bill Due Date:</span> {{ extra_info.due_date | default('N/A', true) }}</p>
+      <p><span class="info-label">Minimum Due:</span>
+        ${{ "{:.2f}".format(extra_info.minimum_due | default(0.0)) }} </p>     
+
+      {% if extra_info.apr is defined %}
         <p><span class="info-label">APR:</span> {{ "{:.2f}".format(extra_info.apr) }}%</p>
       {% endif %}
     </div>
 
-    <!-- Extra Transaction Buttons -->
+    <!-- Pay Bill Button -->
+    {% if account.CurrBal > 0 %}
     <div class="transaction-buttons">
-      <button id="depositBtn" class="account-btn" type="button"
-              onclick="window.location.href='/deposit/{{ account.AccountID }}';">
-        Deposit
-      </button>
-
-      <button id="withdrawBtn" class="account-btn" type="button"
-              onclick="window.location.href='/withdraw/{{ account.AccountID }}';">
-        Withdraw
-      </button>
-
-      <button id="transferBtn" class="account-btn" type="button"
-        onclick="window.location.href='{{ url_for('customer.transfer_funds') | safe }}';">
-        Transfer
-      </button>
-
-
       <button id="payBillBtn" class="account-btn" type="button"
               onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">
         Pay Bill
       </button>
     </div>
+    {% endif %}
+    
 
+    {% if account.AccountType == "Credit Card" %}
+      <!-- Collapsible: Transactions -->
+      <div class="transactions-section">
+        <button class="account-btn toggle-btn" data-target="transactions-container" data-label="Transactions">
+          Show Transactions
+        </button>
+        <section id="transactions-container" class="transactions-box" style="display: none;">
+          <h3>Transactions</h3>
+          <ul id="current-transactions-list">
+            <li>Loading current transactions...</li>
+          </ul>
 
-    <!-- Collapsible: Transactions -->
-    <div class="transactions-section">
-      <button class="account-btn toggle-btn" data-target="transactions-container" data-label="Transactions">
-        Show Transactions
-      </button>
-      <section id="transactions-container" class="transactions-box" style="display: none;">
-        <h3>Transactions</h3>
-        <ul id="current-transactions-list">
-          <li>Loading current transactions...</li>
-        </ul>
-
-        <h3>Past Transactions</h3>
-        <ul id="past-transactions-list">
-          <li>Loading past transactions...</li>
-        </ul>
-      </section>
-    </div>
+          <h3>Past Transactions</h3>
+          <ul id="past-transactions-list">
+            <li>Loading past transactions...</li>
+          </ul>
+        </section>
+      </div>
+    {% endif %}
 
     <!-- Collapsible: Archived Bills -->
     <div class="transactions-section">

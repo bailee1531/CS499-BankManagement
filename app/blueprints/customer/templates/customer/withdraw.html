@@ -28,7 +28,7 @@
     {% endif %}
 
     <!-- Withdraw form -->
-    <form class="deposit-form" method="POST" action="{{ url_for('customer.withdraw_money') }}">
+    <form class="deposit-form" method="POST" action="{{ url_for('customer.withdraw_money', account_id=form.account_id.data) }}">
       {{ form.hidden_tag() }}
 
       <div class="form-group">

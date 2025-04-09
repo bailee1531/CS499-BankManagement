@@ -62,6 +62,10 @@ Evergreen Bank - Mortgage Application
                 <small id="loan-help" class="visually-hidden">
                     Enter the loan amount you are seeking in USD.
                 </small>
+                <small class="form-hint">
+                    The minimum loan amount is $50.
+                </small>
+                
 
                 {# Display loan amount field errors #}
                 {% if form.loan_amount.errors %}
@@ -81,6 +85,9 @@ Evergreen Bank - Mortgage Application
                 {{ form.loan_term }}
                 <small id="term-help" class="visually-hidden">
                     Enter the loan term in years.
+                </small>
+                <small class="form-hint">
+                    The loan term must be between 1 and 50 years.
                 </small>
 
                 {# Display loan term field errors #}
