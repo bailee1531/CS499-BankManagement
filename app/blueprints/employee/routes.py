@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import csv
+from datetime import date
 from decimal import Decimal
 from Crypto.PublicKey import ECC
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, Response
@@ -12,6 +13,7 @@ from scripts.createTeller import create_teller
 from scripts.customer.modifyInfo import modify_info as modify_username
 from scripts.customer import modifyInfo
 from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
+from scripts.transactionLog import generate_transaction_ID
 from .forms import TellerSettingsForm, AdminSettingsForm
 
 # Blueprint for employee routes
