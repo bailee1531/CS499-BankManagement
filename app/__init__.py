@@ -58,7 +58,7 @@ def create_app(test_config=None):
     # ---------------------------
     
     # Define a simple home route that renders the index.html template
-    @app.route('/h')
+    @app.route('/')
     def home():
         """
         Home route that renders the homepage.
