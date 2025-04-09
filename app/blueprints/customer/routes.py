@@ -203,6 +203,8 @@ def settings() -> Response:
     if form.validate_on_submit():
         changes = {}
         newUser = form.username.data.strip()
+        username_changed = False
+        password_changed = False
 
         if form.first_name.data.strip() != str(per_df.at[idx, 'FirstName']).strip():
             changes['FirstName'] = form.first_name.data.strip()
@@ -218,9 +220,11 @@ def settings() -> Response:
         if newUser != username:
             per_df.at[idx, 'Username'] = newUser
             per_df.to_csv(get_csv_path("persons.csv"), index=False)
+    
             cust_df.loc[cust_df['CustomerID'] == customer_id, 'Username'] = newUser
             cust_df.to_csv(get_csv_path("customers.csv"), index=False)
             session['customer'] = newUser
+
             changes['Username'] = newUser
 
         if form.password.data.strip():
@@ -251,6 +255,7 @@ def settings() -> Response:
             )
             with open(pem_path, 'wt') as f:
                 f.write(encrypted)
+
             changes['Password'] = '***'
 
         if changes:

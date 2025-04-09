@@ -18,8 +18,8 @@ if __name__ == '__main__':
     scheduler = start_scheduler()
 
     # For local debugging:
-    app.run(debug=True)
+    # app.run(debug=True)
 
     # For deployment on Render (binds to 0.0.0.0 and uses the PORT environment variable)
-    # port = int(os.environ.get('PORT', 5000))
-    # app.run(debug=False, host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)

@@ -1,8 +1,9 @@
 # Sierra Yerges
-from scripts.transactionLog import generate_transaction_ID
 import pandas as pd
+from datetime import date
 from decimal import Decimal
 import os
+from transactionLog import generate_transaction_ID
 
 def calculateCreditInterest():
     """
@@ -19,13 +20,14 @@ def calculateCreditInterest():
     """
     # Get absolute path for accounts.csv
     accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
-    logPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
+    transPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/transactions.csv'))
 
     # Load account data
     accountsData = pd.read_csv(accountsPath)
     accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
-    # Load log data
-    logData = pd.read_csv(logPath)
+    
+    # Load transaction data
+    transData = pd.read_csv(transPath)
 
     # Identify all credit accounts (credit cards and home mortgage loans)
     creditAccounts = accountsData[(accountsData['AccountType'] == 'Credit Card') | (accountsData['AccountType'] == 'Mortgage Loan')]
@@ -37,36 +39,53 @@ def calculateCreditInterest():
         unpaidBalance = Decimal(str(account['CurrBal']))
         apr = Decimal(str(account['APR']))
         accID = account['AccountID']
-        custID = account['CustomerID']
 
-        if unpaidBalance > 0:
-            # Monthly interest rate from APR
-            monthlyInterestRate = apr / Decimal(100) / Decimal(12)
+        monthlyInterestRate = apr / Decimal(100) / Decimal(12)
 
-            # Calculate interest
-            interest = (unpaidBalance * monthlyInterestRate).quantize(Decimal('0.00'))
+        if unpaidBalance < 0:
+            interest = ((-unpaidBalance) * monthlyInterestRate).quantize(Decimal('0.00'))
+            updatedBalance = (unpaidBalance - interest).quantize(Decimal('0.00'))
+            transaction_type = 'Interest Charged'
 
-            # Update the balance for the specific account
-            updatedBalance = (unpaidBalance + interest).quantize(Decimal('0.00'))
-            accountsData.at[index, 'CurrBal'] = updatedBalance
+        else:
+            continue  # No interest applied to overpaid or settled balances
 
             # Generate transaction ID and log interest accrual
-            transactionID = generate_transaction_ID(logData)
+            transactionID = generate_transaction_ID(transData)
             newLog = {
+                'TransactionID': transactionID,
                 'AccountID': accID,
-                'CustomerID': custID,
                 'TransactionType': 'Interest Earned',
                 'Amount': Decimal(interest).quantize(Decimal('0.00')),
-                'TransactionID': transactionID
+                'TransDate': date.today()
             }
-            logData.loc[len(logData)] = newLog
+            transData.loc[len(transData)] = newLog
+        
+        # Update balance
+        accountsData.at[index, 'CurrBal'] = updatedBalance
 
-            # Log result for each account
-            results.append({"status": "success", "message": f"Interest of ${interest} applied to AccountID {account['AccountID']}."})
+        # Generate transaction ID and log the transaction
+        transactionID = generate_transaction_ID(transData)
+        newLog = {
+            'TransactionID': transactionID,
+            'AccountID': accID,
+            'TransactionType': transaction_type,
+            'Amount': Decimal(interest).quantize(Decimal('0.00')),
+            'TransDate': date.today()
+        }
+        transData.loc[len(transData)] = newLog
+
+        results.append({
+            "status": "success",
+            "message": f"Interest of ${interest} applied to AccountID {accID}."
+        })
 
     # Save updated balances
     accountsData.to_csv(accountsPath, index=False)
     # Log updated balances
-    logData.to_csv(logPath, index=False)
+
+    transData['Amount'] = transData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+
+    transData.to_csv(transPath, index=False)
 
     return results

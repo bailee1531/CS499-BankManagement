@@ -402,3 +402,12 @@ main {
     white-space: nowrap;
     border: 0;
 }
+
+input[readonly],
+input[disabled] {
+    background-color:rgb(226, 224, 224);
+    color: black;
+    opacity: 1;
+    cursor: not-allowed;
+    font-style: italic;
+}

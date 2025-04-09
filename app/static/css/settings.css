@@ -97,10 +97,17 @@ main {
   outline-offset: 2px;
 }
 
-/* Improve readability of disabled inputs */
-input:disabled {
-  color: #e0e0e0;
-  opacity: 1;
-  cursor: not-allowed;
+/* Override for readonly and disabled inputs inside settings */
+.settings-container input[readonly],
+.settings-container input:disabled {
+  background-color: #6c6c6c;
+  color: #f1f1f1;
   font-style: italic;
+  cursor: not-allowed;
+  opacity: 1;
+  border: none;
+  padding: 0.625rem;
+  border-radius: var(--border-radius);
+  width: 100%;
+  font-size: 1rem;
 }

@@ -31,10 +31,13 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
     accountsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/accounts.csv'))
     # Get absolute path for customer.csv file
     customerPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/customers.csv'))
+    # Get absolute path for logs.csv file
+    logPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../csvFiles/logs.csv'))
 
     # Load account data
     accountsData = pd.read_csv(accountsPath)
     customerData = pd.read_csv(customerPath)
+    logData = pd.read_csv(logPath)
 
     # Validate customer existence
     customerRow = customerData[customerData['CustomerID'] == customerID]
@@ -68,7 +71,7 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
         "AccountID": accountID,
         "CustomerID": customerID,
         "AccountType": "Mortgage Loan",
-        "CurrBal": Decimal(loanAmount).quantize(Decimal('0.00')),
+        "CurrBal": -Decimal(loanAmount).quantize(Decimal('0.00')),
         "DateOpened": startDate,
         "CreditLimit": None,
         "APR": interestRate
@@ -80,7 +83,19 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
         accountsData = newLoanDf
     else:
         accountsData = pd.concat([accountsData, newLoanDf], ignore_index=True)
-
+    accountsData['CurrBal'] = accountsData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(
+        lambda x: Decimal(str(x)).quantize(Decimal('0.00')) if pd.notna(x) and str(x) not in ["", "None"] else None
+    )
     accountsData.to_csv(accountsPath, index=False)
+
+    log_id = random.randint(1299, 5999)
+    while log_id in logData['LogID'].values:
+        log_id = random.randint(1299, 5999)
+
+    newLog = {'LogID': log_id, 'UserID': customerID, 'LogMessage': 'Opened a Mortgage Loan Account'}
+    logData.loc[len(logData)] = newLog
+
+    logData.to_csv(logPath, index=False)
 
     return {"status": "success", "message": f"Mortgage loan account {accountID} created with an interest rate of {interestRate}% for {termYears} years."}

@@ -46,7 +46,7 @@ def deleteAcc(custID: int, accID: int) -> dict:
     if os.path.exists(logPath) and os.stat(logPath).st_size > 0:
         logInfo = pd.read_csv(logPath)
     else:
-        logInfo = pd.DataFrame(columns=["AccountID", "CustomerID", "TransactionType", "Amount", "TransactionID"])
+        logInfo = pd.DataFrame(columns=["LogID", "UserID","LogMessage"])
 
     # Find the account in the dataset
     accIndex = accInfo[(accInfo['CustomerID'] == custID) & (accInfo['AccountID'] == accID)].index
@@ -60,15 +60,13 @@ def deleteAcc(custID: int, accID: int) -> dict:
         return {"status": "error", "message": f"Account {accID} cannot be deleted because it has a non-zero balance."}
 
     # Generate a transaction ID
-    transactionID = generate_transaction_ID(logInfo)
+    logID = generate_transaction_ID(logInfo)
 
     # Log account deletion
     log_entry = pd.DataFrame([{
-        "AccountID": accID,
+        "LogID": logID,
         "CustomerID": custID,
-        "TransactionType": "Account Deleted",
-        "Amount": "0.00",  # No money involved
-        "TransactionID": transactionID
+        "LogMessage": "Account Deleted"
     }])
 
     # Append log entry and save

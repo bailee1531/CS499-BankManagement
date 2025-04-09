@@ -9,6 +9,7 @@ import logging
 
 # Import forms for registration and deposit
 from app.blueprints.registration.forms import (
+    TellerUsernameForm,
     RegistrationStep1Form, 
     RegistrationStep2Form, 
     RegistrationStep3Form, 
@@ -266,3 +267,114 @@ def deposit_form():
         form=form,
         form_action=url_for('registration.deposit_form')
     )
+
+@register_bp.route("/register/teller-username", methods=["GET", "POST"])
+def register_teller_username():
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+
+    form = TellerUsernameForm()
+
+    if form.validate_on_submit():
+        # Read from employees.csv
+        df = pd.read_csv(get_csv_path("employees.csv"))
+        username_input = form.username.data.strip().lower()
+
+        # Match user by lowercased username
+        matched_user = df[df['Username'].str.lower() == username_input]
+
+        if matched_user.empty:
+            flash_error("This username is not recognized. Please ask your admin to create your account.")
+            return redirect(url_for('registration.register_teller_username'))
+
+        # Extract and split username into first and last names
+        user_row = matched_user.iloc[0]
+        full_username = user_row['Username']
+        first_name, last_name = full_username.split('.', 1)
+
+        first_name = first_name.capitalize()
+        last_name = last_name.capitalize()
+
+        # Save pre-filled data in session
+        session['registration'] = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'username': full_username
+        }
+
+        return redirect(url_for('registration.register_teller_step1'))
+
+    return render_template("registration/register_teller_username.html", form=form)
+
+@register_bp.route("/register/teller-step1", methods=["GET", "POST"])
+def register_teller_step1():
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+
+    registration = session.get("registration", {})
+    if "username" not in registration:
+        return redirect(url_for("registration.register_teller_username"))
+
+    form = RegistrationStep1Form()
+
+    if form.validate_on_submit():
+        session['registration'].update({
+            'address': form.address.data,
+            'phone_number': form.phone_number.data,
+            'tax_id': form.tax_id.data,
+            'birthday': form.birthday.data,
+        })
+        session.modified = True
+        return redirect(url_for('registration.register_teller_step2'))
+
+    # Pre-fill first and last name from session
+    form.first_name.data = registration.get("first_name", "")
+    form.last_name.data = registration.get("last_name", "")
+
+    return render_template('registration/register_teller_step1.html', form=form, disable_name_fields=True)
+
+@register_bp.route("/register/teller-step2", methods=["GET", "POST"])
+def register_teller_step2():
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+
+    registration = session.get('registration', {})
+    required_keys = ['first_name', 'last_name', 'username', 'address', 'phone_number', 'tax_id', 'birthday']
+
+    if not all(key in registration for key in required_keys):
+        flash_error("Your session has expired or is incomplete. Please restart the registration.")
+        return redirect(url_for('registration.register_teller_username'))
+
+    form = RegistrationStep2Form()
+
+    # Pre-fill and disable username
+    form.username.data = registration['username']
+
+    if form.validate_on_submit():
+        result = webLogin.login_page_button_pressed(
+            NEW_ACCOUNT,
+            "Teller",
+            registration['username'],  # Use from session
+            form.password.data,
+            registration['first_name'],
+            registration['last_name'],
+            registration['address'],
+            form.email.data,
+            registration['phone_number'],
+            registration['tax_id'],
+            form.security_answer_1.data,
+            form.security_answer_2.data,
+        )
+
+        if result.get("status") != "success":
+            flash_error(result.get("message", "Registration failed."))
+            return redirect(url_for('registration.register_teller_step1'))
+
+        # Registration success
+        session.clear()
+        session['teller'] = registration['username']
+        session['role'] = 'teller'
+        flash_success("Welcome to your dashboard!")
+        return redirect(url_for("employee.teller_dashboard"))
+
+    return render_template("registration/register_teller_step2.html", form=form, disable_username=True)

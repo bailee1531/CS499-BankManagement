@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+{% endblock %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h1>Teller Management</h1>
+
+    <div class="admin-controls">
+        <input type="text" id="searchBar" placeholder="Search Teller ID or Name..." onkeyup="filterTellers()">
+        <button class="create-btn" onclick="openCreateModal()">Create Teller Account</button>
+    </div>
+
+    <!-- Create Teller Modal -->
+    <div id="createFormModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateModal()">&times;</span>
+            <h2>Create Teller</h2>
+            <input type="text" id="firstNameInput" placeholder="First Name" required>
+            <input type="text" id="lastNameInput" placeholder="Last Name" required>
+            <button onclick="submitTeller()">Submit</button>
+        </div>
+    </div>
+
+    <!-- View/Edit/Delete Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeViewModal()">&times;</span>
+            <h2>Teller Info</h2>
+            <p><strong>Username:</strong> <span id="modalUsername"></span></p>
+            <p><strong>Employee ID:</strong> <span id="modalEmployeeID"></span></p>
+            <input type="text" id="editUsernameInput" placeholder="New Username">
+            <div class="modal-buttons">
+                <button onclick="submitEdit()">Edit</button>
+                <button onclick="submitDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="teller-grid" id="tellerGrid">
+        {% for teller in tellers %}
+        <div class="teller-card" onclick="openViewModal('{{ teller.EmployeeID }}', '{{ teller.Username }}')">
+            <div class="avatar"></div>
+            <div class="teller-info">
+                <strong>{{ teller.Username }}</strong>
+                <p>Employee ID: {{ teller.EmployeeID }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function filterTellers() {
+    const input = document.getElementById("searchBar").value.toLowerCase();
+    const cards = document.querySelectorAll(".teller-card");
+
+    cards.forEach(card => {
+        const name = card.querySelector("strong").innerText.toLowerCase();
+        card.classList.toggle("hidden", !name.includes(input));
+    });
+}
+
+function openCreateModal() {
+    document.getElementById("createFormModal").style.display = "flex";
+}
+function closeCreateModal() {
+    document.getElementById("createFormModal").style.display = "none";
+    document.getElementById("firstNameInput").value = "";
+    document.getElementById("lastNameInput").value = "";
+}
+
+function openViewModal(id, username) {
+    document.getElementById("modalEmployeeID").textContent = id;
+    document.getElementById("modalUsername").textContent = username;
+    document.getElementById("editUsernameInput").value = "";
+    document.getElementById("viewModal").style.display = "flex";
+}
+function closeViewModal() {
+    document.getElementById("viewModal").style.display = "none";
+}
+
+function submitTeller() {
+    const firstName = document.getElementById("firstNameInput").value.trim();
+    const lastName = document.getElementById("lastNameInput").value.trim();
+
+    if (!firstName || !lastName) {
+        alert("Please enter both first and last name.");
+        return;
+    }
+
+    fetch("/employee/create-teller", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert("Failed to create teller: " + data.message);
+    })
+    .catch(err => alert("Something went wrong."));
+}
+
+function submitEdit() {
+    const id = document.getElementById("modalEmployeeID").textContent;
+    const newUsername = document.getElementById("editUsernameInput").value.trim();
+
+    if (!newUsername) {
+        alert("Please enter a new username.");
+        return;
+    }
+
+    fetch("/employee/edit-teller", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeID: id, newUsername })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert("Failed to update teller: " + data.message);
+    });
+}
+
+function submitDelete() {
+    const id = document.getElementById("modalEmployeeID").textContent;
+
+    if (!confirm("Are you sure you want to delete this teller?")) return;
+
+    fetch("/employee/delete-teller", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeID: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert("Failed to delete teller: " + data.message);
+    });
+}
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") {
+        closeCreateModal();
+        closeViewModal();
+    }
+});
+</script>
+{% endblock %}

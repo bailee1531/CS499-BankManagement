@@ -96,7 +96,6 @@ def credit_cards() -> Response:
                     flash_error("You can only have up to 2 credit cards.")
                     return redirect(url_for("accounts.credit_cards"))
 
-
                 # Create the credit card account
                 createCreditCard.openCreditCardAccount(customer_id)
 
@@ -238,3 +237,18 @@ def mortgage_application():
         form=form,
         form_action=url_for('accounts.mortgage_application')
     )
+
+
+# -----------------------------------------------------------------------------
+# Route: /page-error
+# -----------------------------------------------------------------------------
+@accounts_bp.route('/page_error')
+def page_error():
+    """
+    Route for error page.
+
+    Returns:
+    --------
+    Response: Redirects to the error page.
+    """
+    return render_template("accounts/not_found.html")

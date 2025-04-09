@@ -16,6 +16,15 @@ from wtforms.validators import (
 )
 from wtforms.fields.core import Field  # for type annotations
 
+# -----------------------------------------------------------------------------
+# TellerUsernameForm: Collects username input to verify before sign up.
+# -----------------------------------------------------------------------------
+class TellerUsernameForm(FlaskForm):
+    """
+    Form for teller to input their pre-created username.
+    """
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=25)])
+    submit = SubmitField('Continue')
 
 # -----------------------------------------------------------------------------
 # RegistrationStep1Form: Collects basic personal details in step 1 of registration.
