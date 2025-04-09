@@ -197,7 +197,7 @@
   right: 0.8rem;
   font-size: 1.4rem;
   cursor: pointer;
-  color: #333;
+  color: #fff;
 }
 
 /* --- Left-Side of Modal --- */
@@ -262,4 +262,79 @@
     flex-direction: column;
     width: 90%;
   }
+}
+
+/* === Inputs & Selects for Open Account Modal === */
+.modal-content select {
+  appearance: none;
+  background-color: #fff;
+}
+
+.modal-content input::placeholder,
+.modal-content select {
+  color: #444;
+}
+
+/* === Open Account Modal: Scroll wrapper and step layout === */
+#modalScrollWrapper {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+#accountTypePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#accountTypeSelect {
+  width: 300px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+#accountInfoPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+#accountInfoPage select {
+  width: 300px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  border: 2px solid #888;
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #333;
+}
+
+
+.create-btn {
+  height: 46px;
+  padding: 0 1.5rem;
+  background-color: #007a3d;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.create-btn:hover {
+  background-color: #005c2a;
 }
