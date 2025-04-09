@@ -124,9 +124,9 @@
       <button onclick="submitAccountOpen()">Open Account</button>
     
       <div class="modal-buttons" style="margin-top: 10px;">
-        <button onclick="openTransactionModal('deposit')">Deposit</button>
-        <button onclick="openTransactionModal('withdraw')">Withdraw</button>
-        <button onclick="openTransactionModal('transfer')">Transfer</button>
+        <button onclick="openDepositModal()">Deposit</button>
+        <button onclick="openWithdrawModal()">Withdraw</button>
+        <button onclick="openTransferModal()">Transfer</button>
       </div>
     
       <hr>
@@ -139,71 +139,59 @@
 </div>
 
 <div id="depositModal" class="modal">
-  <div class="modal-content" style="background-color: #434343;">
-    <span class="close" onclick="closeTransactionModal('deposit')">&times;</span>
-    <h2 id="transactionTypeTitle" style="color: white;">Deposit</h2>
-    <form method="post" novalidate>
-      {{ depositForm.hidden_tag() }} <div class="form-group" style="color: white;">
-        <label for="{{ depositForm.amount.id }}">
-          {{ depositForm.amount.label.text }}
-        </label>
-        {{ depositForm.amount(size=32, **{'class': 'form-control', 'id': depositForm.amount.id, 'aria-describedby': 'deposit-help'}) }}
-        <small id="deposit-help" class="visually-hidden">
-          Enter a valid amount in USD to deposit.
-        </small>
+  <div class="modal-content">
+      <span class="close" onclick="closeDepositModal()">&times;</span>
+      <h2 style="text-align:center;">Deposit Funds</h2>
+
+      <label for="depositAccountId">Account ID:</label>
+      <input type="number" id="depositAccountId" name="accountId" placeholder="Enter Account ID" required>
+
+      <label for="depositAmount">Amount to Deposit:</label>
+      <input type="number" step="0.01" id="depositAmount" name="amount" placeholder="Enter Amount (e.g., 100.50)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeDepositModal()">Cancel</button>
+          <button class="action-btn" onclick="submitDeposit()">Deposit</button>
       </div>
-      <button class='submit-btn' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Deposit</button>
-    </form>
   </div>
 </div>
 
 <div id="withdrawModal" class="modal">
-  <div class="modal-content" style="background-color: #434343;">
-    <span class="close" onclick="closeTransactionModal('withdraw')">&times;</span>
-    <h2 id="transactionTypeTitle" style="color: white;">Withdraw</h2>
-    <form method="post" novalidate>
-      {{ withdrawForm.hidden_tag() }}
-      <div class="form-group" style="color: white;">
-        <label for="{{ withdraw_form.amount.id }}">
-          {{ withdrawForm.amount.label.text }}
-        </label>
-        {{ withdrawForm.amount(size=32, **{'class': 'form-control', 'id': withdrawForm.amount.id, 'aria-describedby': 'deposit-help'}) }}
-        <small id="deposit-help" class="visually-hidden">
-          Enter a valid amount in USD to withdraw.
-        </small>
+  <div class="modal-content">
+      <span class="close" onclick="closeWithdrawModal()">&times;</span>
+      <h2 style="text-align:center;">Withdraw Funds</h2>
+
+      <label for="withdrawAccountId">Account ID:</label>
+      <input type="number" id="withdrawAccountId" name="accountId" placeholder="Enter Account ID" required>
+
+      <label for="withdrawAmount">Amount to Withdraw:</label>
+      <input type="number" step="0.01" id="withdrawAmount" name="amount" placeholder="Enter Amount (e.g., 50.00)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeWithdrawModal()">Cancel</button>
+          <button class="action-btn" onclick="submitWithdraw()">Withdraw</button>
       </div>
-      <button class='submit-btn' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Withdrawal</button>
-    </form>
   </div>
 </div>
 
 <div id="transferModal" class="modal">
-  <div class="modal-content" style="background-color: #434343;">
-    <span class="close" onclick="closeTransactionModal('transfer')">&times;</span>
-    <h2 id="transactionTypeTitle" style="color: white;">Transfer</h2>
-    <form method="post" novalidate>
-      {{ transferForm.hidden_tag() }}
-      <div style="display: flex; justify-content: space-around;">
-        <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; margin: 1.5rem;">
-          <h2>From</h2>
-          {{ transferForm.src_account.label }} {{ transferForm.src_account() }}
-        </article>
-        <article class="account-box" style="box-shadow: none; transition: none; color:white; transform: none; border: none; margin: 1.5rem;">
-          <h2>To</h2>
-          {{ transferForm.dest_account.label }} {{ transferForm.dest_account }}
-        </article>
-      </div>
-      <div class="form-group" style="color: white;">
-        <label for="{{ transferForm.amount.id }}">{{ transferForm.amount.label.text }}</label>
+  <div class="modal-content">
+      <span class="close" onclick="closeTransferModal()">&times;</span>
+      <h2 style="text-align:center;">Transfer Funds</h2>
 
-        {{ transferForm.amount(size=32, **{'class': 'form-control', 'id': transferForm.amount.id, 'aria-describedby': 'deposit-help'}) }}
+      <label for="sourceAccountId">Source Account ID:</label>
+      <input type="number" id="sourceAccountId" name="sourceAccountId" placeholder="Enter Source Account ID" required>
 
-        <small id="deposit-help" class="visually-hidden">
-          Enter a valid amount in USD to transfer between your accounts.
-        </small>
+      <label for="destinationAccountId">Destination Account ID:</label>
+      <input type="number" id="destinationAccountId" name="destinationAccountId" placeholder="Enter Destination Account ID" required>
+
+      <label for="transferAmount">Amount to Transfer:</label>
+      <input type="number" step="0.01" id="transferAmount" name="amount" placeholder="Enter Amount (e.g., 25.00)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeTransferModal()">Cancel</button>
+          <button class="action-btn" onclick="submitTransfer()">Transfer</button>
       </div>
-      <button class='submit-btn' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Transfer</button>
-    </form>
   </div>
 </div>
 
@@ -226,7 +214,6 @@
 
 <script>
 let currentCustomerID = null;
-let transactionType = null;
 let openAccountCustomerID = null;
 
 function filterCustomers() {
@@ -279,29 +266,147 @@ function closeCustomerModal() {
   document.getElementById("customerModal").style.display = "none";
 }
 
-function openTransactionModal(type) {
-  transactionType = type + "Modal";
-  document.getElementById(transactionType).style.display = "flex";
-  fetch("/employee/teller-dashboard", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({formData})
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      location.reload();
-    } else {
-      alert("Transaction failed " + data.message);
-    }
-  });
+function openDepositModal() {
+    document.getElementById("depositModal").style.display = "block";
 }
 
-function closeTransactionModal(type) {
-  transactionType = type + "Modal";
-  document.getElementById(transactionType).style.display = "none";
+function closeDepositModal() {
+    document.getElementById("depositModal").style.display = "none";
+}
+
+function submitDeposit() {
+    const accountId = document.getElementById("depositAccountId").value;
+    const amount = document.getElementById("depositAmount").value;
+
+    if (!accountId || !amount) {
+        alert("Please enter both Account ID and the deposit amount.");
+        return;
+    }
+
+    const payload = {
+        accountId: accountId,
+        amount: amount
+    };
+
+    fetch("/employee/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Failed to process deposit.");
+        console.error(err);
+    });
+}
+
+function openWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "block";
+}
+
+function closeWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "none";
+}
+
+function submitWithdraw() {
+    const accountId = document.getElementById("withdrawAccountId").value;
+    const amount = document.getElementById("withdrawAmount").value;
+
+    if (!accountId || !amount) {
+        alert("Please enter both Account ID and the withdrawal amount.");
+        return;
+    }
+
+    const payload = {
+        accountId: accountId,
+        amount: amount
+    };
+
+    fetch("/employee/withdraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Failed to process withdrawal.");
+        console.error(err);
+    });
+}
+
+function openTransferModal() {
+    document.getElementById("transferModal").style.display = "block";
+}
+
+function closeTransferModal() {
+    document.getElementById("transferModal").style.display = "none";
+}
+
+function submitTransfer() {
+    const sourceAccountId = document.getElementById("sourceAccountId").value;
+    const destinationAccountId = document.getElementById("destinationAccountId").value;
+    const amount = document.getElementById("transferAmount").value;
+
+    if (!sourceAccountId || !destinationAccountId || !amount) {
+        alert("Please enter Source Account ID, Destination Account ID, and the transfer amount.");
+        return;
+    }
+
+    const payload = {
+        sourceAccountId: sourceAccountId,
+        destinationAccountId: destinationAccountId,
+        amount: amount
+    };
+
+    fetch("/employee/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Failed to process transfer.");
+        console.error(err);
+    });
+}
+
+window.onclick = function(event) {
+    const depositModal = document.getElementById("depositModal");
+    const withdrawModal = document.getElementById("withdrawModal");
+    const transferModal = document.getElementById("transferModal");
+    if (event.target == depositModal) {
+        depositModal.style.display = "none";
+    }
+    if (event.target == withdrawModal) {
+        withdrawModal.style.display = "none";
+    }
+    if (event.target == transferModal) {
+        transferModal.style.display = "none";
+    }
 }
 
 function submitUsernameEdit() {
@@ -388,19 +493,6 @@ function submitCustomerDelete() {
       alert("Error checking account status.");
       console.error(err);
     });
-}
-
-function submitTransaction() {
-  const amount = document.getElementById("transactionAmount").value;
-  const target = document.getElementById("targetAccount").value;
-  fetch(`/employee/${transactionType}-customer`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerID: currentCustomerID, amount, target })
-  }).then(res => res.json()).then(data => {
-    if (data.success) location.reload();
-    else alert("Transaction failed: " + data.message);
-  });
 }
 
 function viewCustomerAccounts() {

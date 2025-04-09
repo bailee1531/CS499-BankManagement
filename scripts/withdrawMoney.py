@@ -67,7 +67,7 @@ def withdraw(accID, amount) -> dict:
         'TransDate': date.today()
     }
 
-    transInfo.loc[len(accInfo)] = newTrans
+    transInfo.loc[len(transInfo)] = newTrans
     transInfo.to_csv(transPath, index=False)
 
     return {"status": "success", "message": f"Withdrew {amount} from account {accID}."}

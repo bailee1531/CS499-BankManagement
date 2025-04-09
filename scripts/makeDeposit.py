@@ -113,6 +113,8 @@ def deposit(accID, amount) -> dict:
             transaction_type = 'Payment to Credit Card'
         else:
             transaction_type = 'Payment to Mortgage Loan'
+    else:
+        transaction_type = 'Deposit to account'
     accInfo['CreditLimit'] = accInfo['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accInfo.at[accIndex, 'CurrBal'] = Decimal(currentBal).quantize(Decimal('0.00'))
     accInfo.to_csv(accPath, index=False)
@@ -127,7 +129,7 @@ def deposit(accID, amount) -> dict:
         'TransDate': date.today()
     }
 
-    transInfo.loc[len(accInfo)] = newTrans
+    transInfo.loc[len(transInfo)] = newTrans
     transInfo.to_csv(transPath, index=False)
 
     return {"status": "success", "message": f"{amount} deposited to account {accID}."}
