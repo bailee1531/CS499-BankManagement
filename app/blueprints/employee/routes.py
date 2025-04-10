@@ -316,6 +316,7 @@ def open_account_route():
         last = data.get("lastName").strip()
         username = data.get("username").strip()
         password = data.get("password").strip()
+        address = data.get("address").strip()
         ssn = data.get("ssn").strip()
         email = data.get("email").strip()
         phone = data.get("phone").strip()
@@ -325,7 +326,7 @@ def open_account_route():
         # Call existing function to handle CSV + key logic
         result = login_page_button_pressed(
             1, "Customer", username, password,
-            first, last, "N/A", email, phone, ssn, q1, q2
+            first, last, address, email, phone, ssn, q1, q2
         )
 
         if result["status"] != "success":
@@ -669,6 +670,54 @@ def teller_settings():
     form.username.data = username
 
     return render_template("employee/teller_settings.html", form=form)
+
+@employee_bp.route("/transactions-json/teller/<customer_id>")
+@login_required("teller")
+def get_customer_transactions(customer_id):
+    try:
+        import pandas as pd
+        import os
+
+        trans_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/transactions.csv"))
+        acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+
+        trans_df = pd.read_csv(trans_path)
+        acc_df = pd.read_csv(acc_path)
+
+        customer_accounts = acc_df[acc_df["CustomerID"] == int(customer_id)]["AccountID"].tolist()
+        filtered = trans_df[trans_df["AccountID"].isin(customer_accounts)]
+
+        return jsonify(filtered.to_dict(orient="records"))
+
+    except Exception as e:
+        print(f"[ERROR] Failed to load transactions (teller): {e}")
+        return jsonify([])
+
+
+
+@employee_bp.route("/transactions-json/admin/<customer_id>")
+@login_required("admin")
+def transactions_for_customer(customer_id):
+    try:
+        import pandas as pd
+        import os
+
+        acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+        tx_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/transactions.csv"))
+
+        acc_df = pd.read_csv(acc_path)
+        tx_df = pd.read_csv(tx_path)
+
+        acc_ids = acc_df[acc_df["CustomerID"] == int(customer_id)]["AccountID"].tolist()
+        filtered_tx = tx_df[tx_df["AccountID"].isin(acc_ids)]
+
+        return jsonify(filtered_tx.to_dict(orient="records"))
+
+    except Exception as e:
+        print(f"[ERROR] Failed to load transactions (admin): {e}")
+        return jsonify([])
+
+
 
 # ---------------------------
 #Admin Settings

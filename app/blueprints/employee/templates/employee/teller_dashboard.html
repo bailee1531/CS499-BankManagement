@@ -41,10 +41,9 @@
 <!-- Customer Modal -->
 <div id="customerModal" class="modal">
   <div class="modal-content">
-    <a href="{{ url_for('employee.teller_dashboard') }}" class="exit-to-dashboard" title="Exit to Dashboard">Exit</a>
     <span class="close" onclick="closeCustomerModal()">&times;</span>
     
-    <div class="modal-left">
+    <div class="modal-left scroll-panel">
       <!-- Customer Info Panel -->
       <div id="customerInfoPanel">
         <h2>Customer Info</h2>
@@ -86,7 +85,7 @@
       </div>
     </div>
 
-    <div class="modal-right">
+    <div class="modal-right scroll-panel">
       <!-- Edit Username -->
       <h3>Edit Username</h3>
       <input type="text" id="editUsernameInput" placeholder="New Username">
@@ -128,6 +127,7 @@
         <button onclick="openDepositModal()">Deposit</button>
         <button onclick="openWithdrawModal()">Withdraw</button>
         <button onclick="openTransferModal()">Transfer</button>
+        <button onclick="openLogsModal()">View Logs</button>
       </div>
     
       <hr>
@@ -162,6 +162,7 @@
         <input type="text" id="newLastName" placeholder="Last Name" required>
         <input type="text" id="newUsername" placeholder="Username" required>
         <input type="password" id="newPassword" placeholder="Password" required>
+        <input type="text" placeholder="Address" name="address" required>
         <input type="text" id="newSSN" placeholder="SSN (e.g. 123-45-6789)" required>
         <input type="email" id="newEmail" placeholder="Email" required>
         <input type="tel" id="newPhone" placeholder="Phone (e.g. 000-000-0000)" required>
@@ -289,6 +290,15 @@
   </div>
 </div>
 
+<div id="logsModal" class="modal">
+  <div class="modal-content scrollable">
+    <span class="close" onclick="document.getElementById('logsModal').style.display='none'">&times;</span>
+    <h2>Logs for Selected Customer</h2>
+    <div id="logsTableContainer" style="max-height: 400px; overflow-y: auto;"></div>
+  </div>
+</div>
+
+
 <script>
 let currentCustomerID = null;
 let openAccountCustomerID = null;
@@ -312,6 +322,7 @@ function setModalTextContent(ids, values) {
 
 function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
   currentCustomerID = customerID;
+  selectedCustomerID = customerID;
 
   setModalTextContent(
     [
@@ -702,6 +713,7 @@ function submitOpenAccount() {
     lastName: document.getElementById("newLastName").value,
     username: document.getElementById("newUsername").value,
     password: document.getElementById("newPassword").value,
+    address: document.getElementById("newAddress").value,
     ssn: document.getElementById("newSSN").value,
     email: document.getElementById("newEmail").value,
     phone: document.getElementById("newPhone").value,
@@ -730,6 +742,30 @@ function submitOpenAccount() {
     alert("Failed to open account.");
     console.error(err);
   });
+}
+
+function openLogsModal() {
+  if (!selectedCustomerID) return;
+
+  fetch(`/employee/transactions-json/teller/${selectedCustomerID}`)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("logsTableContainer");
+      let table = "<table style='width:100%; border-collapse: collapse;'>";
+      table += "<thead><tr><th>Transaction ID</th><th>Account ID</th><th>Type</th><th>Amount</th><th>Date</th></tr></thead><tbody>";
+      data.forEach(tx => {
+        table += `<tr>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransactionID}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.AccountID}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransactionType}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>$${parseFloat(tx.Amount).toFixed(2)}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransDate}</td>
+        </tr>`;
+      });
+      table += "</tbody></table>";
+      container.innerHTML = table;
+      document.getElementById("logsModal").style.display = "flex";
+    });
 }
 
 </script>

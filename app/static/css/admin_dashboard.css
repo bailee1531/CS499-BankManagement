@@ -159,3 +159,21 @@
 .hidden {
     display: none;
 }
+
+.scroll-panel {
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
+  
+  .modal-content {
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    padding: 2rem;
+    width: 70%;
+    max-width: 900px;
+  }
+  
