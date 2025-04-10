@@ -19,11 +19,10 @@
 
     {# Login form, using POST method and Flask-WTF for CSRF protection #}
     <form action="{{ form_action }}" method="post" novalidate aria-describedby="login-instructions">
-
-      {# CSRF hidden token for security #}
       {{ form.hidden_tag() }}
-
-      {# Username input field with label and error display #}
+   
+      <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+    
       <div class="form-group">
         <label for="username">Username</label>
         {{ form.username() }}
@@ -35,8 +34,7 @@
           </div>
         {% endif %}
       </div>
-
-      {# Password input field with label and error display #}
+    
       <div class="form-group">
         <label for="password">Password</label>
         {{ form.password() }}
@@ -48,24 +46,22 @@
           </div>
         {% endif %}
       </div>
-
-      {# Forgot password link #}
+    
       <div class="form-group">
         <a href="{{ forgot_password_url or '#' }}" class="forgot-password">Forgot Password?</a>
       </div>
-
-      {# Submit button for logging in #}
+    
       <button type="submit" name="new_or_returning" value="2" class="btn btn--login" aria-label="Log in to your account">
         Login
       </button>
-
-      {# Optional sign-up button, shown only if the flag is set #}
+    
       {% if show_signup_button %}
         <button type="button" class="btn" onclick='window.location.href = {{ signup_url | tojson }};' aria-label="Sign up for a new account">
           Sign Up
         </button>
       {% endif %}
     </form>
+    
   </section>
 </main>
 {% endblock %}

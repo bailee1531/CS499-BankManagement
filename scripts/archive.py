@@ -57,11 +57,15 @@ def archive(recordType: str, recordID: int) -> dict:
             return {"status": "error", "message": "No mortgage loans to archive."}
 
         loansData = pd.read_csv(loansPath)
-
+        
         # Locate the paid-off mortgage loan
+        loansData['CurrBal'] = loansData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         loanRecord = loansData[
-            (loansData['AccountID'] == recordID) & (loansData['AccountType'] == 'Mortgage Loan') & (Decimal(loansData['CurrBal'].iloc[0]) == Decimal('0.00'))
+            (loansData['AccountID'] == recordID) & 
+            (loansData['AccountType'] == 'Mortgage Loan') & 
+            (loansData['CurrBal'] == Decimal('0.00'))
         ]
+
         if loanRecord.empty:
             return {"status": "error", "message": f"Mortgage Loan with ID {recordID} is not fully paid off or does not exist."}
 
@@ -71,14 +75,14 @@ def archive(recordType: str, recordID: int) -> dict:
             archivedLoansData = loanRecord
         else:
             archivedLoansData = pd.concat([archivedLoansData, loanRecord], ignore_index=True)
-        archivedLoansData['CurrBal'] = archivedLoansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
-        archivedLoansData['CreditLimit'] = archivedLoansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        archivedLoansData['CurrBal'] = archivedLoansData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        archivedLoansData['CreditLimit'] = archivedLoansData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         archivedLoansData.to_csv(archivedLoansPath, index=False)
 
         # Remove the mortgage loan from active records
         loansData = loansData[loansData['AccountID'] != recordID]
-        loansData['CurrBal'] = loansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
-        loansData['CreditLimit'] = loansData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        loansData['CurrBal'] = loansData['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        loansData['CreditLimit'] = loansData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         loansData.to_csv(loansPath, index=False)
 
         return {"status": "success", "message": f"Mortgage Loan with ID {recordID} archived successfully."}

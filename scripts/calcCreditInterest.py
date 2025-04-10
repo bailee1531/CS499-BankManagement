@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import date
 from decimal import Decimal
 import os
-from transactionLog import generate_transaction_ID
+from scripts.transactionLog import generate_transaction_ID
 
 def calculateCreditInterest():
     """

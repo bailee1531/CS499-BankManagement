@@ -101,11 +101,13 @@ header {
     color: var(--white);
 }
 
-/* Set logo image dimensions and spacing */
-.header__logo img {
-    width: 2.5rem;
+/* Set mascot image dimensions and spacing */
+.header__mascot img {
+    height: 50px;
+    width: auto;
     /* Approximately 40px */
-    margin-right: 0.625rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
 }
 
 /* Header Navigation */
@@ -194,6 +196,14 @@ footer {
     /* Push footer to bottom using flex layout */
 }
 
+.footer__bottom p {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 /* Footer authentication button style (typically for logout or similar actions) */
 .footer__auth .btn {
     background: transparent;
@@ -226,6 +236,26 @@ footer {
 .footer__contact a:hover,
 .footer__bottom a:hover {
     text-decoration: underline;
+}
+
+/* Add bars before footer contact and bottom links */
+.footer__contact a::before,
+.footer__bottom a::before {
+    content: "|";
+    margin: 0 0.4rem;
+    color: var(--white);
+}
+
+/* Remove bar before the first contact link (email) */
+.footer__contact a:first-of-type::before {
+    content: "";
+    margin: 0;
+}
+
+/* Remove bar before the first bottom link (Privacy Policy) */
+.footer__bottom a:first-of-type::before {
+    content: "";
+    margin: 0;
 }
 
 .footer__content ul {
@@ -280,8 +310,6 @@ footer {
 }
 
 /* Flash Messages */
-/* Styling for alert messages (e.g., notifications) */
-
 /* Flash Messages: Generic alert styling remains */
 .flash-messages .alert {
     padding: 0.75rem 1rem;
@@ -337,9 +365,9 @@ main {
 .error-message {
     background-color: #ffbaba;
     /* Light red background */
-    border: 0.0625rem solid --danger;
+    border: 0.0625rem solid #d8000c;
     /* Red border */
-    color: var(--danger);
+    color: #d8000c;
     /* Red text */
     padding: 0.625rem;
     margin-bottom: 1.25rem;
@@ -405,3 +433,11 @@ main {
     border: 0;
 }
 
+input[readonly],
+input[disabled] {
+    background-color:rgb(226, 224, 224);
+    color: black;
+    opacity: 1;
+    cursor: not-allowed;
+    font-style: italic;
+}

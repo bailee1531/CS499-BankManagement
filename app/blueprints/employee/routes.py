@@ -1,9 +1,9 @@
 import os
 import pandas as pd
-
-
-
 import json
+import csv
+from datetime import date
+from decimal import Decimal
 from Crypto.PublicKey import ECC
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, Response
 from app.blueprints.auth.forms import LoginForm
@@ -11,12 +11,14 @@ from app.blueprints.sharedUtilities import (
     get_csv_path, login_required, flash_error, flash_success, get_account_transactions, get_customer_accounts
 )
 from scripts.createTeller import create_teller
-from scripts.makeDeposit import deposit as make_deposit
 from scripts.customer.modifyInfo import modify_info as modify_username
 from scripts.customer import modifyInfo
 from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
+
+from scripts.transactionLog import generate_transaction_ID
 from scripts.withdrawMoney import withdraw as withdraw_money
 from scripts.fundTransfer import transferFunds as transfer_funds
+from scripts.customer.webLogin import login_page_button_pressed
 from .forms import TellerSettingsForm, AdminSettingsForm, DepositForm
 
 # Blueprint for employee routes
@@ -29,7 +31,6 @@ def admin_login():
 
     if request.method == "POST":
         username = request.form.get("username")
-        employee_id = request.form.get("employeeId")
 
         teller_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
         df = pd.read_csv(teller_path)
@@ -38,7 +39,6 @@ def admin_login():
 
         if not match.empty:
             session['admin'] = username
-            session['employee_id'] = 0
             session['role'] = 'admin'
             return redirect(url_for("employee.admin_dashboard"))
         else:
@@ -95,6 +95,24 @@ def create_teller_route():
         print(f"[ERROR] Failed to create teller: {e}")
         return jsonify(success=False, message=str(e)), 500
 
+@employee_bp.route("/check-employee", methods=["POST"])
+def check_employee():
+    data = request.get_json()
+    employee_id = data.get("employeeID")
+    personsPath = get_csv_path("persons.csv")
+
+    if employee_id is None:
+        return jsonify({'exists': bool(exists)})
+
+    try:
+        df = pd.read_csv(personsPath)
+        exists = (df["ID"] == int(employee_id)).any()
+        return jsonify({'exists': bool(exists)})
+    except FileNotFoundError:
+        return jsonify({'exists': bool(exists)})
+    except Exception as e:
+        print(f"Error checking employee ID: {e}")
+        return jsonify({'exists': bool(exists)})
 
 @employee_bp.route("/edit-teller", methods=["POST"])
 def edit_teller():
@@ -128,30 +146,34 @@ def delete_teller():
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
 
-@employee_bp.route("/teller-dashboard")
+@employee_bp.route("/teller-dashboard", methods=["GET", "POST"])
 def teller_dashboard():
-    df = pd.read_csv(get_csv_path("customers.csv"))
     try:
-        customers = df.to_dict(orient="records")
+        customers_df = pd.read_csv(get_csv_path("customers.csv"))
+        persons_df = pd.read_csv(get_csv_path("persons.csv"))
+        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+
+        # Convert IDs to int for consistency
+        customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
+        persons_df["ID"] = persons_df["ID"].astype(int)
+        accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
+        accounts_df["AccountID"] = accounts_df["AccountID"].astype(int) # Ensure AccountID is int
+
+        # Merge customers + persons to get full profile
+        merged_df = pd.merge(customers_df, persons_df, left_on="CustomerID", right_on="ID", how="left")
+
+        # Get just one account per customer
+        account_map = accounts_df.groupby("CustomerID")["AccountID"].first().reset_index()
+        merged_df = pd.merge(merged_df, account_map, left_on="CustomerID", right_on="CustomerID", how="left")
+
+        # Rename AccountID column for clarity in the template
+        merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
+
+        customers = merged_df.to_dict(orient="records")
     except Exception as e:
         customers = []
-        flash(f"Error loading customers: {e}", "danger")
-        
-    # Initialize DepositForm
-    form = DepositForm()
-
-    # Load accounts and populate form choices
-    try:
-        accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-        form.account_id.choices = [
-            (str(acc["AccountID"]), f"{acc['AccountType']} - {acc['AccountID']}")
-            for _, acc in accounts_df.iterrows()
-        ]
-    except Exception as e:
-        form.account_id.choices = []
-        flash(f"Error loading account options: {e}", "danger")
-
-    return render_template("employee/teller_dashboard.html", customers=customers, form=form)
+        return jsonify(success=False, message=str(e)), 500
+    return render_template("employee/teller_dashboard.html", customers=customers)
 
 @employee_bp.route("/edit-username", methods=["POST"])
 def edit_username():
@@ -214,6 +236,27 @@ def reset_customer_password_route():
         return jsonify(success=False, message="Old password is incorrect."), 400
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
+    
+@employee_bp.route("/get-accounts/<int:customer_id>")
+def get_accounts(customer_id):
+    accounts = []
+    try:
+        accounts_path = get_csv_path("accounts.csv")
+        with open(accounts_path, newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if int(row["CustomerID"]) == customer_id:
+                    accounts.append({
+                        "AccountID": row["AccountID"],
+                        "AccountType": row["AccountType"],
+                        "CurrBal": row["CurrBal"],
+                        "DateOpened": row["DateOpened"],
+                        "CreditLimit": row.get("CreditLimit", ""),
+                        "APR": row.get("APR", "")
+                    })
+        return jsonify(success=True, accounts=accounts)
+    except Exception as e:
+        return jsonify(success=False, message=str(e))
 
 @employee_bp.route("/check-accounts/<int:customer_id>", methods=["GET"])
 def check_customer_accounts(customer_id):
@@ -230,63 +273,232 @@ def check_customer_accounts(customer_id):
         return jsonify(success=True, hasOpenAccountsOrBills=has_accounts or has_bills)
     except Exception as e:
         return jsonify(success=False, message=f"Error checking account status: {str(e)}"), 500
+    
 
-@employee_bp.route("/delete-customer", methods=["POST"])
-def delete_customer():
+@employee_bp.route("/open-account", methods=["POST"])
+def open_account_route():
     data = request.get_json()
-    customer_id = data.get("customerId")
-
-    if not customer_id:
-        return jsonify(success=False, message="Customer ID required"), 400
 
     try:
-        result = delete_customer_logic("Customer", customer_id, is_admin=True)
-        if result["status"] == "success":
-            return jsonify(success=True)
-        else:
-            return jsonify(success=False, message=result["message"]), 400
-    except Exception as e:
-        return jsonify(success=False, message=str(e)), 500
+        # Unpack fields
+        first = data.get("firstName").strip()
+        last = data.get("lastName").strip()
+        username = data.get("username").strip()
+        password = data.get("password").strip()
+        ssn = data.get("ssn").strip()
+        email = data.get("email").strip()
+        phone = data.get("phone").strip()
+        q1 = data.get("securityAnswer1").strip()
+        q2 = data.get("securityAnswer2").strip()
 
-@employee_bp.route("/deposit", methods=["GET", "POST"])
-def record_deposit() -> Response:
-    data = request.get_json()
-    account_id = data.get("accountId")
-    form = DepositForm()
+        # Call existing function to handle CSV + key logic
+        result = login_page_button_pressed(
+            1, "Customer", username, password,
+            first, last, "N/A", email, phone, ssn, q1, q2
+        )
 
-    if form.validate_on_submit():
-        result = make_deposit(account_id, form.amount.data)
         if result["status"] != "success":
-            flash_error(result["message"])
-        else:
-            return redirect(url_for("employee.teller_dashboard"))
-        
-    return render_template("employee/teller_dashboard.html", form=form)
+            return jsonify(success=False, message=result["message"])
 
-@employee_bp.route("/withdraw", methods=["POST"])
-def record_withdrawal():
+        # Get new customer ID
+        cust_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/customers.csv"))
+        cust_df = pd.read_csv(cust_path)
+        customer_row = cust_df[cust_df["Username"] == username]
+        if customer_row.empty:
+            return jsonify(success=False, message="Customer ID not found after creation.")
+        customer_id = int(customer_row["CustomerID"].iloc[0])
+
+        # Add account
+        acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+        acc_df = pd.read_csv(acc_path) if os.path.exists(acc_path) else pd.DataFrame(columns=[
+            "AccountID", "CustomerID", "AccountType", "CurrBal", "DateOpened", "CreditLimit", "APR"
+        ])
+        import random
+        from datetime import date
+        from decimal import Decimal
+
+        acc_id = random.randint(1000, 9999)
+        while acc_id in acc_df["AccountID"].values:
+            acc_id = random.randint(1000, 9999)
+
+        acc_df.loc[len(acc_df)] = {
+            "AccountID": acc_id,
+            "CustomerID": customer_id,
+            "AccountType": data.get("accountType", "Checking"),
+            "CurrBal": Decimal("0.00"),
+            "DateOpened": date.today(),
+            "CreditLimit": None,
+            "APR": None
+        }
+        acc_df.to_csv(acc_path, index=False)
+
+        return jsonify(success=True, message="Customer account successfully created.")
+
+    except Exception as e:
+        print(f"[ERROR] Account creation failed: {e}")
+        return jsonify(success=False, message="Account creation failed.")
+
+
+@employee_bp.route("/delete-account", methods=["POST"])
+def delete_account():
     data = request.get_json()
-    account_id = data.get("accountId")
-    amount = float(data.get("amount"))
+    account_id = int(data.get("accountID"))
+
+    # Load accounts CSV
+    acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+    acc_df = pd.read_csv(acc_path)
+
+    # Find the account
+    account_row = acc_df[acc_df["AccountID"] == account_id]
+    if account_row.empty:
+        return jsonify(success=False, message="Account not found.")
+
+    balance = float(account_row["CurrBal"].iloc[0])
+    if balance != 0.00:
+        return jsonify(success=False, message="Account must have a balance of $0.00 to be deleted.")
+
+    # Delete the account
+    acc_df = acc_df[acc_df["AccountID"] != account_id]
+    acc_df.to_csv(acc_path, index=False)
+
+    return jsonify(success=True, message="Account successfully deleted.")
+
+
+@employee_bp.route("/deposit", methods=["POST"])
+def deposit():
+    from scripts.makeDeposit import deposit
+    data = request.get_json()
 
     try:
-        withdraw_money(account_id, amount)
-        return jsonify(success=True)
+        accPath = get_csv_path("accounts.csv")
+        df = pd.read_csv(accPath)
+        df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        
+        accountID = data.get("accountId").strip()
+        amount = data.get("amount").strip()
+        accountID = int(accountID)
+
+        accIndex = df.loc[df['AccountID'] == accountID].index[0]
+
+        bal = Decimal(df.at[accIndex, 'CurrBal'])
+
+        if not accountID or not amount:
+            return jsonify(success=False, message="Account ID and deposit amount are required.")
+
+        try:
+            amount = Decimal(amount)
+            if amount <= Decimal("0.00"):
+                return jsonify(success=False, message="Deposit amount must be positive.")
+            result = deposit(accountID, amount)
+        except ValueError:
+            return jsonify(success=False, message="Invalid account ID or deposit amount format.")
+
+        if result["status"] == "success":
+            bal += Decimal(amount)
+            df.at[accIndex, 'CurrBal'] = Decimal(bal)
+            df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+            df.to_csv(accPath, index=False)
+            return jsonify(success=True, message="Deposit completed.")
+        else:
+            return jsonify(success=False, message=result["message"])
+
     except Exception as e:
-        return jsonify(success=False, message=str(e)), 500
+        print(f"Deposit failed: {e}")
+        return jsonify(success=False, message="Deposit failed.")
+    
+@employee_bp.route("/withdraw", methods=["POST"])
+def withdraw():
+    from scripts.withdrawMoney import withdraw
+    data = request.get_json()
+
+    try:
+        accPath = get_csv_path("accounts.csv")
+        df = pd.read_csv(accPath)
+        df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        
+        accountID = data.get("accountId").strip()
+        amount = data.get("amount").strip()
+        accountID = int(accountID)
+
+        accIndex = df.loc[df['AccountID'] == accountID].index[0]
+
+        bal = Decimal(df.at[accIndex, 'CurrBal'])
+
+        if not accountID or not amount:
+            return jsonify(success=False, message="Account ID and withdrawal amount are required.")
+
+        try:
+            accountID = int(accountID)
+            amount = Decimal(amount)
+            if amount <= Decimal("0.00"):
+                return jsonify(success=False, message="Withdrawal amount must be positive.")
+            result = withdraw(accountID, amount)
+        except ValueError:
+            return jsonify(success=False, message="Invalid account ID or withdrawal amount format.")
+
+        if result["status"] == "success":
+            bal -= Decimal(amount)
+            df.at[accIndex, 'CurrBal'] = Decimal(bal)
+            df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+            df.to_csv(accPath, index=False)
+            return jsonify(success=True, message="Withdrawal completed.")
+        else:
+            return jsonify(success=False, message=result["message"])
+
+    except Exception as e:
+        print(f"Withdrawal failed: {e}")
+        return jsonify(success=False, message="Withdrawal failed.")
 
 @employee_bp.route("/transfer", methods=["POST"])
-def record_transfer():
+def transfer():
+    from scripts.fundTransfer import transferFunds
     data = request.get_json()
-    from_account = data.get("fromAccount")
-    to_account = data.get("toAccount")
-    amount = float(data.get("amount"))
 
     try:
-        transfer_funds(from_account, to_account, amount)
-        return jsonify(success=True)
+        accPath = get_csv_path("accounts.csv")
+        df = pd.read_csv(accPath)
+        df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        
+        src_account = data.get("sourceAccountId").strip()
+        dest_account = data.get("destinationAccountId").strip()
+        amount = data.get("amount").strip()
+
+        src_account = int(src_account)
+        dest_account = int(dest_account)
+        amount = Decimal(amount)
+
+        src_index = df.loc[df['AccountID'] == src_account].index[0]
+        dest_index = df.loc[df['AccountID'] == dest_account].index[0]
+
+        srcBal = Decimal(df.at[src_index, 'CurrBal'])
+        destBal = Decimal(df.at[dest_index, 'CurrBal'])
+
+        if not src_account or not dest_account or not amount:
+            return jsonify(success=False, message="Source Account ID, Destination Account ID, and transfer amount are required.")
+
+        try:
+            if amount <= Decimal("0.00"):
+                return jsonify(success=False, message="Transfer amount must be positive.")
+            if src_account == dest_account:
+                return jsonify(success=False, message="Source and destination accounts cannot be the same.")
+            result = transferFunds(src_account, dest_account, amount)
+        except ValueError:
+            return jsonify(success=False, message="Invalid account ID or transfer amount format.")
+
+        if result["status"] == "success":
+            srcBal -= Decimal(amount)
+            destBal += Decimal(amount)
+            df.at[src_index, 'CurrBal'] = Decimal(srcBal)
+            df.at[dest_index, 'CurrBal'] = Decimal(destBal)
+            df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+            df.to_csv(accPath, index=False)
+            return jsonify(success=True, message="Transfer completed.")
+        else:
+            return jsonify(success=False, message=result["message"])
+
     except Exception as e:
-        return jsonify(success=False, message=str(e)), 500
+        print(f"Transfer failed: {e}")
+        return jsonify(success=False, message="Transfer failed.")
 
 @employee_bp.route("/teller-login", methods=["GET", "POST"])
 def teller_login():

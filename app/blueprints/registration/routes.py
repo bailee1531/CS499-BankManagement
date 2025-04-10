@@ -1,4 +1,6 @@
 import pandas as pd
+from decimal import Decimal
+from datetime import date, timedelta
 from flask import (
     Blueprint, render_template, request, redirect,
     url_for, session
@@ -7,6 +9,7 @@ import logging
 
 # Import forms for registration and deposit
 from app.blueprints.registration.forms import (
+    TellerUsernameForm,
     RegistrationStep1Form, 
     RegistrationStep2Form, 
     RegistrationStep3Form, 
@@ -16,6 +19,8 @@ from app.blueprints.registration.forms import (
 # Import customer operations and utilities for account creation
 from scripts.customer import webLogin, openAcc
 from scripts import createCreditCard
+from scripts import createCreditCard
+from scripts.billPayment import scheduleBillPayment
 
 # Import shared utilities for checking account type and managing flash messages
 from app.blueprints.sharedUtilities import (
@@ -129,6 +134,7 @@ def register_step3():
         Response: Redirects to deposit form or dashboard on success, otherwise renders registration form.
     """
     form = RegistrationStep3Form()
+
     if form.validate_on_submit():
         registration = session.get('registration')
         if not registration:
@@ -139,7 +145,7 @@ def register_step3():
         registration['account_type'] = form.account_type.data
         session['registration'] = registration
 
-        # Attempt to create a new customer account using webLogin utility
+        # Attempt to create a new customer account
         login_result = webLogin.login_page_button_pressed(
             NEW_ACCOUNT,
             "Customer",
@@ -154,42 +160,74 @@ def register_step3():
             registration['security_answer_1'],
             registration['security_answer_2'],
         )
+
         if login_result.get("status") == "error":
             flash_error(login_result.get("message", "Registration failed"))
             return redirect(url_for('registration.register_step1'))
 
-        # Retrieve the customer ID and handle account creation
+        # Retrieve the new customer's ID
         try:
             customer_id = get_customer_id_by_username(registration['username'])
         except Exception as e:
             flash_error(f"Error retrieving customer ID: {str(e)}")
             return redirect(url_for('registration.register_step1'))
 
-        # Set session variables for a successful registration
+        # Set session data
         session["customer_id"] = customer_id
         session["customer"] = registration["username"]
 
-        # Open the specific account type (e.g., travel visa)
-        if registration['account_type'] == 'Travel_Visa':
+        if registration['account_type'] == 'Credit Card':
             try:
+                # Create credit card account
                 createCreditCard.openCreditCardAccount(customer_id)
-                flash_success("Travel visa account opened successfully!")
+
+                # Get the newly created account
+                accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+                new_card = accounts_df[
+                    (accounts_df["CustomerID"] == customer_id) &
+                    (accounts_df["AccountType"] == "Credit Card")
+                ].iloc[-1]
+
+                # Schedule initial bill payment
+                bill_payment_result = scheduleBillPayment(
+                    customerID=customer_id,
+                    payeeName="Evergreen Bank",
+                    payeeAddress="Somewhere In The World",
+                    amount=Decimal("0"),
+                    dueDate=(date.today() + timedelta(days=30)).isoformat(),
+                    paymentAccID=new_card["AccountID"]
+                )
+
+                # Handle result
+                if bill_payment_result.get("status") == "success":
+                    flash_success(bill_payment_result.get("message"))
+                else:
+                    flash_error(bill_payment_result.get("message"))
+
+                flash_success("Visa credit card account opened successfully! Your first bill is due in 30 days.")
                 session.pop('registration', None)
                 return redirect(url_for('customer.customer_dashboard'))
+
             except Exception as e:
-                flash_error(f"Unable to open travel visa account: {str(e)}")
+                flash_error(f"Unable to open Visa credit account: {str(e)}")
                 return redirect(url_for('registration.register_step1'))
 
-        # For other account types, mark pending deposit step
-        session['pending_account_type'] = registration['account_type']
-        session['pending_account_name'] = registration['account_type']
-        session.pop('registration', None)
-        flash_success("Registration complete! Please proceed with your initial deposit to open your account.")
-        return redirect(url_for('registration.deposit_form'))
+        elif registration['account_type'] == 'Mortgage Loan':
+            # Redirect to mortgage application page to initiate loan
+            return redirect(url_for('accounts.mortgage_application'))
+
+        else:
+            # For other account types, go to deposit form
+            session['pending_account_type'] = registration['account_type']
+            session['pending_account_name'] = registration['account_type']
+            session.pop('registration', None)
+            flash_success("Registration complete! Please proceed with your initial deposit to open your account.")
+            return redirect(url_for('registration.deposit_form'))
 
     return render_template('registration/register_step3.html', form=form)
 
-@register_bp.route('/deposit-registration', methods=['GET', 'POST'])
+
+@register_bp.route('/deposit', methods=['GET', 'POST'])
 def deposit_form():
     """
     Route to handle deposit form submission for opening an account.
@@ -230,55 +268,102 @@ def deposit_form():
         form_action=url_for('registration.deposit_form')
     )
 
-@register_bp.route("/register/teller-step1", methods=["GET", "POST"])
-def register_teller_step1():
-    # Same logic as customer step1, but only allow if session["employee_mode"] is True
+@register_bp.route("/register/teller-username", methods=["GET", "POST"])
+def register_teller_username():
     if not session.get("employee_mode"):
         return redirect(url_for("home"))
-    
-    form = RegistrationStep1Form()
+
+    form = TellerUsernameForm()
+
     if form.validate_on_submit():
-        # Store collected data in session
+        # Read from employees.csv
+        df = pd.read_csv(get_csv_path("employees.csv"))
+        username_input = form.username.data.strip().lower()
+
+        # Match user by lowercased username
+        matched_user = df[df['Username'].str.lower() == username_input]
+
+        if matched_user.empty:
+            flash_error("This username is not recognized. Please ask your admin to create your account.")
+            return redirect(url_for('registration.register_teller_username'))
+
+        # Extract and split username into first and last names
+        user_row = matched_user.iloc[0]
+        full_username = user_row['Username']
+        first_name, last_name = full_username.split('.', 1)
+
+        first_name = first_name.capitalize()
+        last_name = last_name.capitalize()
+
+        # Save pre-filled data in session
         session['registration'] = {
-            'first_name': form.first_name.data,
-            'last_name': form.last_name.data,
+            'first_name': first_name,
+            'last_name': last_name,
+            'username': full_username,
+            'email': f"{first_name}.{last_name}@evergreen.com"
+        }
+
+        return redirect(url_for('registration.register_teller_step1'))
+
+    return render_template("registration/register_teller_username.html", form=form)
+
+@register_bp.route("/register/teller-step1", methods=["GET", "POST"])
+def register_teller_step1():
+    if not session.get("employee_mode"):
+        return redirect(url_for("home"))
+
+    registration = session.get("registration", {})
+    if "username" not in registration:
+        return redirect(url_for("registration.register_teller_username"))
+
+    form = RegistrationStep1Form()
+
+    if form.validate_on_submit():
+        session['registration'].update({
             'address': form.address.data,
             'phone_number': form.phone_number.data,
             'tax_id': form.tax_id.data,
             'birthday': form.birthday.data,
-        }
+        })
+        session.modified = True
         return redirect(url_for('registration.register_teller_step2'))
-    return render_template('registration/register_teller_step1.html', form=form)
+
+    # Pre-fill first and last name from session
+    form.first_name.data = registration.get("first_name", "")
+    form.last_name.data = registration.get("last_name", "")
+
+
+    return render_template('registration/register_teller_step1.html', form=form, disable_name_fields=True)
 
 @register_bp.route("/register/teller-step2", methods=["GET", "POST"])
 def register_teller_step2():
     if not session.get("employee_mode"):
         return redirect(url_for("home"))
 
+    registration = session.get('registration', {})
+    required_keys = ['first_name', 'last_name', 'username', 'address', 'phone_number', 'tax_id', 'birthday']
+
+    if not all(key in registration for key in required_keys):
+        flash_error("Your session has expired or is incomplete. Please restart the registration.")
+        return redirect(url_for('registration.register_teller_username'))
+
     form = RegistrationStep2Form()
 
+    # Pre-fill and disable username and email
+    form.username.data = registration['username']
+    form.email.data = registration['email']
+    form.confirm_email.data = registration['email']
+
     if form.validate_on_submit():
-        registration = session.get('registration', {})
-        if not registration:
-            flash_error("Your session has expired. Please restart the registration process.")
-            return redirect(url_for('registration.register_teller_step1'))
-
-        # Check if the username already exists in employees.csv
-        usernames = pd.read_csv(get_csv_path("employees.csv"))['Username'].str.lower()
-        if form.username.data.lower() not in usernames.values:
-            flash_error("This username is not recognized. Please make sure an admin created your employee account first.")
-            return redirect(url_for('registration.register_teller_step1'))
-
-        # Combine step 1 and step 2 data into one call
         result = webLogin.login_page_button_pressed(
             NEW_ACCOUNT,
             "Teller",
-            form.username.data,
+            registration['username'],  # Use from session
             form.password.data,
             registration['first_name'],
             registration['last_name'],
             registration['address'],
-            form.email.data,
+            registration['email'],
             registration['phone_number'],
             registration['tax_id'],
             form.security_answer_1.data,
@@ -289,13 +374,11 @@ def register_teller_step2():
             flash_error(result.get("message", "Registration failed."))
             return redirect(url_for('registration.register_teller_step1'))
 
-        # Successful creation — log in and redirect
+        # Registration success
         session.clear()
-        session['teller'] = form.username.data
+        session['teller'] = registration['username']
         session['role'] = 'teller'
-        session.pop("employee_mode", None)
-
         flash_success("Welcome to your dashboard!")
         return redirect(url_for("employee.teller_dashboard"))
 
-    return render_template("registration/register_teller_step2.html", form=form)
+    return render_template("registration/register_teller_step2.html", form=form, disable_username=True, disable_email_field=True, disable_confirm_email_field=True)

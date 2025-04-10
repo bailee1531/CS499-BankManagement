@@ -19,21 +19,27 @@
 
   <div class="teller-controls">
     <input type="text" id="searchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+    <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
   </div>
 
   <!-- Grid of customer cards -->
   <div class="customer-grid" id="customerGrid">
     {% for customer in customers %}
-    <div class="customer-card" onclick="openCustomerModal('{{ customer.CustomerID }}', '{{ customer.Username }}', '{{ customer.Password }}', '{{ customer.AccountNumber }}', '{{ customer.Interest1099INT }}')">
+    <div class="customer-card" onclick="openCustomerModal(
+      '{{ customer.CustomerID }}',
+      '{{ customer.Username }}',
+      '{{ customer.FirstName }}',
+      '{{ customer.LastName }}',
+      '{{ customer.PhoneNum }}',
+      '{{ customer.Email }}',
+      '{{ customer.Address }}')">
       <div class="avatar"></div>
       <div class="customer-info">
         <strong>{{ customer.Username }}</strong>
-        <p>Account #: {{ customer.AccountNumber }}</p>
-        <p>1099-INT: ${{ customer.Interest1099INT }}</p>
+        <p>Customer ID: {{ customer.CustomerID }}</p>
       </div>
       <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
       <button class="open-account-btn" onclick="event.stopPropagation(); openAccountsModal('{{ customer.CustomerID }}')">View Accounts</button>
-
     </div>
     {% endfor %}
   </div>
@@ -42,47 +48,234 @@
 <!-- Customer Modal -->
 <div id="customerModal" class="modal">
   <div class="modal-content">
+    <a href="{{ url_for('employee.teller_dashboard') }}" class="exit-to-dashboard" title="Exit to Dashboard">Exit</a>
     <span class="close" onclick="closeCustomerModal()">&times;</span>
-    <h2>Customer Info</h2>
-    <p><strong>Username:</strong> <span id="modalUsername"></span></p>
-    <p><strong>Password:</strong> <span id="modalPassword"></span></p>
-    <p><strong>Account #:</strong> <span id="modalAccount"></span></p>
-    <h3>Edit Username</h3>
-    <input type="text" id="editUsernameInput" placeholder="New Username">
-    <button onclick="submitUsernameEdit()">Update Username</button>
-    <hr>
-    <h3>Reset Password</h3>
-    <input type="password" id="oldPasswordInput" placeholder="Old Password">
-    <input type="password" id="newPasswordInput" placeholder="New Password">
-    <button onclick="resetCustomerPassword()">Reset Password</button>
-    <div class="modal-buttons">
-      <button onclick="submitCustomerDelete()">Delete Customer</button>
+    
+    <div class="modal-left">
+      <!-- Customer Info Panel -->
+      <div id="customerInfoPanel">
+        <h2>Customer Info</h2>
+    
+        <div class="form-group">
+          <label>Username</label>
+          <div id="modalUsername" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Customer ID</label>
+          <div id="modalCustomerID" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>First Name</label>
+          <div id="modalFirstName" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <div id="modalLastName" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <div id="modalPhone" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <div id="modalEmail" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <div id="modalAddress" class="readonly-field"></div>
+        </div>
+      </div>
+    
+      <!-- User's Accounts Panel -->
+      <div id="userAccountsPanel" style="display: none;">
+        <h2>User's Accounts</h2>
+        <div id="userAccounts" class="readonly-field scroll-box"></div>
+      </div>
     </div>
-    <hr>
-    <div class="modal-buttons">
-      <button onclick="openTransactionModal('deposit')">Deposit</button>
-      <button onclick="openTransactionModal('withdraw')">Withdraw</button>
-      <button onclick="openTransactionModal('transfer')">Transfer</button>
+
+    <div class="modal-right">
+      <!-- Edit Username -->
+      <h3>Edit Username</h3>
+      <input type="text" id="editUsernameInput" placeholder="New Username">
+      <button onclick="submitUsernameEdit()">Update Username</button>
+      <hr>
+    
+      <!-- Reset Password -->
+      <h3>Reset Password</h3>
+      <input type="password" id="oldPasswordInput" placeholder="Old Password">
+      <input type="password" id="newPasswordInput" placeholder="New Password">
+      <button onclick="resetCustomerPassword()">Reset Password</button>
+      <hr>
+
+      <!-- Toggle Button -->
+      <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+    
+      <!-- Open New Account + Transaction Buttons -->
+      <h3>Open New Account</h3>
+      <select id="accountType" onchange="toggleAccountInputs()">
+        <option value="Checking">Checking</option>
+        <option value="Savings">Savings</option>
+        <option value="Money Market">Money Market</option>
+        <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+        <option value="Travel Visa">Travel Visa</option>
+      </select>
+      <!-- Deposit input -->
+      <input type="number" id="initialDeposit" placeholder="Initial Deposit">
+
+      <!-- Mortgage inputs -->
+      <input type="number" id="loanAmount" placeholder="Loan Amount" style="display:none;">
+      <input type="number" id="loanTerm" placeholder="Years" style="display:none;">
+
+      <!-- Credit card note -->
+      <input type="text" id="creditNote" placeholder="N/A for credit cards" disabled style="display:none; background-color: #eee; color: #888;">
+
+      <button onclick="submitAccountOpen()">Open Account</button>
+    
+      <div class="modal-buttons" style="margin-top: 10px;">
+        <button onclick="openDepositModal()">Deposit</button>
+        <button onclick="openWithdrawModal()">Withdraw</button>
+        <button onclick="openTransferModal()">Transfer</button>
+      </div>
+    
+      <hr>
+      <!-- Delete Button Last -->
+      <div class="modal-buttons" style="margin-top: 10px;">
+        <button onclick="submitCustomerDelete()">Delete Customer</button>
+      </div>
     </div>
   </div>
 </div>
 
+<div id="openAccountModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAccountModal()">&times;</span>
+    <div id="modalScrollWrapper" style="max-height: 75vh; overflow-y: auto; padding-right: 10px;">
+      <div id="accountTypePage">
+        <h2 style="text-align:center;">Step 1: Select Account Type</h2>
+        <select id="accountTypeSelect">
+          <option value="" disabled selected>Select Account Type</option>
+          <option value="Checking">Checking</option>
+          <option value="Savings">Savings</option>
+          <option value="Money Market">Money Market</option>
+          <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+          <option value="Travel Visa">Travel Visa</option>
+        </select>
+        <button class="create-btn" onclick="goToAccountInfoPage()">Next</button>
+      </div>
+
+      <div id="accountInfoPage" style="display: none;">
+        <h2 style="text-align:center;">Step 2: Customer Info</h2>
+        <input type="text" id="newFirstName" placeholder="First Name" required>
+        <input type="text" id="newLastName" placeholder="Last Name" required>
+        <input type="text" id="newUsername" placeholder="Username" required>
+        <input type="password" id="newPassword" placeholder="Password" required>
+        <input type="text" id="newSSN" placeholder="SSN (e.g. 123-45-6789)" required>
+        <input type="email" id="newEmail" placeholder="Email" required>
+        <input type="tel" id="newPhone" placeholder="Phone (e.g. 000-000-0000)" required>
+
+        <select id="securityQuestion1" required>
+          <option value="" disabled selected>Select First Security Question</option>
+          <option value="mother_child">Who is your Mother's favorite child?</option>
+          <option value="chicken_name">What would you name a chicken if you owned one?</option>
+          <option value="first_gamertag">What was your first gamertag?</option>
+          <option value="childhood_dream">What was your dream career as a child?</option>
+          <option value="least_favorite_relative">Who is your least favorite relative?</option>
+          <option value="first_anime">What was your first anime?</option>
+          <option value="longest_word">What is the longest word you can spell without spell check?</option>
+          <option value="favorite_food">What is your favorite food?</option>
+          <option value="never_visit">Where would you never visit even if you were on your last breath?</option>
+          <option value="remove_kindly">If you could kindly remove someone from the history books, who would it be?</option>
+          <option value="only_eat">If you could only eat one meal for the rest of your life, what would it be?</option>
+          <option value="musical_experts">What musical do you know well enough to sing every song?</option>
+          <option value="best_spiderman">Who was the best Spider-Man?</option>
+          <option value="worst_film">What was the worst film ever created?</option>
+        </select>
+        <input type="text" id="securityAnswer1" placeholder="Answer to First Question" required>
+        
+        <select id="securityQuestion2" required>
+          <option value="" disabled selected>Select Second Security Question</option>
+          <option value="mother_child">Who is your Mother's favorite child?</option>
+          <option value="chicken_name">What would you name a chicken if you owned one?</option>
+          <option value="first_gamertag">What was your first gamertag?</option>
+          <option value="childhood_dream">What was your dream career as a child?</option>
+          <option value="least_favorite_relative">Who is your least favorite relative?</option>
+          <option value="first_anime">What was your first anime?</option>
+          <option value="longest_word">What is the longest word you can spell without spell check?</option>
+          <option value="favorite_food">What is your favorite food?</option>
+          <option value="never_visit">Where would you never visit even if you were on your last breath?</option>
+          <option value="remove_kindly">If you could kindly remove someone from the history books, who would it be?</option>
+          <option value="only_eat">If you could only eat one meal for the rest of your life, what would it be?</option>
+          <option value="musical_experts">What musical do you know well enough to sing every song?</option>
+          <option value="best_spiderman">Who was the best Spider-Man?</option>
+          <option value="worst_film">What was the worst film ever created?</option>
+        </select>
+        <input type="text" id="securityAnswer2" placeholder="Answer to Second Question" required>
+
+        <div class="modal-buttons">
+          <button onclick="goBackToAccountType()">Back</button>
+          <button class="create-btn" onclick="submitOpenAccount()">Create Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Deposit Modal -->
 <div id="depositModal" class="modal">
-  <div class="modal-content" style="background-color: #434343;">
-    <span class="close" onclick="closeTransactionModal('deposit')">&times;</span>
-    <h2 id="transactionTypeTitle" style="color: white;">Deposit</h2>
-    <form action="{{ url_for('employee.teller_dashboard') }}" method="post" novalidate>
-      {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
-      <div class="form-group" style="color: white;">
-        <label for="{{ form.amount.id }}">{{ form.amount.label.text }}</label>
-        {{ form.amount(size=32, **{'class': 'form-control', 'id': form.amount.id, 'aria-describedby': 'deposit-help'}) }}
-        <small id="deposit-help" class="visually-hidden">
-          Enter a valid amount in USD to transfer between your accounts.
-        </small>
+  <div class="modal-content">
+      <span class="close" onclick="closeDepositModal()">&times;</span>
+      <h2 style="text-align:center;">Deposit Funds</h2>
+
+      <label for="depositAccountId">Account ID:</label>
+      <input type="number" id="depositAccountId" name="accountId" placeholder="Enter Account ID" required>
+
+      <label for="depositAmount">Amount to Deposit:</label>
+      <input type="number" step="0.01" id="depositAmount" name="amount" placeholder="Enter Amount (e.g., 100.50)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeDepositModal()">Cancel</button>
+          <button class="action-btn" onclick="submitDeposit()">Deposit</button>
       </div>
-      <button class='submit-btn' type="submit" style="width: 60%; background-color: #7e7f9a;">Complete Deposit</button>
-    </form>
+  </div>
+</div>
+
+<div id="withdrawModal" class="modal">
+  <div class="modal-content">
+      <span class="close" onclick="closeWithdrawModal()">&times;</span>
+      <h2 style="text-align:center;">Withdraw Funds</h2>
+
+      <label for="withdrawAccountId">Account ID:</label>
+      <input type="number" id="withdrawAccountId" name="accountId" placeholder="Enter Account ID" required>
+
+      <label for="withdrawAmount">Amount to Withdraw:</label>
+      <input type="number" step="0.01" id="withdrawAmount" name="amount" placeholder="Enter Amount (e.g., 50.00)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeWithdrawModal()">Cancel</button>
+          <button class="action-btn" onclick="submitWithdraw()">Withdraw</button>
+      </div>
+  </div>
+</div>
+
+<div id="transferModal" class="modal">
+  <div class="modal-content">
+      <span class="close" onclick="closeTransferModal()">&times;</span>
+      <h2 style="text-align:center;">Transfer Funds</h2>
+
+      <label for="sourceAccountId">Source Account ID:</label>
+      <input type="number" id="sourceAccountId" name="sourceAccountId" placeholder="Enter Source Account ID" required>
+
+      <label for="destinationAccountId">Destination Account ID:</label>
+      <input type="number" id="destinationAccountId" name="destinationAccountId" placeholder="Enter Destination Account ID" required>
+
+      <label for="transferAmount">Amount to Transfer:</label>
+      <input type="number" step="0.01" id="transferAmount" name="amount" placeholder="Enter Amount (e.g., 25.00)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeTransferModal()">Cancel</button>
+          <button class="action-btn" onclick="submitTransfer()">Transfer</button>
+      </div>
   </div>
 </div>
 
@@ -92,8 +285,11 @@
     <span class="close" onclick="closeAccountModal()">&times;</span>
     <h2>Open New Account</h2>
     <select id="accountType">
+      <option value="Checking">Checking</option>
       <option value="Savings">Savings</option>
       <option value="Money Market">Money Market</option>
+      <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+      <option value="Travel Visa">Travel Visa</option>
     </select>
     <input type="number" id="initialDeposit" placeholder="Initial Deposit">
     <button onclick="submitAccountOpen()">Open</button>
@@ -124,7 +320,6 @@
 
 <script>
 let currentCustomerID = null;
-let transactionType = null;
 let openAccountCustomerID = null;
 
 function filterCustomers() {
@@ -144,30 +339,180 @@ function setModalTextContent(ids, values) {
   });
 }
 
-function openCustomerModal(id, username, password, account, interest) {
-  currentCustomerID = id;
+function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
+  currentCustomerID = customerID;
 
   setModalTextContent(
-    ["modalUsername", "modalPassword", "modalAccount"],
-    [username, password, account, interest]
+    [
+      "modalUsername",
+      "modalCustomerID",
+      "modalFirstName",
+      "modalLastName",
+      "modalPhone",
+      "modalEmail",
+      "modalAddress"
+    ],
+    [
+      username,
+      customerID,
+      firstName,
+      lastName,
+      phone,
+      email,
+      address
+    ]
   );
 
   document.getElementById("editUsernameInput").value = "";
   document.getElementById("customerModal").style.display = "flex";
+  toggleAccountInputs();
 }
 
 function closeCustomerModal() {
   document.getElementById("customerModal").style.display = "none";
 }
 
-function openTransactionModal(type) {
-  transactionType = type + "Modal";
-  document.getElementById(transactionType).style.display = "flex";
+function openDepositModal() {
+    document.getElementById("depositModal").style.display = "block";
 }
 
-function closeTransactionModal(type) {
-  transactionType = type + "Modal";
-  document.getElementById(transactionType).style.display = "none";
+function closeDepositModal() {
+    document.getElementById("depositModal").style.display = "none";
+}
+
+function submitDeposit() {
+    const accountId = document.getElementById("depositAccountId").value;
+    const amount = document.getElementById("depositAmount").value;
+
+    if (!accountId || !amount) {
+        alert("Please enter both Account ID and the deposit amount.");
+        return;
+    }
+
+    const payload = {
+        accountId: accountId,
+        amount: amount
+    };
+
+    fetch("/employee/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Failed to process deposit.");
+        console.error(err);
+    });
+}
+
+function openWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "block";
+}
+
+function closeWithdrawModal() {
+    document.getElementById("withdrawModal").style.display = "none";
+}
+
+function submitWithdraw() {
+    const accountId = document.getElementById("withdrawAccountId").value;
+    const amount = document.getElementById("withdrawAmount").value;
+
+    if (!accountId || !amount) {
+        alert("Please enter both Account ID and the withdrawal amount.");
+        return;
+    }
+
+    const payload = {
+        accountId: accountId,
+        amount: amount
+    };
+
+    fetch("/employee/withdraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Failed to process withdrawal.");
+        console.error(err);
+    });
+}
+
+function openTransferModal() {
+    document.getElementById("transferModal").style.display = "block";
+}
+
+function closeTransferModal() {
+    document.getElementById("transferModal").style.display = "none";
+}
+
+function submitTransfer() {
+    const sourceAccountId = document.getElementById("sourceAccountId").value;
+    const destinationAccountId = document.getElementById("destinationAccountId").value;
+    const amount = document.getElementById("transferAmount").value;
+
+    if (!sourceAccountId || !destinationAccountId || !amount) {
+        alert("Please enter Source Account ID, Destination Account ID, and the transfer amount.");
+        return;
+    }
+
+    const payload = {
+        sourceAccountId: sourceAccountId,
+        destinationAccountId: destinationAccountId,
+        amount: amount
+    };
+
+    fetch("/employee/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Failed to process transfer.");
+        console.error(err);
+    });
+}
+
+window.onclick = function(event) {
+    const depositModal = document.getElementById("depositModal");
+    const withdrawModal = document.getElementById("withdrawModal");
+    const transferModal = document.getElementById("transferModal");
+    if (event.target == depositModal) {
+        depositModal.style.display = "none";
+    }
+    if (event.target == withdrawModal) {
+        withdrawModal.style.display = "none";
+    }
+    if (event.target == transferModal) {
+        transferModal.style.display = "none";
+    }
 }
 
 function submitUsernameEdit() {
@@ -234,7 +579,7 @@ function submitCustomerDelete() {
         return;
       }
 
-      // Step 2: Proceed with deletion
+      // Step 2: Delete
       fetch("/employee/delete-customer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -256,17 +601,53 @@ function submitCustomerDelete() {
     });
 }
 
-function submitTransaction() {
-  const amount = document.getElementById("transactionAmount").value;
-  const target = document.getElementById("targetAccount").value;
-  fetch(`/employee/${transactionType}-customer`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerID: currentCustomerID, amount, target })
-  }).then(res => res.json()).then(data => {
-    if (data.success) location.reload();
-    else alert("Transaction failed: " + data.message);
-  });
+function viewCustomerAccounts() {
+  if (!currentCustomerID) return;
+
+  fetch(`/employee/get-accounts/${currentCustomerID}`)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("userAccounts");
+      if (!container) return;
+
+      if (data.success && data.accounts.length > 0) {
+        const formatted = data.accounts.map(acc =>
+          `• AccountID: ${acc.AccountID}
+  Type: ${acc.AccountType}
+  Balance: $${parseFloat(acc.CurrBal).toFixed(2)}
+  Opened: ${acc.DateOpened}${acc.CreditLimit ? `\n  Credit Limit: $${parseFloat(acc.CreditLimit).toFixed(2)}` : ""}`
+        ).join('\n\n');
+
+        container.textContent = formatted;
+      } else {
+        container.textContent = "This user has no accounts.";
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching accounts:", err);
+      document.getElementById("userAccounts").textContent = "Error loading accounts.";
+    });
+}
+
+let showingAccounts = false;
+
+function toggleCustomerView() {
+  const infoPanel = document.getElementById("customerInfoPanel");
+  const accountsPanel = document.getElementById("userAccountsPanel");
+  const toggleBtn = document.getElementById("toggleAccountsBtn");
+
+  showingAccounts = !showingAccounts;
+
+  if (showingAccounts) {
+    infoPanel.style.display = "none";
+    accountsPanel.style.display = "block";
+    toggleBtn.textContent = "Customer Info";
+    viewCustomerAccounts(); // Load accounts only when showing
+  } else {
+    infoPanel.style.display = "block";
+    accountsPanel.style.display = "none";
+    toggleBtn.textContent = "User's Accounts";
+  }
 }
 
 function openAccountModal(id) {
@@ -282,13 +663,24 @@ function closeAccountModal() {
 
 function submitAccountOpen() {
   const type = document.getElementById("accountType").value;
-  const deposit = parseFloat(document.getElementById("initialDeposit").value);
-  if (isNaN(deposit)) return alert("Enter a valid deposit amount.");
+  let payload = { customerID: currentCustomerID, accountType: type };
+
+  if (["Checking", "Savings", "Money Market"].includes(type)) {
+    const deposit = parseFloat(document.getElementById("initialDeposit").value);
+    if (isNaN(deposit)) return alert("Enter a valid deposit amount.");
+    payload.depositAmount = deposit;
+  } else if (type === "Home Mortgage Loan") {
+    const amount = parseFloat(document.getElementById("loanAmount").value);
+    const years = parseInt(document.getElementById("loanTerm").value);
+    if (isNaN(amount) || isNaN(years)) return alert("Enter valid loan details.");
+    payload.loanAmount = amount;
+    payload.loanTerm = years;
+  }
 
   fetch("/employee/open-account", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerID: openAccountCustomerID, accountType: type, depositAmount: deposit })
+    body: JSON.stringify(payload)
   }).then(res => res.json()).then(data => {
     if (data.success) location.reload();
     else alert("Failed to open account: " + data.message);

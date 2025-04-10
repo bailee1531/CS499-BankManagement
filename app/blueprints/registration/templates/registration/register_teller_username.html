@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Teller Username Verification{% endblock %}
+
+{% block content %}
+<main>
+  <section class="register-container">
+    <h2>Teller Registration</h2>
+    <form method="post">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        <label for="username">Enter your Admin created username.</label>
+        {{ form.username(class="form-control", placeholder="username") }}
+        {% if form.username.errors %}
+        <div class="error-message">
+          {% for error in form.username.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn--login">Continue</button>
+    </form>
+  </section>
+</main>
+{% endblock %}

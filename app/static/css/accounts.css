@@ -208,6 +208,60 @@ fieldset.accounts-container {
     margin: 0 0.5rem;
 }
 
+.archived-loans-section {
+    background-color: var(--bg-box);
+    padding: 2rem 1rem;
+    border-radius: var(--container-border-radius);
+    margin-top: 3rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.archived-loans-section h2 {
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.archived-loans-container {
+    background-color: var(--dark-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    color: var(--white);
+}
+
+.archived-loans-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.archived-loans-container .transaction-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #555;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.archived-loans-container .transaction-item:last-child {
+    border-bottom: none;
+}
+
+.archived-loans-container .transaction-info,
+.archived-loans-container .transaction-date {
+    font-size: 1rem;
+}
+
+  
+
 /* =======================================
    Global Main Content Area Padding
 ======================================= */
