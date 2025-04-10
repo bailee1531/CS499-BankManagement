@@ -8,74 +8,83 @@
   <script src="{{ url_for('static', filename='js/collapsible_sections.js') }}" defer></script>
   <script>
     const transactionApiUrl = "{{ url_for('customer.get_transactions', account_id=account.AccountID) }}";
+    const archivedBillsApiUrl = "{{ url_for('customer.get_archived_bills', account_id=account.AccountID) }}";
+    window.accountId = {{ account.AccountID | tojson | safe }};
   </script>
   <script src="{{ url_for('static', filename='js/update-transactions.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/update-archive.js') }}" defer></script>
 {% endblock %}
-
 
 {% block content %}
 <main class="account-page">
   <div class="account-summary">
-    <!-- Display Account Name using updated h1 styling -->
-    <h1>{{ account.account_type }}</h1>
-    
-    <!-- Display Total Account Balance with two decimal places -->
-    <h2>Total Balance: $<span id="accountBalance">{{ "{:.2f}".format(account.curr_bal | default(0)) }}</span></h2>
+    <h1>{{ account.AccountType }}</h1>
+    <h2>Total Balance: $<span id="accountBalance">{{ "{:.2f}".format(account.CurrBal | default(0)) }}</span></h2>
 
-   <!-- Deposit, Withdrawal, and Transfer Buttons -->
-    <div class="transaction-buttons">
-      <button id="depositBtn" class="account-btn" type="button" onclick="window.location.href='/deposit';">Deposit</button>
-      <button id="withdrawalBtn" class="account-btn" type="button" onclick="window.location.href='/withdraw';">Withdraw</button>
-      {% if accounts|length > 1 %}
-      <a id="transferBtn" class="account-btn" href="{{ url_for('customer.transfer_funds') }}">Transfer</a>
+    <!-- Account Details -->
+    <div class="extra-account-info">
+      <p><span class="info-label">Date Opened:</span> {{ account.DateOpened }}</p>
+      <p><span class="info-label">Account ID:</span> {{ account.AccountID }}</p>
+      {% if account.account_type in ["Savings", "Money Market"] and extra_info.apr is defined and extra_info.apr is not none %}
+        <p><span class="info-label">APR:</span> {{ "{:.2f}".format(extra_info.apr) }}%</p>
       {% endif %}
-
     </div>
 
-    
-    <!-- Collapsible Sections for Transactions -->
+    <!-- Extra Transaction Buttons -->
+    <div class="transaction-buttons">
+      <button id="depositBtn" class="account-btn" type="button"
+              onclick="window.location.href='/deposit/{{ account.AccountID }}';">
+        Deposit
+      </button>
+
+      <button id="withdrawBtn" class="account-btn" type="button"
+              onclick="window.location.href='/withdraw/{{ account.AccountID }}';">
+        Withdraw
+      </button>
+
+      <button id="transferBtn" class="account-btn" type="button"
+        onclick="window.location.href='{{ url_for('customer.transfer_funds') | safe }}';">
+        Transfer
+      </button>
+
+
+      <button id="payBillBtn" class="account-btn" type="button"
+              onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">
+        Pay Bill
+      </button>
+    </div>
+
+
+    <!-- Collapsible: Transactions -->
     <div class="transactions-section">
-      <!-- Current Transactions Section -->
-      <button class="account-btn toggle-btn" data-target="current-transactions" data-label="Current Transactions">
-        Show Current Transactions
+      <button class="account-btn toggle-btn" data-target="transactions-container" data-label="Transactions">
+        Show Transactions
       </button>
-      <section id="current-transactions" class="transactions-box" style="display: none;">
-        <h3>Current Transactions (Past 30 Days)</h3>
-        {% if current_transactions %}
-          <ul id="current-transactions-list">
-            {% for txn in current_transactions %}
-              <li class="transaction-item">
-                <div class="transaction-date">{{ txn.TransDate or 'N/A' }}</div>
-                <div class="transaction-info">{{ txn.description }} - ${{ "{:.2f}".format(txn.amount) }}</div>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p id="current-transactions-list">No current transactions available.</p>
-        {% endif %}
+      <section id="transactions-container" class="transactions-box" style="display: none;">
+        <h3>Transactions</h3>
+        <ul id="current-transactions-list">
+          <li>Loading current transactions...</li>
+        </ul>
+
+        <h3>Past Transactions</h3>
+        <ul id="past-transactions-list">
+          <li>Loading past transactions...</li>
+        </ul>
       </section>
-      
-      <!-- Past Transactions Section -->
-      <button class="account-btn toggle-btn" data-target="past-transactions" data-label="Past Transactions">
-        Show Past Transactions
+    </div>
+
+    <!-- Collapsible: Archived Bills -->
+    <div class="transactions-section">
+      <button class="account-btn toggle-btn" data-target="archived-bills-container" data-label="Archived Bills">
+        Show Archived Bills
       </button>
-      <section id="past-transactions" class="transactions-box" style="display: none;">
-        <h3>Past Transactions (Older than 30 Days)</h3>
-        {% if past_transactions %}
-          <ul id="past-transactions-list">
-            {% for txn in past_transactions %}
-              <li class="transaction-item">
-                <div class="transaction-date">{{ txn.TransDate or 'N/A' }}</div>
-                <div class="transaction-info">{{ txn.description }} - ${{ "{:.2f}".format(txn.amount) }}</div>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p id="past-transactions-list">No past transactions available.</p>
-        {% endif %}
+      <section id="archived-bills-container" class="transactions-box" style="display: none;">
+        <h3>Archived Bills</h3>
+        <ul id="archived-bills-list">
+          <li>Loading archived bills...</li>
+        </ul>
       </section>
     </div>
   </div>
 </main>
-
 {% endblock %}

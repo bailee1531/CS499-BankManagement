@@ -39,7 +39,7 @@ Evergreen Bank - Create Account
                 <!-- Email Field -->
                 <div class="form-group">
                     <label for="email">Email Address *</label>
-                    {{ form.email(class="form-control", placeholder="Enter your email address", autocomplete="email") }}
+                    {{ form.email(class="form-control", placeholder="Enter your email address", autocomplete="email", readonly=disable_email) }}
                     {% if form.email.errors %}
                     <div class="error-message">
                         {% for error in form.email.errors %}
@@ -52,7 +52,7 @@ Evergreen Bank - Create Account
                 <!-- Confirm Email Field -->
                 <div class="form-group">
                     <label for="confirm_email">Confirm Email Address *</label>
-                    {{ form.confirm_email(class="form-control", placeholder="Confirm your email address", autocomplete="email") }}
+                    {{ form.confirm_email(class="form-control", placeholder="Confirm your email address", autocomplete="email", readonly=disable_email) }}
                     {% if form.confirm_email.errors %}
                     <div class="error-message">
                         {% for error in form.confirm_email.errors %}

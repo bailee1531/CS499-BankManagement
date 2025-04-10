@@ -14,6 +14,7 @@
 
   <div class="teller-controls">
     <input type="text" id="searchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+    <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
   </div>
 
   <!-- Grid of customer cards -->
@@ -114,7 +115,7 @@
       <!-- Deposit input -->
       <input type="number" id="initialDeposit" placeholder="Initial Deposit">
 
-      <!-- Mortgage-specific inputs -->
+      <!-- Mortgage inputs -->
       <input type="number" id="loanAmount" placeholder="Loan Amount" style="display:none;">
       <input type="number" id="loanTerm" placeholder="Years" style="display:none;">
 
@@ -138,6 +139,64 @@
   </div>
 </div>
 
+<div id="openAccountModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAccountModal()">&times;</span>
+    <div id="modalScrollWrapper" style="max-height: 75vh; overflow-y: auto; padding-right: 10px;">
+      <div id="accountTypePage">
+        <h2 style="text-align:center;">Step 1: Select Account Type</h2>
+        <select id="accountTypeSelect">
+          <option value="" disabled selected>Select Account Type</option>
+          <option value="Checking">Checking</option>
+          <option value="Savings">Savings</option>
+          <option value="Money Market">Money Market</option>
+          <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+          <option value="Travel Visa">Travel Visa</option>
+        </select>
+        <button class="create-btn" onclick="goToAccountInfoPage()">Next</button>
+      </div>
+
+      <div id="accountInfoPage" style="display: none;">
+        <h2 style="text-align:center;">Step 2: Customer Info</h2>
+        <input type="text" id="newFirstName" placeholder="First Name" required>
+        <input type="text" id="newLastName" placeholder="Last Name" required>
+        <input type="text" id="newUsername" placeholder="Username" required>
+        <input type="password" id="newPassword" placeholder="Password" required>
+        <input type="text" id="newSSN" placeholder="SSN (e.g. 123-45-6789)" required>
+        <input type="email" id="newEmail" placeholder="Email" required>
+        <input type="tel" id="newPhone" placeholder="Phone (e.g. 000-000-0000)" required>
+
+        <select id="securityQuestion1" required>
+          <option value="" disabled selected>Select First Security Question</option>
+          <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+          <option value="What is your favorite movie?">What is your favorite movie?</option>
+          <option value="What city were you born in?">What city were you born in?</option>
+          <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+          <option value="What was your dream job as a child?">What was your dream job as a child?</option>
+        </select>
+        <input type="text" id="securityAnswer1" placeholder="Answer to First Question" required>
+
+        <select id="securityQuestion2" required>
+          <option value="" disabled selected>Select Second Security Question</option>
+          <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+          <option value="What is your favorite movie?">What is your favorite movie?</option>
+          <option value="What city were you born in?">What city were you born in?</option>
+          <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+          <option value="What was your dream job as a child?">What was your dream job as a child?</option>
+        </select>
+        <input type="text" id="securityAnswer2" placeholder="Answer to Second Question" required>
+
+        <div class="modal-buttons">
+          <button onclick="goBackToAccountType()">Back</button>
+          <button class="create-btn" onclick="submitOpenAccount()">Create Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Deposit Modal -->
 <div id="depositModal" class="modal">
   <div class="modal-content">
       <span class="close" onclick="closeDepositModal()">&times;</span>
@@ -473,7 +532,7 @@ function submitCustomerDelete() {
         return;
       }
 
-      // Step 2: Proceed with deletion
+      // Step 2: Delete
       fetch("/employee/delete-customer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -605,5 +664,55 @@ function toggleAccountInputs() {
     creditNote.style.display = "block";
   }
 }
+
+function goToAccountInfoPage() {
+  const selectedType = document.getElementById("accountTypeSelect").value;
+  if (!selectedType) return alert("Please select an account type.");
+  window.selectedAccountType = selectedType;
+  document.getElementById("accountTypePage").style.display = "none";
+  document.getElementById("accountInfoPage").style.display = "block";
+}
+
+function goBackToAccountType() {
+  document.getElementById("accountTypePage").style.display = "block";
+  document.getElementById("accountInfoPage").style.display = "none";
+}
+
+function submitOpenAccount() {
+  const payload = {
+    firstName: document.getElementById("newFirstName").value,
+    lastName: document.getElementById("newLastName").value,
+    username: document.getElementById("newUsername").value,
+    password: document.getElementById("newPassword").value,
+    ssn: document.getElementById("newSSN").value,
+    email: document.getElementById("newEmail").value,
+    phone: document.getElementById("newPhone").value,
+    securityQuestion1: document.getElementById("securityQuestion1").value,
+    securityAnswer1: document.getElementById("securityAnswer1").value,
+    securityQuestion2: document.getElementById("securityQuestion2").value,
+    securityAnswer2: document.getElementById("securityAnswer2").value,
+    accountType: window.selectedAccountType
+  };
+
+  fetch("/employee/open-account", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+      location.reload();
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(err => {
+    alert("Failed to open account.");
+    console.error(err);
+  });
+}
+
 </script>
 {% endblock %}

@@ -31,7 +31,8 @@
     {% endif %}
 
     {# Deposit form #}
-    <form class="deposit-form" method="POST" action="{{ url_for('customer.deposit_money') }}">
+    <form class="deposit-form" method="POST" action="{{ url_for('customer.deposit_money', account_id=account_id) }}">
+
       {{ form.hidden_tag() }}
 
       {# Account selection dropdown #}

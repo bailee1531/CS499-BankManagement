@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Account Overview{% endblock %}
+
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/account_overview.css') }}">
+  <script src="{{ url_for('static', filename='js/collapsible_sections.js') }}" defer></script>
+  <script>
+    const transactionApiUrl = "{{ url_for('customer.get_transactions', account_id=account.AccountID) }}";
+    const archivedBillsApiUrl = "{{ url_for('customer.get_archived_bills', account_id=account.AccountID) }}";
+    window.accountId = {{ account.AccountID | tojson | safe }};
+  </script>
+  <script src="{{ url_for('static', filename='js/update-transactions.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/update-archive.js') }}" defer></script>
+  {% if account.AccountType == "Credit Card" %}
+  <script src="{{ url_for('static', filename='js/update-bill-amount.js') }}" defer></script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<main class="account-page">
+  <div class="account-summary">
+    <h1>{{ account.AccountType }}</h1>
+    <h2>Total Balance: $<span id="accountBalance">{{ "{:.2f}".format(account.CurrBal | default(0)) }}</span></h2>
+
+
+
+    <!-- Account Details -->
+    <div class="extra-account-info">
+      <p><span class="info-label">Date Opened:</span> {{ account.DateOpened }}</p>
+      <p><span class="info-label">Account ID:</span> {{ account.AccountID }}</p>
+      <p><span class="info-label">Bill Due Date:</span> {{ extra_info.due_date | default('N/A', true) }}</p>
+      <p><span class="info-label">Minimum Due:</span>
+        ${{ "{:.2f}".format(extra_info.minimum_due | default(0.0)) }} </p>     
+
+      {% if extra_info.apr is defined %}
+        <p><span class="info-label">APR:</span> {{ "{:.2f}".format(extra_info.apr) }}%</p>
+      {% endif %}
+    </div>
+
+    <!-- Pay Bill Button -->
+    {% if account.CurrBal > 0 %}
+    <div class="transaction-buttons">
+      <button id="payBillBtn" class="account-btn" type="button"
+              onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">
+        Pay Bill
+      </button>
+    </div>
+    {% endif %}
+    
+
+    {% if account.AccountType == "Credit Card" %}
+      <!-- Collapsible: Transactions -->
+      <div class="transactions-section">
+        <button class="account-btn toggle-btn" data-target="transactions-container" data-label="Transactions">
+          Show Transactions
+        </button>
+        <section id="transactions-container" class="transactions-box" style="display: none;">
+          <h3>Transactions</h3>
+          <ul id="current-transactions-list">
+            <li>Loading current transactions...</li>
+          </ul>
+
+          <h3>Past Transactions</h3>
+          <ul id="past-transactions-list">
+            <li>Loading past transactions...</li>
+          </ul>
+        </section>
+      </div>
+    {% endif %}
+
+    <!-- Collapsible: Archived Bills -->
+    <div class="transactions-section">
+      <button class="account-btn toggle-btn" data-target="archived-bills-container" data-label="Archived Bills">
+        Show Archived Bills
+      </button>
+      <section id="archived-bills-container" class="transactions-box" style="display: none;">
+        <h3>Archived Bills</h3>
+        <ul id="archived-bills-list">
+          <li>Loading archived bills...</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}

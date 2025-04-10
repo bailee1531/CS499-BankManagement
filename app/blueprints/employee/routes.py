@@ -13,8 +13,12 @@ from scripts.createTeller import create_teller
 from scripts.customer.modifyInfo import modify_info as modify_username
 from scripts.customer import modifyInfo
 from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
+
 from scripts.transactionLog import generate_transaction_ID
-from .forms import TellerSettingsForm, AdminSettingsForm
+from scripts.withdrawMoney import withdraw as withdraw_money
+from scripts.fundTransfer import transferFunds as transfer_funds
+from scripts.customer.webLogin import login_page_button_pressed
+from .forms import TellerSettingsForm, AdminSettingsForm, DepositForm
 
 # Blueprint for employee routes
 employee_bp = Blueprint('employee', __name__, template_folder='templates')
@@ -92,6 +96,24 @@ def create_teller_route():
         print(f"[ERROR] Failed to create teller: {e}")
         return jsonify(success=False, message=str(e)), 500
 
+@employee_bp.route("/check-employee", methods=["POST"])
+def check_employee():
+    data = request.get_json()
+    employee_id = data.get("employeeID")
+    personsPath = get_csv_path("persons.csv")
+
+    if employee_id is None:
+        return jsonify({'exists': bool(exists)})
+
+    try:
+        df = pd.read_csv(personsPath)
+        exists = (df["ID"] == int(employee_id)).any()
+        return jsonify({'exists': bool(exists)})
+    except FileNotFoundError:
+        return jsonify({'exists': bool(exists)})
+    except Exception as e:
+        print(f"Error checking employee ID: {e}")
+        return jsonify({'exists': bool(exists)})
 
 @employee_bp.route("/edit-teller", methods=["POST"])
 def edit_teller():
@@ -128,12 +150,11 @@ def delete_teller():
 @employee_bp.route("/teller-dashboard", methods=["GET", "POST"])
 def teller_dashboard():
     try:
-        # Load all required CSVs
         customers_df = pd.read_csv(get_csv_path("customers.csv"))
         persons_df = pd.read_csv(get_csv_path("persons.csv"))
         accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
 
-        # Convert IDs to int if needed for consistency
+        # Convert IDs to int for consistency
         customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
         persons_df["ID"] = persons_df["ID"].astype(int)
         accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
@@ -142,14 +163,13 @@ def teller_dashboard():
         # Merge customers + persons to get full profile
         merged_df = pd.merge(customers_df, persons_df, left_on="CustomerID", right_on="ID", how="left")
 
-        # Get just one account per customer (e.g., first one)
+        # Get just one account per customer
         account_map = accounts_df.groupby("CustomerID")["AccountID"].first().reset_index()
         merged_df = pd.merge(merged_df, account_map, left_on="CustomerID", right_on="CustomerID", how="left")
 
         # Rename AccountID column for clarity in the template
         merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
 
-        # Final dict list for template
         customers = merged_df.to_dict(orient="records")
     except Exception as e:
         customers = []
@@ -254,23 +274,96 @@ def check_customer_accounts(customer_id):
         return jsonify(success=True, hasOpenAccountsOrBills=has_accounts or has_bills)
     except Exception as e:
         return jsonify(success=False, message=f"Error checking account status: {str(e)}"), 500
+    
 
-@employee_bp.route("/delete-customer", methods=["POST"])
-def delete_customer():
+@employee_bp.route("/open-account", methods=["POST"])
+def open_account_route():
     data = request.get_json()
-    customer_id = data.get("customerId")
-
-    if not customer_id:
-        return jsonify(success=False, message="Customer ID required"), 400
 
     try:
-        result = delete_customer_logic("Customer", customer_id, is_admin=True)
-        if result["status"] == "success":
-            return jsonify(success=True)
-        else:
-            return jsonify(success=False, message=result["message"]), 400
+        # Unpack fields
+        first = data.get("firstName").strip()
+        last = data.get("lastName").strip()
+        username = data.get("username").strip()
+        password = data.get("password").strip()
+        ssn = data.get("ssn").strip()
+        email = data.get("email").strip()
+        phone = data.get("phone").strip()
+        q1 = data.get("securityAnswer1").strip()
+        q2 = data.get("securityAnswer2").strip()
+
+        # Call existing function to handle CSV + key logic
+        result = login_page_button_pressed(
+            1, "Customer", username, password,
+            first, last, "N/A", email, phone, ssn, q1, q2
+        )
+
+        if result["status"] != "success":
+            return jsonify(success=False, message=result["message"])
+
+        # Get new customer ID
+        cust_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/customers.csv"))
+        cust_df = pd.read_csv(cust_path)
+        customer_row = cust_df[cust_df["Username"] == username]
+        if customer_row.empty:
+            return jsonify(success=False, message="Customer ID not found after creation.")
+        customer_id = int(customer_row["CustomerID"].iloc[0])
+
+        # Add account
+        acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+        acc_df = pd.read_csv(acc_path) if os.path.exists(acc_path) else pd.DataFrame(columns=[
+            "AccountID", "CustomerID", "AccountType", "CurrBal", "DateOpened", "CreditLimit", "APR"
+        ])
+        import random
+        from datetime import date
+        from decimal import Decimal
+
+        acc_id = random.randint(1000, 9999)
+        while acc_id in acc_df["AccountID"].values:
+            acc_id = random.randint(1000, 9999)
+
+        acc_df.loc[len(acc_df)] = {
+            "AccountID": acc_id,
+            "CustomerID": customer_id,
+            "AccountType": data.get("accountType", "Checking"),
+            "CurrBal": Decimal("0.00"),
+            "DateOpened": date.today(),
+            "CreditLimit": None,
+            "APR": None
+        }
+        acc_df.to_csv(acc_path, index=False)
+
+        return jsonify(success=True, message="Customer account successfully created.")
+
     except Exception as e:
-        return jsonify(success=False, message=str(e)), 500
+        print(f"[ERROR] Account creation failed: {e}")
+        return jsonify(success=False, message="Account creation failed.")
+
+
+@employee_bp.route("/delete-account", methods=["POST"])
+def delete_account():
+    data = request.get_json()
+    account_id = int(data.get("accountID"))
+
+    # Load accounts CSV
+    acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+    acc_df = pd.read_csv(acc_path)
+
+    # Find the account
+    account_row = acc_df[acc_df["AccountID"] == account_id]
+    if account_row.empty:
+        return jsonify(success=False, message="Account not found.")
+
+    balance = float(account_row["CurrBal"].iloc[0])
+    if balance != 0.00:
+        return jsonify(success=False, message="Account must have a balance of $0.00 to be deleted.")
+
+    # Delete the account
+    acc_df = acc_df[acc_df["AccountID"] != account_id]
+    acc_df.to_csv(acc_path, index=False)
+
+    return jsonify(success=True, message="Account successfully deleted.")
+
 
 @employee_bp.route("/deposit", methods=["POST"])
 def deposit():

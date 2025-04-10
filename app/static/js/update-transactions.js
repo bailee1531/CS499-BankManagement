@@ -1,63 +1,57 @@
-// Function to update the transactions by polling the API endpoint and filter by date
 function updateTransactions() {
-  if (typeof transactionApiUrl === "undefined") {
-    console.error("transactionApiUrl is not defined");
-    return;
-  }
+  const url = `/api/transactions/${window.accountId}`;
 
-  fetch(transactionApiUrl)
-    .then(response => response.json())
+  fetch(url)
+    .then(res => res.json())
     .then(data => {
-      const transactions = data.transactions || [
-        ...(data.current_transactions || []),
-        ...(data.past_transactions || [])
-      ];
+      const currentList = document.getElementById("current-transactions-list");
+      const pastList = document.getElementById("past-transactions-list");
 
-      const today = new Date();
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(today.getDate() - 30);
+      currentList.innerHTML = ""; // Clear loading message
+      pastList.innerHTML = "";
 
-      const currentTxns = transactions.filter(txn => {
-        const txnDate = new Date(txn.TransDate);
-        return txnDate >= thirtyDaysAgo;
-      });
-
-      const pastTxns = transactions.filter(txn => {
-        const txnDate = new Date(txn.TransDate);
-        return txnDate < thirtyDaysAgo;
-      });
-
-      const currentContainer = document.getElementById('current-transactions-list');
-      if (currentTxns.length > 0) {
-        currentContainer.innerHTML = currentTxns
-          .map(txn => `
-            <li class="transaction-item">
-              <div class="transaction-date">${txn.TransDate}</div>
-              <div class="transaction-info">${txn.description} - $${parseFloat(txn.amount).toFixed(2)}</div>
-            </li>
-          `)
-          .join('');
-      } else {
-        currentContainer.innerHTML = '<p>No current transactions available.</p>';
+      if (data.error) {
+        currentList.innerHTML = `<li>Error: ${data.error}</li>`;
+        pastList.innerHTML = `<li>Error: ${data.error}</li>`;
+        return;
       }
 
-      const pastContainer = document.getElementById('past-transactions-list');
-      if (pastTxns.length > 0) {
-        pastContainer.innerHTML = pastTxns
-          .map(txn => `
-            <li class="transaction-item">
-              <div class="transaction-date">${txn.TransDate}</div>
-              <div class="transaction-info">${txn.description} - $${parseFloat(txn.amount).toFixed(2)}</div>
-            </li>
-          `)
-          .join('');
-      } else {
-        pastContainer.innerHTML = '<p>No past transactions available.</p>';
-      }
+      const addItems = (list, transactions) => {
+        if (!transactions.length) {
+          list.innerHTML = "<li>No transactions</li>";
+        } else {
+          for (const tx of transactions) {
+            const li = document.createElement("li");
+            li.classList.add("transaction-item");
+      
+            const dateSpan = document.createElement("span");
+            dateSpan.classList.add("transaction-date");
+            dateSpan.textContent = tx.TransDate;
+      
+            const infoSpan = document.createElement("span");
+            infoSpan.classList.add("transaction-info");
+            infoSpan.textContent = `${tx.description} - $${tx.amount.toFixed(2)}`;
+      
+            li.appendChild(dateSpan);
+            li.appendChild(infoSpan);
+            list.appendChild(li);
+          }
+        }
+      };
+      
+
+      addItems(currentList, data.current_transactions);
+      addItems(pastList, data.past_transactions);
     })
-    .catch(error => console.error('Error fetching transactions:', error));
+    .catch(err => {
+      console.error("Error loading transactions:", err);
+    });
 }
 
-// Call on page load and then every 10 seconds
-updateTransactions();
-setInterval(updateTransactions, 10000);
+  
+  
+  // Call on page load and then every 10 seconds
+  updateTransactions();
+  setInterval(updateTransactions, 10000);
+  
+  

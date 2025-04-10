@@ -5,13 +5,20 @@ Defines routes for handling personal accounts, credit cards, and mortgage applic
 """
 import pandas as pd
 from decimal import Decimal
+from datetime import date, timedelta
 
 from flask import (
-    Blueprint, render_template, session, flash, redirect, url_for, request, Response
+    Blueprint, render_template, session, redirect, url_for, request, Response
 )
 
+# Import shared utilities for checking account type and managing flash messages
+from app.blueprints.sharedUtilities import (
+    user_has_account_type, get_csv_path, 
+    flash_success, flash_error, get_customer_accounts
+)
 # Internal utility and form imports
 from scripts import createCreditCard, createLoan
+from scripts.billPayment import scheduleBillPayment
 from app.blueprints.sharedUtilities import get_csv_path, flash_success, flash_error
 from app.blueprints.accounts.forms import MortgageForm
 
@@ -58,38 +65,70 @@ def personal_accounts() -> Response:
 
 # -----------------------------------------------------------------------------
 # Route: /credit-cards
-# Handles credit card actions (e.g., Travel Visa card)
+# Handles credit card actions 
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Route: /credit-cards
+# Handles credit card actions 
 # -----------------------------------------------------------------------------
 @accounts_bp.route('/credit-cards')
 def credit_cards() -> Response:
     """
-    Handle credit card operations, including opening a Travel Visa credit card.
-
+    Handle credit card operations, including opening a credit card.
     Returns:
         Response: Rendered credit card page or redirection after processing.
     """
-    card_to_open: str = request.args.get('open')
+    card_to_open = request.args.get('open')
 
     if card_to_open:
-        if "customer_id" not in session:
-            flash_error("You must be logged in to open a credit card.")
-            return redirect(url_for("auth.customer_login", next=request.url))
+        try:
+            # Retrieve customer_id from session
+            customer_id = session.get("customer_id")
+            if not customer_id:
+                flash_error("You must be logged in to open an account.")
+                return redirect(url_for("auth.customer_login", next=request.url))
 
-        customer_id: int = session["customer_id"]
+            if card_to_open.lower() == 'credit-card':
+                accounts_df = get_customer_accounts(customer_id)
+                credit_cards = accounts_df[accounts_df["AccountType"] == "Credit Card"]
 
-        if card_to_open.lower() == 'travel-visa':
-            try:
+                if len(credit_cards) >= 2:
+                    flash_error("You can only have up to 2 credit cards.")
+                    return redirect(url_for("accounts.credit_cards"))
+
                 # Create the credit card account
                 createCreditCard.openCreditCardAccount(customer_id)
-                flash_success("Travel Visa credit card opened successfully!")
+
+                # Reload accounts.csv to find the newly added credit card
+                accounts_df = get_customer_accounts(customer_id)
+                new_card = accounts_df[accounts_df["AccountType"] == "Credit Card"].iloc[-1]
+
+                # Schedule first credit card bill payment and capture the result
+                bill_payment_result = scheduleBillPayment(
+                    customerID=customer_id,
+                    payeeName="Evergreen Bank",
+                    payeeAddress="Somewhere In The World",
+                    amount=Decimal("0"),
+                    dueDate=(date.today() + timedelta(days=30)).isoformat(),
+                    paymentAccID=new_card["AccountID"]
+                )
+
+                # Flash the appropriate message based on the bill payment result
+                if bill_payment_result.get("status") == "success":
+                    flash_success(bill_payment_result.get("message"))
+                else:
+                    flash_error(bill_payment_result.get("message"))
+
+                # Flash the credit card account creation success message
+                flash_success("Credit card opened successfully! Your first bill is due in 30 days.")
                 return redirect(url_for("customer.customer_dashboard"))
 
-            except Exception as e:
-                flash_error(f"Unable to open Travel Visa account: {str(e)}")
-                return redirect(url_for("accounts.credit_cards"))
+            flash_error("Invalid credit card selection.")
+            return redirect(url_for("accounts.credit_cards"))
 
-        flash_error("Invalid credit card selection.")
-        return redirect(url_for("accounts.credit_cards"))
+        except Exception as e:
+            flash_error(f"Unable to open credit card account: {str(e)}")
+            return redirect(url_for("accounts.credit_cards"))
 
     return render_template('accounts/credit_cards.html')
 
@@ -122,9 +161,6 @@ def loans() -> Response:
 def mortgage_application():
     """
     Route for mortgage loan application.
-
-    Returns:
-        Response: Redirects to dashboard on success, otherwise renders the application form.
     """
     form = MortgageForm()
 
@@ -134,9 +170,27 @@ def mortgage_application():
         customer_id = session.get("customer_id")
 
         if not customer_id:
-            flash_error("Customer not logged in or session expired.")
-            return redirect(url_for('auth.customer_login'))
+            flash_error("You must be logged in to open an account.")
+            return redirect(url_for("auth.customer_login", next=request.url))
 
+        # Enforce minimum loan amount
+        if loan_amount < Decimal("50.00"):
+            flash_error("The minimum loan amount is $50.")
+            return render_template(
+                'accounts/mortgage_application.html',
+                form=form,
+                form_action=url_for('accounts.mortgage_application')
+            )
+        
+        if loan_term > 50:
+            flash_error("Loan term cannot exceed 50 years.")
+            return render_template(
+                'accounts/mortgage_application.html',
+                form=form,
+                form_action=url_for('accounts.mortgage_application')
+        )
+
+        
         try:
             accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
 
@@ -156,6 +210,23 @@ def mortgage_application():
         # Attempt to create new mortgage loan
         result = createLoan.createMortgageLoanAccount(customer_id, loan_amount, loan_term)
         if result.get("status") == "success":
+            accounts_df = get_customer_accounts(customer_id)
+            new_mortgage = accounts_df[accounts_df["AccountType"].str.lower() == "mortgage loan"].iloc[-1]
+
+            bill_payment_result = scheduleBillPayment(
+                customerID=customer_id,
+                payeeName="Evergreen Bank",
+                payeeAddress="Somewhere In The World",
+                amount=Decimal("50.00"),
+                dueDate=(date.today() + timedelta(days=30)).isoformat(),
+                paymentAccID=new_mortgage["AccountID"]
+            )
+
+            if bill_payment_result.get("status") == "success":
+                flash_success(bill_payment_result.get("message"))
+            else:
+                flash_error(bill_payment_result.get("message"))
+
             flash_success(result.get("message"))
             return redirect(url_for('customer.customer_dashboard'))
         else:
