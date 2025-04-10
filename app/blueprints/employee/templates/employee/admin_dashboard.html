@@ -55,6 +55,7 @@
         {% endfor %}
     </div>
 </div>
+
 <div class="teller-dashboard">
     <h1>Customer Management</h1>
   
@@ -64,74 +65,75 @@
   
     <!-- Grid of customer cards -->
     <div class="customer-grid" id="customerGrid">
-      {% for customer in customers %}
-      <div class="customer-card" onclick="openCustomerModal(
-        '{{ customer.CustomerID }}',
-        '{{ customer.Username }}',
-        '{{ customer.FirstName }}',
-        '{{ customer.LastName }}',
-        '{{ customer.PhoneNum }}',
-        '{{ customer.Email }}',
-        '{{ customer.Address }}')">
-        <div class="avatar"></div>
-        <div class="customer-info">
-          <strong>{{ customer.Username }}</strong>
-          <p>Customer ID: {{ customer.CustomerID }}</p>
+        {% for customer in customers %}
+        <div class="customer-card" onclick="openCustomerModal(
+            '{{ customer.CustomerID }}',
+            '{{ customer.Username }}',
+            '{{ customer.FirstName }}',
+            '{{ customer.LastName }}',
+            '{{ customer.PhoneNum }}',
+            '{{ customer.Email }}',
+            '{{ customer.Address }}')">
+            <div class="avatar"></div>
+            <div class="customer-info">
+                <strong>{{ customer.Username }}</strong>
+                <p>Customer ID: {{ customer.CustomerID }}</p>
+            </div>
         </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
     </div>
-  </div>
+</div>
   
-  <!-- Customer Modal -->
-  <div id="customerModal" class="modal">
-    <div class="modal-content">
-      <a href="{{ url_for('employee.admin_dashboard') }}" class="exit-to-dashboard" title="Exit to Dashboard">Exit</a>
-      <span class="close" onclick="closeCustomerModal()">&times;</span>
-      
-      <div class="modal-left">
-        <!-- Customer Info Panel -->
-        <div id="customerInfoPanel">
-          <h2>Customer Info</h2>
-      
-          <div class="form-group">
-            <label>Username</label>
-            <div id="modalUsername" class="readonly-field"></div>
-          </div>
-          <div class="form-group">
-            <label>Customer ID</label>
-            <div id="modalCustomerID" class="readonly-field"></div>
-          </div>
-          <div class="form-group">
-            <label>First Name</label>
-            <div id="modalFirstName" class="readonly-field"></div>
-          </div>
-          <div class="form-group">
-            <label>Last Name</label>
-            <div id="modalLastName" class="readonly-field"></div>
-          </div>
-          <div class="form-group">
-            <label>Phone Number</label>
-            <div id="modalPhone" class="readonly-field"></div>
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <div id="modalEmail" class="readonly-field"></div>
-          </div>
-          <div class="form-group">
-            <label>Address</label>
-            <div id="modalAddress" class="readonly-field"></div>
-          </div>
-        </div>
-      
-    <!-- User's Accounts Panel -->
-    <div id="userAccountsPanel" style="display: none;">
-        <h2>User's Accounts</h2>
-        <div id="userAccounts" class="readonly-field scroll-box"></div>
-    </div>
+    <!-- Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCustomerModal()">&times;</span>
+        
+            <div class="modal-left">
+            <!-- Customer Info Panel -->
+            <div id="customerInfoPanel">
+                <h2>Customer Info</h2>
+        
+                <div class="form-group">
+                    <label>Username</label>
+                    <div id="modalUsername" class="readonly-field"></div>
+                </div>
+                    <div class="form-group">
+                    <label>Customer ID</label>
+                    <div id="modalCustomerID" class="readonly-field"></div>
+                </div>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <div id="modalFirstName" class="readonly-field"></div>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <div id="modalLastName" class="readonly-field"></div>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <div id="modalPhone" class="readonly-field"></div>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <div id="modalEmail" class="readonly-field"></div>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <div id="modalAddress" class="readonly-field"></div>
+                </div>
+            </div>
+        
+            <!-- User's Accounts Panel -->
+            <div id="userAccountsPanel" style="display: none;">
+                <h2>User's Accounts</h2>
+                <div id="userAccounts" class="readonly-field scroll-box"></div>
+            </div>
 
-    <!-- Toggle Button -->
-    <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+            <!-- Toggle Button -->
+            <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+        </div>
+    </div>
 </div>
 
 
