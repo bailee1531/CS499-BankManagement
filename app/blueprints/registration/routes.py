@@ -299,7 +299,8 @@ def register_teller_username():
         session['registration'] = {
             'first_name': first_name,
             'last_name': last_name,
-            'username': full_username
+            'username': full_username,
+            'email': f"{first_name}.{last_name}@evergreen.com"
         }
 
         return redirect(url_for('registration.register_teller_step1'))
@@ -331,6 +332,7 @@ def register_teller_step1():
     form.first_name.data = registration.get("first_name", "")
     form.last_name.data = registration.get("last_name", "")
 
+
     return render_template('registration/register_teller_step1.html', form=form, disable_name_fields=True)
 
 @register_bp.route("/register/teller-step2", methods=["GET", "POST"])
@@ -347,8 +349,10 @@ def register_teller_step2():
 
     form = RegistrationStep2Form()
 
-    # Pre-fill and disable username
+    # Pre-fill and disable username and email
     form.username.data = registration['username']
+    form.email.data = registration['email']
+    form.confirm_email.data = registration['email']
 
     if form.validate_on_submit():
         result = webLogin.login_page_button_pressed(
@@ -359,7 +363,7 @@ def register_teller_step2():
             registration['first_name'],
             registration['last_name'],
             registration['address'],
-            form.email.data,
+            registration['email'],
             registration['phone_number'],
             registration['tax_id'],
             form.security_answer_1.data,
@@ -377,4 +381,4 @@ def register_teller_step2():
         flash_success("Welcome to your dashboard!")
         return redirect(url_for("employee.teller_dashboard"))
 
-    return render_template("registration/register_teller_step2.html", form=form, disable_username=True)
+    return render_template("registration/register_teller_step2.html", form=form, disable_username=True, disable_email_field=True, disable_confirm_email_field=True)
