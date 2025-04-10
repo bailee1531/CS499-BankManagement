@@ -112,29 +112,28 @@ def flash_success(message):
 # ---------------------------
 # Decorators
 # ---------------------------
-def login_required(session_key="customer"):
+def login_required(*allowed_roles):
     """
-    Decorator to ensure that a user is logged in before accessing a route.
-
-    Args:
-        session_key (str): The session key to check for the user's login status (default is 'customer').
-
-    Returns:
-        function: The wrapped function that requires the user to be logged in.
+    Decorator to allow access if the user has *any* of the specified session keys.
+    
+    Example usage:
+        @login_required_any("admin", "teller")
     """
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            if not session.get(session_key):
-                flash_error("Login required")
-                # Redirect to the appropriate login based on session_key.
-                if session_key == "admin":
-                    return redirect(url_for("auth.admin_login", next=request.url))
-                elif session_key == "teller":
-                    return redirect(url_for("auth.teller_login", next=request.url))
-                else:
-                    return redirect(url_for("auth.customer_login", next=request.url))
-            return f(*args, **kwargs)
+            for role in allowed_roles:
+                if session.get(role):
+                    return f(*args, **kwargs)
+            flash_error("Login required")
+            # Redirect to appropriate login based on preference
+            if "admin" in allowed_roles:
+                return redirect(url_for("auth.admin_login", next=request.url))
+            elif "teller" in allowed_roles:
+                return redirect(url_for("auth.teller_login", next=request.url))
+            else:
+                return redirect(url_for("auth.customer_login", next=request.url))
         return wrapper
     return decorator
+
 
