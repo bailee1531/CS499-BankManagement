@@ -89,7 +89,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeCustomerModal()">&times;</span>
         
-            <div class="modal-left">
+            <div class="modal-left scroll-panel">
             <!-- Customer Info Panel -->
             <div id="customerInfoPanel">
                 <h2>Customer Info</h2>
@@ -132,9 +132,20 @@
 
             <!-- Toggle Button -->
             <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+            <button onclick="openLogsModal()">View Logs</button>
         </div>
     </div>
 </div>
+
+<!-- Logs Modal -->
+<div id="logsModal" class="modal">
+  <div class="modal-content scrollable">
+    <span class="close" onclick="document.getElementById('logsModal').style.display='none'">&times;</span>
+    <h2>Logs for Selected Customer</h2>
+    <div id="logsTableContainer" style="max-height: 400px; overflow-y: auto;"></div>
+  </div>
+</div>
+
 
 
 <script>
@@ -362,5 +373,47 @@ document.addEventListener("keydown", function(e) {
         closeViewModal();
     }
 });
+
+let selectedCustomerID = null;
+
+function openCustomerModal(customerID, username, firstName, lastName, phone, email, address) {
+  selectedCustomerID = customerID;  // store globally
+
+  document.getElementById("modalCustomerID").innerText = customerID;
+  document.getElementById("modalUsername").innerText = username;
+  document.getElementById("modalFirstName").innerText = firstName;
+  document.getElementById("modalLastName").innerText = lastName;
+  document.getElementById("modalPhone").innerText = phone;
+  document.getElementById("modalEmail").innerText = email;
+  document.getElementById("modalAddress").innerText = address;
+
+  document.getElementById("customerModal").style.display = "flex";
+}
+
+function openLogsModal() {
+  if (!selectedCustomerID) return;
+
+  fetch(`/employee/transactions-json/admin/${selectedCustomerID}`)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("logsTableContainer");
+      let table = "<table style='width:100%; border-collapse: collapse;'>";
+      table += "<thead><tr><th>Transaction ID</th><th>Account ID</th><th>Type</th><th>Amount</th><th>Date</th></tr></thead><tbody>";
+      data.forEach(tx => {
+        table += `<tr>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransactionID}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.AccountID}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransactionType}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>$${parseFloat(tx.Amount).toFixed(2)}</td>
+          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransDate}</td>
+        </tr>`;
+      });
+      table += "</tbody></table>";
+      container.innerHTML = table;
+      document.getElementById("logsModal").style.display = "flex";
+    });
+}
+
+
 </script>
 {% endblock %}
