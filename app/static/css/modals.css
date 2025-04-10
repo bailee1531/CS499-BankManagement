@@ -103,6 +103,20 @@
     transition: color var(--transition);
 }
 
+.accounts-header-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.accounts-header-list h2 {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+
 
 /* Selected Account Label */
 #selectedAccountLabel {
@@ -149,4 +163,18 @@
         transform: translateY(0);
     }
 }
+
+/* Ensure vertical stacking */
+.accounts-transactions-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Optional: Ensure accounts container uses full width */
+.accounts-container {
+    width: 100%;
+}
+
 

@@ -40,7 +40,6 @@
         <p>Customer ID: {{ customer.CustomerID }}</p>
       </div>
       <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
-      <button class="open-account-btn" onclick="event.stopPropagation(); openAccountsModal('{{ customer.CustomerID }}')">View Accounts</button>
     </div>
     {% endfor %}
   </div>
@@ -86,12 +85,6 @@
           <div id="modalAddress" class="readonly-field"></div>
         </div>
       </div>
-    
-      <!-- User's Accounts Panel -->
-      <div id="userAccountsPanel" style="display: none;">
-        <h2>User's Accounts</h2>
-        <div id="userAccounts" class="readonly-field scroll-box"></div>
-      </div>
     </div>
 
     <div class="modal-right">
@@ -109,7 +102,7 @@
       <hr>
 
       <!-- Toggle Button -->
-      <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+      <button onclick="openAccountsModal(currentCustomerID)">User Accounts</button>
     
       <!-- Open New Account + Transaction Buttons -->
       <h3>Open New Account</h3>
@@ -303,20 +296,24 @@
 <div id="viewAccountsModal" class="modal">
   <div class="modal-content accounts-section">
     <span class="close" onclick="closeAccountsModal()">&times;</span>
-    <h2>Customer Accounts</h2>
 
-    <ul id="accountList" class="accounts-container">
-      <!-- Account boxes will be injected here -->
-    </ul>
-
-    <div id="transactionSection" class="transaction-section hidden">
-      <h3 id="selectedAccountLabel">Transactions</h3>
-      <ul id="transactionList">
-        <!-- Transactions will be injected here -->
+    <div class="accounts-transactions-wrapper">
+      <h2>Your Accounts</h2>
+    
+      <ul id="accountList" class="accounts-container">
+        <!-- Account boxes will be injected here -->
       </ul>
+    
+      <div id="transactionSection" class="transaction-section hidden">
+        <h3 id="selectedAccountLabel">Transactions</h3>
+        <ul id="transactionList">
+          <!-- Transactions will be injected here -->
+        </ul>
+      </div>
     </div>
   </div>
 </div>
+
 
 
 
@@ -695,6 +692,80 @@ function submitAccountOpen() {
     if (data.success) location.reload();
     else alert("Failed to open account: " + data.message);
   });
+}
+
+function toggleAccountInputs() {
+const type = document.getElementById("accountType").value;
+
+const deposit = document.getElementById("initialDeposit");
+const loanAmount = document.getElementById("loanAmount");
+const loanTerm = document.getElementById("loanTerm");
+const creditNote = document.getElementById("creditNote");
+
+// Hide all by default
+deposit.style.display = "none";
+loanAmount.style.display = "none";
+loanTerm.style.display = "none";
+creditNote.style.display = "none";
+
+if (["Checking", "Savings", "Money Market"].includes(type)) {
+  deposit.placeholder = "Initial Deposit";
+  deposit.style.display = "block";
+} else if (type === "Home Mortgage Loan") {
+  loanAmount.style.display = "block";
+  loanTerm.style.display = "block";
+} else if (type === "Travel Visa") {
+  creditNote.style.display = "block";
+}
+}
+
+function goToAccountInfoPage() {
+const selectedType = document.getElementById("accountTypeSelect").value;
+if (!selectedType) return alert("Please select an account type.");
+window.selectedAccountType = selectedType;
+document.getElementById("accountTypePage").style.display = "none";
+document.getElementById("accountInfoPage").style.display = "block";
+}
+
+function goBackToAccountType() {
+document.getElementById("accountTypePage").style.display = "block";
+document.getElementById("accountInfoPage").style.display = "none";
+}
+
+function submitOpenAccount() {
+const payload = {
+  firstName: document.getElementById("newFirstName").value,
+  lastName: document.getElementById("newLastName").value,
+  username: document.getElementById("newUsername").value,
+  password: document.getElementById("newPassword").value,
+  ssn: document.getElementById("newSSN").value,
+  email: document.getElementById("newEmail").value,
+  phone: document.getElementById("newPhone").value,
+  securityQuestion1: document.getElementById("securityQuestion1").value,
+  securityAnswer1: document.getElementById("securityAnswer1").value,
+  securityQuestion2: document.getElementById("securityQuestion2").value,
+  securityAnswer2: document.getElementById("securityAnswer2").value,
+  accountType: window.selectedAccountType
+};
+
+fetch("/employee/open-account", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+})
+.then(res => res.json())
+.then(data => {
+  if (data.success) {
+    alert(data.message);
+    location.reload();
+  } else {
+    alert("Error: " + data.message);
+  }
+})
+.catch(err => {
+  alert("Failed to open account.");
+  console.error(err);
+});
 }
 
 function closeAccountsModal() {
