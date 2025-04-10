@@ -12,13 +12,31 @@ main {
 /* Hero Section */
 .hero {
     text-align: center;
+    margin-top: 1rem;
 }
 
 .hero h1 {
-    margin-bottom: 0.625rem;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin-top: 1rem;
 }
 
 .hero p {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.landing-logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.landing-logo {
+    height: 250px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    max-width: 90%;
+    width: auto;
+    object-fit: contain;
+    animation: fadeIn 1.2s ease-in-out;
 }

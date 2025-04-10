@@ -106,14 +106,20 @@ class RegistrationStep2Form(FlaskForm):
 
     # List of predefined security questions
     security_question_choices = [
-        ("mother_maiden", "What is your mother's maiden name?"),
-        ("first_pet", "What was the name of your first pet?"),
-        ("first_car", "What was your first car?"),
-        ("childhood_friend", "What is the first name of your childhood best friend?"),
-        ("favorite_teacher", "Who was your favorite teacher in school?"),
-        ("first_job", "What was your first job?"),
-        ("city_birth", "In which city were you born?"),
-        ("favorite_food", "What is your favorite food?")
+        ("mother_child", "Who is your Mother's favorite child?"),
+        ("chicken_name", "What would you name a chicken if you owned one?"),
+        ("first_gamertag", "What was your first gamertag?"),
+        ("childhood_dream", "What was your dream career as a child?"),
+        ("least_favorite_relative", "Who is your least favorite relative?"),
+        ("first_anime", "What was your first anime?"),
+        ("longest_word", "What is the longest word you can spell without spell check?"),
+        ("favorite_food", "What is your favorite food?"),
+        ("never_visit", "Where would you never visit even if you were on your last breath?"),
+        ("remove_kindly", "If you could kindly remove someone from the history books, who would it be?"),
+        ("only_eat", "If you could only eat one meal for the rest of your life, what would it be?"),
+        ("musical_experts", "What musical do you know well enough to sing every song?"),
+        ("best_spiderman", "Who was the best Spider-Man?"),
+        ("worst_film", "What was the worst film ever created?")
     ]
 
     security_question_1 = SelectField(

@@ -101,11 +101,13 @@ header {
     color: var(--white);
 }
 
-/* Set logo image dimensions and spacing */
-.header__logo img {
-    width: 2.5rem;
+/* Set mascot image dimensions and spacing */
+.header__mascot img {
+    height: 50px;
+    width: auto;
     /* Approximately 40px */
-    margin-right: 0.625rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
 }
 
 /* Header Navigation */
