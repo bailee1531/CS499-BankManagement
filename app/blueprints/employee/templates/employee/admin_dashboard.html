@@ -36,7 +36,7 @@
             <p><strong>Employee ID:</strong> <span id="modalEmployeeID"></span></p>
             <input type="text" id="editUsernameInput" placeholder="New Username">
             <div class="modal-buttons">
-                <button onclick="submitEdit()">Edit</button>
+                <button id="edit-btn" onclick="submitEdit()">Edit</button>
                 <button onclick="submitDelete()">Delete</button>
             </div>
         </div>
@@ -80,6 +80,21 @@ function openViewModal(id, username) {
     document.getElementById("modalUsername").textContent = username;
     document.getElementById("editUsernameInput").value = "";
     document.getElementById("viewModal").style.display = "flex";
+
+    fetch("/employee/check-employee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeID: id })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(!data.exists) {
+            const editButton = document.querySelector('#viewModal .modal-buttons button:first-child');
+            if (editButton) {
+                editButton.disabled = true;
+            }
+        }
+    })
 }
 function closeViewModal() {
     document.getElementById("viewModal").style.display = "none";
@@ -116,16 +131,22 @@ function submitEdit() {
         return;
     }
 
-    fetch("/employee/edit-teller", {
+    fetch('/employee/edit-teller', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeID: id, newUsername })
+        body: JSON.stringify({employeeID: id, newUsername: newUsername})
     })
     .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert("Failed to update teller: " + data.message);
-    });
+    .then(editData => {
+        if (editData.success) {
+            alert("Teller information updated successfully.");
+            document.getElementById('modalUsername').textContent = newUsername;
+            closeViewModal();
+        }
+        else {
+            alert("Failed to update teller information: " + editData.message);
+        }
+    })
 }
 
 function submitDelete() {

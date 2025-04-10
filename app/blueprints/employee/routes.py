@@ -93,6 +93,24 @@ def create_teller_route():
         print(f"[ERROR] Failed to create teller: {e}")
         return jsonify(success=False, message=str(e)), 500
 
+@employee_bp.route("/check-employee", methods=["POST"])
+def check_employee():
+    data = request.get_json()
+    employee_id = data.get("employeeID")
+    personsPath = get_csv_path("persons.csv")
+
+    if employee_id is None:
+        return jsonify({'exists': bool(exists)})
+
+    try:
+        df = pd.read_csv(personsPath)
+        exists = (df["ID"] == int(employee_id)).any()
+        return jsonify({'exists': bool(exists)})
+    except FileNotFoundError:
+        return jsonify({'exists': bool(exists)})
+    except Exception as e:
+        print(f"Error checking employee ID: {e}")
+        return jsonify({'exists': bool(exists)})
 
 @employee_bp.route("/edit-teller", methods=["POST"])
 def edit_teller():
