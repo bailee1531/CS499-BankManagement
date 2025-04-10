@@ -1,13 +1,17 @@
 import pandas as pd
+import os
 import logging
 from decimal import Decimal
-from flask import Blueprint, render_template, Response, redirect, url_for, jsonify, request, session
+from Crypto.PublicKey import ECC
+from flask import Blueprint, render_template, Response, redirect, url_for, jsonify, request, session, current_app
 from datetime import datetime, timedelta, date
 from app.blueprints.sharedUtilities import (
     get_csv_path, get_logged_in_customer,
     get_customer_accounts, 
     login_required, flash_error, flash_success
 )
+
+from scripts.customer import modifyInfo
 from scripts.archive import archive, viewArchivedBills, viewArchivedLoans
 from scripts.makeDeposit import deposit
 from scripts.withdrawMoney import withdraw
