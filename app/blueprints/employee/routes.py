@@ -54,11 +54,31 @@ def admin_login():
 # Admin Dashboard Route
 @employee_bp.route("/admin-dashboard")
 def admin_dashboard():
-    csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
+    employeePath = get_csv_path("employees.csv")
+    customers_df = pd.read_csv(get_csv_path("customers.csv"))
+    persons_df = pd.read_csv(get_csv_path("persons.csv"))
+    accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+
+    # Convert IDs to int for consistency
+    customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
+    persons_df["ID"] = persons_df["ID"].astype(int)
+    accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
+    accounts_df["AccountID"] = accounts_df["AccountID"].astype(int)
 
     try:
-        if os.path.exists(csv_path) and os.path.getsize(csv_path) > 0:
-            df = pd.read_csv(csv_path)
+        # Merge customers + persons to get full profile
+        merged_df = pd.merge(customers_df, persons_df, left_on="CustomerID", right_on="ID", how="left")
+
+        # Get just one account per customer
+        account_map = accounts_df.groupby("CustomerID")["AccountID"].first().reset_index()
+        merged_df = pd.merge(merged_df, account_map, left_on="CustomerID", right_on="CustomerID", how="left")
+
+        # Rename AccountID column for clarity in the template
+        merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
+
+        customers = merged_df.to_dict(orient="records")
+        if os.path.exists(employeePath) and os.path.getsize(employeePath) > 0:
+            df = pd.read_csv(employeePath)
 
             # Check if required columns exist
             if all(col in df.columns for col in ["Username", "EmployeeID", "Position"]):
@@ -73,8 +93,10 @@ def admin_dashboard():
     except Exception as e:
         flash(f"Error reading CSV: {e}", "danger")
         tellers = []
+        customers = []
+        return jsonify(success=False, message=str(e)), 500
 
-    return render_template("employee/admin_dashboard.html", tellers=tellers)
+    return render_template("employee/admin_dashboard.html", tellers=tellers, customers=customers)
 
 # Create Teller Route
 @employee_bp.route("/create-teller", methods=["POST"])

@@ -13,7 +13,7 @@
     <h1>Teller Management</h1>
 
     <div class="admin-controls">
-        <input type="text" id="searchBar" placeholder="Search Teller ID or Name..." onkeyup="filterTellers()">
+        <input type="text" id="tellerSearchBar" placeholder="Search Teller ID or Name..." onkeyup="filterTellers()">
         <button class="create-btn" onclick="openCreateModal()">Create Teller Account</button>
     </div>
 
@@ -54,86 +54,86 @@
         </div>
         {% endfor %}
     </div>
-    <div class="teller-dashboard">
-        <h1>Customer Management</h1>
-      
-        <div class="teller-controls">
-          <input type="text" id="searchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
-        </div>
-      
-        <!-- Grid of customer cards -->
-        <div class="customer-grid" id="customerGrid">
-          {% for customer in customers %}
-          <div class="customer-card" onclick="openCustomerModal(
-            '{{ customer.CustomerID }}',
-            '{{ customer.Username }}',
-            '{{ customer.FirstName }}',
-            '{{ customer.LastName }}',
-            '{{ customer.PhoneNum }}',
-            '{{ customer.Email }}',
-            '{{ customer.Address }}')">
-            <div class="avatar"></div>
-            <div class="customer-info">
-              <strong>{{ customer.Username }}</strong>
-              <p>Customer ID: {{ customer.CustomerID }}</p>
-            </div>
-          </div>
-          {% endfor %}
+</div>
+<div class="teller-dashboard">
+    <h1>Customer Management</h1>
+  
+    <div class="teller-controls">
+      <input type="text" id="customerSearchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+    </div>
+  
+    <!-- Grid of customer cards -->
+    <div class="customer-grid" id="customerGrid">
+      {% for customer in customers %}
+      <div class="customer-card" onclick="openCustomerModal(
+        '{{ customer.CustomerID }}',
+        '{{ customer.Username }}',
+        '{{ customer.FirstName }}',
+        '{{ customer.LastName }}',
+        '{{ customer.PhoneNum }}',
+        '{{ customer.Email }}',
+        '{{ customer.Address }}')">
+        <div class="avatar"></div>
+        <div class="customer-info">
+          <strong>{{ customer.Username }}</strong>
+          <p>Customer ID: {{ customer.CustomerID }}</p>
         </div>
       </div>
+      {% endfor %}
+    </div>
+  </div>
+  
+  <!-- Customer Modal -->
+  <div id="customerModal" class="modal">
+    <div class="modal-content">
+      <a href="{{ url_for('employee.admin_dashboard') }}" class="exit-to-dashboard" title="Exit to Dashboard">Exit</a>
+      <span class="close" onclick="closeCustomerModal()">&times;</span>
       
-      <!-- Customer Modal -->
-      <div id="customerModal" class="modal">
-        <div class="modal-content">
-          <a href="{{ url_for('employee.admin_dashboard') }}" class="exit-to-dashboard" title="Exit to Dashboard">Exit</a>
-          <span class="close" onclick="closeCustomerModal()">&times;</span>
-          
-          <div class="modal-left">
-            <!-- Customer Info Panel -->
-            <div id="customerInfoPanel">
-              <h2>Customer Info</h2>
-          
-              <div class="form-group">
-                <label>Username</label>
-                <div id="modalUsername" class="readonly-field"></div>
-              </div>
-              <div class="form-group">
-                <label>Customer ID</label>
-                <div id="modalCustomerID" class="readonly-field"></div>
-              </div>
-              <div class="form-group">
-                <label>First Name</label>
-                <div id="modalFirstName" class="readonly-field"></div>
-              </div>
-              <div class="form-group">
-                <label>Last Name</label>
-                <div id="modalLastName" class="readonly-field"></div>
-              </div>
-              <div class="form-group">
-                <label>Phone Number</label>
-                <div id="modalPhone" class="readonly-field"></div>
-              </div>
-              <div class="form-group">
-                <label>Email</label>
-                <div id="modalEmail" class="readonly-field"></div>
-              </div>
-              <div class="form-group">
-                <label>Address</label>
-                <div id="modalAddress" class="readonly-field"></div>
-              </div>
-            </div>
-          
-            <!-- User's Accounts Panel -->
-            <div id="userAccountsPanel" style="display: none;">
-              <h2>User's Accounts</h2>
-              <div id="userAccounts" class="readonly-field scroll-box"></div>
-            </div>
+      <div class="modal-left">
+        <!-- Customer Info Panel -->
+        <div id="customerInfoPanel">
+          <h2>Customer Info</h2>
+      
+          <div class="form-group">
+            <label>Username</label>
+            <div id="modalUsername" class="readonly-field"></div>
           </div>
-</div>
+          <div class="form-group">
+            <label>Customer ID</label>
+            <div id="modalCustomerID" class="readonly-field"></div>
+          </div>
+          <div class="form-group">
+            <label>First Name</label>
+            <div id="modalFirstName" class="readonly-field"></div>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <div id="modalLastName" class="readonly-field"></div>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <div id="modalPhone" class="readonly-field"></div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <div id="modalEmail" class="readonly-field"></div>
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <div id="modalAddress" class="readonly-field"></div>
+          </div>
+        </div>
+      
+        <!-- User's Accounts Panel -->
+        <div id="userAccountsPanel" style="display: none;">
+          <h2>User's Accounts</h2>
+          <div id="userAccounts" class="readonly-field scroll-box"></div>
+        </div>
+      </div>
 
 <script>
 function filterTellers() {
-    const input = document.getElementById("searchBar").value.toLowerCase();
+    const input = document.getElementById("tellerSearchBar").value.toLowerCase();
     const cards = document.querySelectorAll(".teller-card");
 
     cards.forEach(card => {
@@ -242,6 +242,23 @@ function submitDelete() {
     });
 }
 
+function filterCustomers() {
+  const input = document.getElementById("customerSearchBar").value.toLowerCase();
+  const cards = document.querySelectorAll(".customer-card");
+  cards.forEach(card => {
+    const name = card.querySelector("strong").innerText.toLowerCase();
+    const account = card.querySelector("p").innerText.toLowerCase();
+    card.classList.toggle("hidden", !name.includes(input) && !account.includes(input));
+  });
+}
+
+function setModalTextContent(ids, values) {
+  ids.forEach((id, index) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = values[index];
+  });
+}
+
 function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
   currentCustomerID = customerID;
 
@@ -267,7 +284,6 @@ function openCustomerModal(customerID, username, firstName, lastName, phone, ema
   );
 
   document.getElementById("customerModal").style.display = "flex";
-  toggleAccountInputs();
 }
 
 function closeCustomerModal() {

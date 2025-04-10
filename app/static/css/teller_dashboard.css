@@ -32,6 +32,17 @@
   box-sizing: border-box;
 }
 
+#customerSearchBar {
+  flex: 1;
+  padding: 0 1rem;
+  height: 42px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 60%;
+  box-sizing: border-box;
+}
+
 /* ================= Customer Card Grid ================= */
 .customer-grid {
   display: grid;
