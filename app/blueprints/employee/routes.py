@@ -30,7 +30,6 @@ def admin_login():
 
     if request.method == "POST":
         username = request.form.get("username")
-        employee_id = request.form.get("employeeId")
 
         teller_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
         df = pd.read_csv(teller_path)
@@ -39,7 +38,6 @@ def admin_login():
 
         if not match.empty:
             session['admin'] = username
-            session['employee_id'] = 0
             session['role'] = 'admin'
             return redirect(url_for("employee.admin_dashboard"))
         else:

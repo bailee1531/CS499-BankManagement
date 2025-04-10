@@ -1,0 +1,55 @@
+@import url("shared.css");
+
+.terms-section {
+    background-color: var(--dark-bg);
+    color: var(--white);
+    padding: 2rem;
+}
+
+.terms-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--dark-bg);
+    border-radius: var(--container-border-radius);
+}
+
+.terms-heading {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+    padding-bottom: 0.5rem;
+}
+
+.terms-intro {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.terms-block {
+    margin-bottom: 1.5rem;
+}
+
+.terms-block h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--white);
+}
+
+.terms-block p,
+.terms-block ul {
+    color: #ddd;
+}
+
+.terms-block ul {
+    padding-left: 1.5rem;
+    list-style: disc;
+}
+
+.terms-contact {
+    text-align: center;
+    margin-top: 2rem;
+    font-weight: bold;
+}

@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 {% block meta_description %}Welcome to Evergreen Bank. Your trusted partner in financial solutions.{% endblock %}
 {% block title %}Evergreen Bank - Home{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+{% endblock %}
 {% block content %}
 <main>
     <section class="hero">
+        <div class="landing-logo-container">
+            <img src="{{ url_for('static', filename='images/Evergreen_Logo.png') }}" alt="Evergreen Bank Logo" class="landing-logo">
+        </div>
         <h1>Welcome to Evergreen Bank</h1>
         <p>Your trusted partner in financial solutions.</p>
     </section>
