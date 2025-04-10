@@ -112,7 +112,7 @@ def terms_of_service() -> Response:
     return render_template("customer/terms.html")
 
 @customer_bp.route('/Dashboard')
-@login_required("customer_id")
+@login_required("customer")
 def customer_dashboard() -> Response:
     """
     Render the user's dashboard displaying their accounts.
@@ -147,7 +147,7 @@ def customer_dashboard() -> Response:
     )
 
 @customer_bp.route('/account-overview/<int:account_id>')
-@login_required("customer_id")
+@login_required("customer")
 def account_overview(account_id: int) -> Response:
     """
     Display detailed information for a specific account.
@@ -183,7 +183,7 @@ def account_overview(account_id: int) -> Response:
 # =============================================================================
 
 @customer_bp.route('/settings', methods=['GET', 'POST'])
-@login_required("customer_id")
+@login_required("customer")
 def settings() -> Response:
     """
     Render and process the user settings form.
@@ -290,7 +290,7 @@ def settings() -> Response:
 
 
 @customer_bp.route('/credit-mortgage/<int:account_id>')
-@login_required("customer_id")
+@login_required("customer")
 def credit_mortgage_page(account_id: int) -> Response:
     """
     Display detailed information for Credit Card or Mortgage accounts.
@@ -344,7 +344,7 @@ def credit_mortgage_page(account_id: int) -> Response:
 # =============================================================================
 
 @customer_bp.route('/deposit/<int:account_id>', methods=['GET', 'POST'])
-@login_required("customer_id")
+@login_required("customer")
 def deposit_money(account_id: int) -> Response:
     """
     Process a deposit for a selected account.
@@ -380,7 +380,7 @@ def deposit_money(account_id: int) -> Response:
 # =============================================================================
 
 @customer_bp.route('/withdraw/<int:account_id>', methods=['GET', 'POST'])
-@login_required("customer_id")
+@login_required("customer")
 def withdraw_money(account_id=None) -> Response:
     customer_id = get_logged_in_customer()
     form = WithdrawForm()
@@ -408,7 +408,7 @@ def withdraw_money(account_id=None) -> Response:
 # =============================================================================
 
 @customer_bp.route('/account/transfer', methods=['GET', 'POST'])
-@login_required('customer_id')
+@login_required('customer')
 def transfer_funds() -> Response:
     """
     Process a fund transfer between two accounts.
@@ -436,7 +436,7 @@ def transfer_funds() -> Response:
 # =============================================================================
 
 @customer_bp.route('/pay-bill/<int:account_id>', methods=['GET', 'POST'])
-@login_required("customer_id")
+@login_required("customer")
 def pay_bill(account_id: int):
     """
     Handles bill payment for a specified account. 
@@ -662,6 +662,7 @@ def pay_bill(account_id: int):
 # =============================================================================
 
 @customer_bp.route('/api/transactions/<int:account_id>')
+@login_required("customer")
 def get_transactions(account_id):
     """
     Retrieve transactions for a specific account, split into 'current' and 'past'
@@ -709,7 +710,7 @@ def get_transactions(account_id):
 
 
 @customer_bp.route('/archived-bills/<int:account_id>')
-@login_required("customer_id")
+@login_required("customer")
 def get_archived_bills(account_id: int):
     """
     Retrieve archived credit card bills for the currently logged-in customer,
@@ -738,7 +739,7 @@ def get_archived_bills(account_id: int):
 
 
 @customer_bp.route('/api/account-balance/<int:account_id>')
-@login_required("customer_id")
+@login_required("customer")
 def get_account_balance(account_id: int):
     """
     Retrieve the current balance and type of the account.
