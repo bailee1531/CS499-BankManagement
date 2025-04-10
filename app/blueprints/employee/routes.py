@@ -53,6 +53,7 @@ def admin_login():
 
 # Admin Dashboard Route
 @employee_bp.route("/admin-dashboard")
+@login_required("admin")
 def admin_dashboard():
     csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
 
@@ -78,6 +79,7 @@ def admin_dashboard():
 
 # Create Teller Route
 @employee_bp.route("/create-teller", methods=["POST"])
+@login_required("admin")
 def create_teller_route():
     data = request.get_json()
     first = data.get("firstName", "").strip()
@@ -114,6 +116,7 @@ def check_employee():
         return jsonify({'exists': bool(exists)})
 
 @employee_bp.route("/edit-teller", methods=["POST"])
+@login_required("admin")
 def edit_teller():
     data = request.get_json()
     employee_id = int(data.get("employeeID", 0))
@@ -132,6 +135,7 @@ def edit_teller():
         return jsonify(success=False, message=str(e)), 500
 
 @employee_bp.route("/delete-teller", methods=["POST"])
+@login_required("admin")
 def delete_teller():
     data = request.get_json()
     employee_id = int(data.get("employeeID", 0))
@@ -146,6 +150,7 @@ def delete_teller():
         return jsonify(success=False, message=str(e)), 500
 
 @employee_bp.route("/teller-dashboard", methods=["GET", "POST"])
+@login_required("teller")
 def teller_dashboard():
     try:
         customers_df = pd.read_csv(get_csv_path("customers.csv"))
@@ -175,6 +180,7 @@ def teller_dashboard():
     return render_template("employee/teller_dashboard.html", customers=customers)
 
 @employee_bp.route("/edit-username", methods=["POST"])
+@login_required("teller")
 def edit_username():
     data = request.get_json()
     customer_id = data.get("customerId")
@@ -202,6 +208,7 @@ def edit_username():
 #Reset Customer Password
 # ---------------------------
 @employee_bp.route("/reset-password", methods=["POST"])
+@login_required("teller")
 def reset_customer_password_route():
     data = request.get_json()
     customer_id = data.get("customerID")
@@ -237,6 +244,7 @@ def reset_customer_password_route():
         return jsonify(success=False, message=str(e)), 500
     
 @employee_bp.route("/get-accounts/<int:customer_id>")
+@login_required("teller", "admin")
 def get_accounts(customer_id):
     accounts = []
     try:
@@ -258,6 +266,7 @@ def get_accounts(customer_id):
         return jsonify(success=False, message=str(e))
 
 @employee_bp.route("/check-accounts/<int:customer_id>", methods=["GET"])
+@login_required("teller", "admin")
 def check_customer_accounts(customer_id):
     try:
         accounts_path = get_csv_path("accounts.csv")
@@ -275,6 +284,7 @@ def check_customer_accounts(customer_id):
     
 
 @employee_bp.route("/open-account", methods=["POST"])
+@login_required("teller")
 def open_account_route():
     data = request.get_json()
 
@@ -339,6 +349,7 @@ def open_account_route():
 
 
 @employee_bp.route("/delete-account", methods=["POST"])
+@login_required("teller")
 def delete_account():
     data = request.get_json()
     account_id = int(data.get("accountID"))
@@ -364,6 +375,7 @@ def delete_account():
 
 
 @employee_bp.route("/deposit", methods=["POST"])
+@login_required("teller")
 def deposit():
     from scripts.makeDeposit import deposit
     data = request.get_json()
@@ -406,6 +418,7 @@ def deposit():
         return jsonify(success=False, message="Deposit failed.")
     
 @employee_bp.route("/withdraw", methods=["POST"])
+@login_required("teller")
 def withdraw():
     from scripts.withdrawMoney import withdraw
     data = request.get_json()
@@ -449,6 +462,7 @@ def withdraw():
         return jsonify(success=False, message="Withdrawal failed.")
 
 @employee_bp.route("/transfer", methods=["POST"])
+@login_required("teller")
 def transfer():
     from scripts.fundTransfer import transferFunds
     data = request.get_json()
