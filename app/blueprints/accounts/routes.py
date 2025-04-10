@@ -14,7 +14,7 @@ from flask import (
 # Import shared utilities for checking account type and managing flash messages
 from app.blueprints.sharedUtilities import (
     user_has_account_type, get_csv_path, 
-    flash_success, flash_error, get_customer_accounts
+    flash_success, flash_error, get_customer_accounts, login_required
 )
 # Internal utility and form imports
 from scripts import createCreditCard, createLoan
@@ -110,7 +110,8 @@ def credit_cards() -> Response:
                     payeeAddress="Somewhere In The World",
                     amount=Decimal("0"),
                     dueDate=(date.today() + timedelta(days=30)).isoformat(),
-                    paymentAccID=new_card["AccountID"]
+                    paymentAccID=new_card["AccountID"],
+                    minPayment = 0
                 )
 
                 # Flash the appropriate message based on the bill payment result
@@ -158,20 +159,15 @@ def loans() -> Response:
 # Handles GET/POST for mortgage loan application
 # -----------------------------------------------------------------------------
 @accounts_bp.route('/customer/mortgage', methods=['GET', 'POST'])
+@login_required("customer_id")
 def mortgage_application():
-    """
-    Route for mortgage loan application.
-    """
+
     form = MortgageForm()
 
     if form.validate_on_submit():
         loan_amount = Decimal(form.loan_amount.data)
         loan_term = form.loan_term.data
         customer_id = session.get("customer_id")
-
-        if not customer_id:
-            flash_error("You must be logged in to open an account.")
-            return redirect(url_for("auth.customer_login", next=request.url))
 
         # Enforce minimum loan amount
         if loan_amount < Decimal("50.00"):
@@ -188,9 +184,8 @@ def mortgage_application():
                 'accounts/mortgage_application.html',
                 form=form,
                 form_action=url_for('accounts.mortgage_application')
-        )
-
-        
+            )
+    
         try:
             accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
 
@@ -217,9 +212,10 @@ def mortgage_application():
                 customerID=customer_id,
                 payeeName="Evergreen Bank",
                 payeeAddress="Somewhere In The World",
-                amount=Decimal("50.00"),
+                amount=loan_amount,
                 dueDate=(date.today() + timedelta(days=30)).isoformat(),
-                paymentAccID=new_mortgage["AccountID"]
+                paymentAccID=new_mortgage["AccountID"],
+                minPayment = loan_amount / (loan_term * 12)
             )
 
             if bill_payment_result.get("status") == "success":

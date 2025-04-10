@@ -6,7 +6,7 @@ from decimal import Decimal
 import os
 from datetime import date, timedelta
 
-def scheduleBillPayment(customerID: int, payeeName: str, payeeAddress: str, amount: Decimal, dueDate: str, paymentAccID: int) -> dict:
+def scheduleBillPayment(customerID: int, payeeName: str, payeeAddress: str, amount: Decimal, dueDate: str, paymentAccID: int, minPayment=Decimal("0.00")) -> dict:
     """
     Schedules a bill payment for the customer.
 
@@ -24,6 +24,8 @@ def scheduleBillPayment(customerID: int, payeeName: str, payeeAddress: str, amou
         The due date for the payment in YYYY-MM-DD format.
     paymentAccID : int
         The Account ID from which the payment will be made.
+    minPayment : Decimal
+        The minimum required payment for the bill.
 
     Returns
     -------
@@ -52,6 +54,7 @@ def scheduleBillPayment(customerID: int, payeeName: str, payeeAddress: str, amou
         'Amount': Decimal(amount).quantize(Decimal('0.00')),
         'DueDate': dueDate,
         'PaymentAccID': paymentAccID,
+        'MinPayment': Decimal(minPayment).quantize(Decimal('0.00'))
     }
 
     billsData.loc[len(billsData)] = newBillPayment
@@ -123,13 +126,12 @@ def processScheduledBills() -> list:
             billsData['Amount'] = billsData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
             amount = Decimal(bill['Amount']).quantize(Decimal('0.00'))
 
-
             success = False
             # Checking and savings account used to pay bills
             if accountType == 'Credit Card':
                 creditLimit = accountsData.at[accIndex[0], 'CreditLimit']
                 creditLimit = Decimal(str(creditLimit))
-                
+
                 if balance + amount > creditLimit:
                     overLimitFee = Decimal('35.00')
                     dueDate = (date.today() + timedelta(days=30)).isoformat()
@@ -140,7 +142,8 @@ def processScheduledBills() -> list:
                         '301 Sparkman Dr NW, Huntsville, AL 35899',
                         overLimitFee,
                         dueDate,
-                        bill['PaymentAccID']
+                        bill['PaymentAccID'],
+                        Decimal('35.00')
                     )
 
                     results.append({"status": "error", "message": f"Over-limit fee of ${overLimitFee} billed and due by {dueDate}."})
@@ -175,8 +178,52 @@ def processScheduledBills() -> list:
     accountsData['CreditLimit'] = accountsData['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
     accountsData.to_csv(accountsPath, index=False)
     billsData['Amount'] = billsData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
+    billsData['MinPayment'] = billsData['MinPayment'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
     billsData.to_csv(billsPath, index=False)
     transData['Amount'] = transData['Amount'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
     transData.to_csv(transPath, index=False)
 
     return results
+
+
+def generate_monthly_credit_card_statements():
+    """
+    Updates MinPayment for overdue credit card bills based on balance:
+    - $25 if amount < $1000
+    - 2% of amount if amount >= $1000
+    """
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    accounts_path = os.path.abspath(os.path.join(base_dir, '../csvFiles/accounts.csv'))
+    bills_path = os.path.abspath(os.path.join(base_dir, '../csvFiles/bills.csv'))
+
+    if not os.path.exists(accounts_path) or not os.path.exists(bills_path):
+        return {"status": "error", "message": "Required CSV file(s) not found."}
+
+    accounts_df = pd.read_csv(accounts_path)
+    bills_df = pd.read_csv(bills_path)
+
+    # Find all credit card accounts
+    credit_card_ids = accounts_df[accounts_df['AccountType'] == 'Credit Card']['AccountID'].astype(int).tolist()
+
+    today = date.today()
+    updated_count = 0
+
+    bills_df['Amount'] = bills_df['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+    bills_df['DueDate'] = pd.to_datetime(bills_df['DueDate']).dt.date
+
+
+    bills_df['MinPayment'] = pd.to_numeric(bills_df['MinPayment'], errors='coerce')
+    
+    for idx, row in bills_df.iterrows():
+        if int(row['PaymentAccID']) in credit_card_ids and row['DueDate'] < today:
+            amount = row['Amount']
+            new_min = Decimal('25.00') if amount < Decimal('1000.00') else (amount * Decimal('0.02')).quantize(Decimal('0.00'))
+            bills_df.at[idx, 'MinPayment'] = float(Decimal(new_min))
+            updated_count += 1
+
+    if updated_count > 0:
+        bills_df['MinPayment'] = bills_df['MinPayment'].apply(lambda x: f"{Decimal(str(x)):.2f}" if pd.notna(x) else "")
+        bills_df.to_csv(bills_path, index=False)
+        return {"status": "success", "message": f"{updated_count} overdue credit card bill(s) updated."}
+    else:
+        return {"status": "success", "message": "No overdue credit card bills found."}

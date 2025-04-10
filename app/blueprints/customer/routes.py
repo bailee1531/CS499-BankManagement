@@ -4,7 +4,8 @@ import logging
 from decimal import Decimal
 from Crypto.PublicKey import ECC
 from flask import Blueprint, render_template, Response, redirect, url_for, jsonify, request, session, current_app
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from app.blueprints.sharedUtilities import (
     get_csv_path, get_logged_in_customer,
     get_customer_accounts, 
@@ -112,7 +113,7 @@ def terms_of_service() -> Response:
     return render_template("customer/terms.html")
 
 @customer_bp.route('/Dashboard')
-@login_required("customer")
+@login_required("customer_id")
 def customer_dashboard() -> Response:
     """
     Render the user's dashboard displaying their accounts.
@@ -147,7 +148,7 @@ def customer_dashboard() -> Response:
     )
 
 @customer_bp.route('/account-overview/<int:account_id>')
-@login_required("customer")
+@login_required("customer_id")
 def account_overview(account_id: int) -> Response:
     """
     Display detailed information for a specific account.
@@ -183,7 +184,7 @@ def account_overview(account_id: int) -> Response:
 # =============================================================================
 
 @customer_bp.route('/settings', methods=['GET', 'POST'])
-@login_required("customer")
+@login_required("customer_id")
 def settings() -> Response:
     """
     Render and process the user settings form.
@@ -290,7 +291,7 @@ def settings() -> Response:
 
 
 @customer_bp.route('/credit-mortgage/<int:account_id>')
-@login_required("customer")
+@login_required("customer_id")
 def credit_mortgage_page(account_id: int) -> Response:
     """
     Display detailed information for Credit Card or Mortgage accounts.
@@ -323,7 +324,7 @@ def credit_mortgage_page(account_id: int) -> Response:
             bill_data = bill_row.iloc[0]
             extra_info["bill_id"] = int(bill_data["BillID"])
             extra_info["due_date"] = str(bill_data["DueDate"])
-            extra_info["minimum_due"] = float(bill_data["Amount"])
+            extra_info["minimum_due"] = float(bill_data["MinPayment"])
 
 
 
@@ -344,7 +345,7 @@ def credit_mortgage_page(account_id: int) -> Response:
 # =============================================================================
 
 @customer_bp.route('/deposit/<int:account_id>', methods=['GET', 'POST'])
-@login_required("customer")
+@login_required("customer_id")
 def deposit_money(account_id: int) -> Response:
     """
     Process a deposit for a selected account.
@@ -366,6 +367,12 @@ def deposit_money(account_id: int) -> Response:
         logger.error(f"Error setting up deposit form: {e}")
 
     if form.validate_on_submit():
+
+        if request.method == 'POST':
+            print("POST received")
+            print(form.data)
+            print(form.errors)
+
         result = deposit(int(form.account_id.data), form.amount.data)
         if result["status"] != "success":
             flash_error(result["message"])
@@ -380,7 +387,7 @@ def deposit_money(account_id: int) -> Response:
 # =============================================================================
 
 @customer_bp.route('/withdraw/<int:account_id>', methods=['GET', 'POST'])
-@login_required("customer")
+@login_required("customer_id")
 def withdraw_money(account_id=None) -> Response:
     customer_id = get_logged_in_customer()
     form = WithdrawForm()
@@ -434,138 +441,149 @@ def transfer_funds() -> Response:
 # =============================================================================
 # Bill Payment Route
 # =============================================================================
-
 @customer_bp.route('/pay-bill/<int:account_id>', methods=['GET', 'POST'])
-@login_required("customer")
+@login_required("customer_id")
 def pay_bill(account_id: int):
     """
-    Handles bill payment for a specified account. 
-    Allows customers to pay credit card or mortgage loan bills using their checking or savings accounts.
+    Handles bill payment for a specified account.
+    After every payment, a snapshot of the bill is archived.
+    The active bill is removed only when the remaining amount equals zero.
     """
     customer_id = get_logged_in_customer()
 
-    # Load the target bill account
+    # Load account data.
     try:
-        try:
-            account = load_account_by_id(account_id)
-        except ValueError:
-            flash_error("That mortgage account has been closed or archived.")
-            return redirect(url_for("customer.customer_dashboard"))
-
-        account["AccountID"] = int(account["AccountID"])
-        account_type = account["AccountType"]
+        account = load_account_by_id(account_id)
+    except ValueError:
+        flash_error("That account has been closed or archived.")
+        return redirect(url_for("customer.customer_dashboard"))
     except Exception:
         flash_error("Error retrieving account details.")
         return redirect(url_for("customer.customer_dashboard"))
 
-    # Retrieve the bill associated with this account
-    bill = get_bill_for_account(customer_id, account_id)
+    account["AccountID"] = int(account["AccountID"])
+    account_type = account["AccountType"]
 
-    # Default bill values for display if no bill is due
-    if bill.empty or Decimal(str(bill["Amount"])).quantize(Decimal("0.00")) == Decimal("0.00"):
-        min_amount = None
-        due_date_obj = None
-        due_date_str = None
-        payee_name_value = "Evergreen Bank"
-        payee_address_value = "Somewhere In The World"
-        bill_id_value = ""
-    else:
-        # Bill exists, extract necessary fields
-        min_amount = float(bill["Amount"])
-        due_date_str = bill["DueDate"]
+    # Retrieve the bill associated with this account.
+    bill = get_bill_for_account(customer_id, account_id)
+    min_amount = None
+    due_date_obj = None
+    due_date_str = None
+    payee_name_value = "Evergreen Bank"
+    payee_address_value = "Somewhere In The World"
+    bill_id_value = ""
+
+    if not bill.empty:
+        bill_id_value = bill["BillID"]
+        payee_name_value = bill["PayeeName"]
+        payee_address_value = bill["PayeeAddress"]
         try:
+            due_date_str = bill["DueDate"]
             due_date_obj = datetime.strptime(due_date_str, "%Y-%m-%d").date()
         except Exception:
             due_date_obj = None
-        payee_name_value = bill["PayeeName"]
-        payee_address_value = bill["PayeeAddress"]
-        bill_id_value = bill["BillID"]
 
-    # Get all eligible payment accounts (checking/savings)
+        if account_type in ['Credit Card', 'Mortgage Loan']:
+            min_amount = float(Decimal(bill["MinPayment"]).quantize(Decimal("0.00")))
+        else:
+            min_amount = float(Decimal(bill["Amount"]).quantize(Decimal("0.00")))
+        
+        # Optionally, inform the user if the bill is fully paid.
+        if Decimal(str(bill["Amount"])).quantize(Decimal("0.00")) == Decimal("0.00"):
+            flash_success("Bill is fully paid. It will be archived upon processing.")
+
+    # Get eligible payment accounts (e.g., checking/savings).
     accounts_df = get_customer_accounts(customer_id)
     form = BillPaymentForm()
     form.paymentAccID.choices = [
         (int(row["AccountID"]), f'{row["AccountType"]} - ${row["CurrBal"]:.2f}')
-        for _, row in accounts_df.iterrows()
-        if row["AccountType"] in ["Checking", "Savings"]
+        for _, row in accounts_df.iterrows() if row["AccountType"] in ["Checking", "Savings"]
     ]
 
-    # Populate form fields on GET request
+    # Populate the form on GET.
     if request.method == "GET":
         form.bill_id.data = bill_id_value
-        form.paymentAccID.data = account_id
-        if account_type in ['Credit Card', 'Mortgage Loan']:
+        form.paymentAccID.data = account_id  # Default selection.
+        if not bill.empty and account_type in ['Credit Card', 'Mortgage Loan']:
             form.payee_name.data = payee_name_value
             form.payee_address.data = payee_address_value
             if due_date_obj:
                 form.due_date.data = due_date_obj
 
-    # Handle POST request (form submission)
+    # Process the payment on POST.
     if form.validate_on_submit():
-        # Extract form data
         bill_id = form.bill_id.data
-        amount = Decimal(form.amount.data).quantize(Decimal('0.00'))
+        amount = Decimal(form.amount.data).quantize(Decimal("0.00"))
         due_date_input = form.due_date.data
         due_date_str_input = due_date_input.strftime("%Y-%m-%d") if due_date_input else ""
         payee_name_input = form.payee_name.data
         payee_address_input = form.payee_address.data
         payment_account_id = int(form.paymentAccID.data)
 
-        # Load data files
+        # Load data files.
         try:
             bills_df, accounts_df, logs_df = read_dataframes()
         except Exception:
             flash_error("Unable to read data files.")
             return redirect(url_for("customer.customer_dashboard"))
 
-        # Existing bill: validate and process payment
+        # Check that the active bill exists.
         if bill_id and int(bill_id) in bills_df['BillID'].values:
             try:
                 bill_record = bills_df[bills_df['BillID'] == int(bill_id)].iloc[0]
-                full_amount_due = Decimal(bill_record["Amount"]).quantize(Decimal('0.00'))
+                full_amount_due = Decimal(bill_record["Amount"]).quantize(Decimal("0.00"))
 
-                # Validate amount based on account type
+                # Validate payment amount based on account type.
                 if account_type in ["Credit Card", "Mortgage Loan"]:
-                    if amount < full_amount_due:
-                        flash_error(f"You must pay at least the due amount of ${full_amount_due:.2f}.")
-                        return render_template("customer/bill_pay.html", form=form, account_id=account_id, min_amount=full_amount_due, due_date=due_date_str_input, account_type=account_type)
+                    min_payment = Decimal(bill_record["MinPayment"]).quantize(Decimal("0.00"))
+                    if amount < min_payment:
+                        flash_error(f"You must pay at least the minimum payment of ${min_payment:.2f}.")
+                        return render_template("customer/bill_pay.html", form=form, account_id=account_id,
+                                               min_amount=min_payment, due_date=due_date_str_input, account_type=account_type)
+                    if amount > full_amount_due:
+                        flash_error(f"Payment exceeds the remaining bill amount of ${full_amount_due:.2f}.")
+                        return render_template("customer/bill_pay.html", form=form, account_id=account_id,
+                                               min_amount=min_payment, due_date=due_date_str_input, account_type=account_type)
                 else:
                     if amount != full_amount_due:
                         flash_error(f"You must pay the exact bill amount of ${full_amount_due:.2f}.")
-                        return render_template("customer/bill_pay.html", form=form, account_id=account_id, min_amount=full_amount_due, due_date=due_date_str_input, account_type=account_type)
+                        return render_template("customer/bill_pay.html", form=form, account_id=account_id,
+                                               min_amount=full_amount_due, due_date=due_date_str_input, account_type=account_type)
 
-                # Prevent using the same account for payment
+                # Prevent using the same account as the bill account.
                 if payment_account_id == account_id:
                     flash_error("Payment account cannot be the same as the bill account.")
-                    return redirect(url_for("customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview", account_id=account_id))
+                    target_page = "customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview"
+                    return redirect(url_for(target_page, account_id=account_id))
 
-                # Load account balances
+                # Check that the payment account has sufficient funds.
                 acc_row = load_account_by_id(account_id)
-                curr_bal = Decimal(acc_row["CurrBal"]).quantize(Decimal('0.00'))
+                curr_bal = Decimal(acc_row["CurrBal"]).quantize(Decimal("0.00"))
                 payment_acc_row = load_account_by_id(payment_account_id)
                 payment_curr_bal = Decimal(payment_acc_row["CurrBal"]).quantize(Decimal("0.00"))
-
-                # Ensure sufficient funds
                 if payment_curr_bal < amount:
                     flash_error("Insufficient funds in payment account.")
-                    return redirect(url_for("customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview", account_id=account_id))
+                    target_page = "customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview"
+                    return redirect(url_for(target_page, account_id=account_id))
 
-                # Prevent overpaying credit card balance
+                # Calculate new balance for the bill account.
                 if account_type == "Credit Card":
                     new_balance = curr_bal - amount
                     if new_balance < Decimal("0.00"):
                         flash_error("Payment exceeds credit card balance.")
                         return redirect(url_for("customer.credit_mortgage_page", account_id=account_id))
+                elif account_type == "Mortgage Loan":
+                    new_balance = curr_bal + amount  # For mortgage loans, adding reduces the negative balance.
                 else:
                     new_balance = curr_bal - amount
 
-                # Update balances
+                # Update account balances.
                 new_payment_balance = payment_curr_bal - amount
                 update_account_balance(accounts_df, account_id, new_balance)
                 update_account_balance(accounts_df, payment_account_id, new_payment_balance)
                 accounts_df.to_csv(get_csv_path("accounts.csv"), index=False)
 
-                # Log the transaction
+                # Log the transaction.
                 transaction_id = generate_transaction_ID(logs_df)
                 logs_df.loc[len(logs_df)] = {
                     'AccountID': payment_account_id,
@@ -575,62 +593,60 @@ def pay_bill(account_id: int):
                     'TransactionID': transaction_id
                 }
 
-                # Archive the bill
-                archive_result = archive("bill", int(bill_id))
-                if archive_result["status"] == "success":
-                    flash_success("Bill paid and archived successfully.")
+                # Calculate the remaining amount of the bill.
+                remaining_bill = full_amount_due - amount
+
+                # Archive after every payment.
+                # If remaining_bill > 0, archive a snapshot (do not remove the active record).
+                # If remaining_bill == 0 (or less), archive and remove the active record.
+                if remaining_bill > Decimal("0.00"):
+                    # Save the current due date to restore in the archived copy
+                    original_due_date = bills_df.loc[bills_df['BillID'] == int(bill_id), 'DueDate'].values[0]
+
+                    # Archive current state (before updating due date)
+                    archive_result = archive("bill", int(bill_id), remove_record=False)
+
+                    # Update the active record: new amount and new due date (one month ahead)
+                    new_due_date = datetime.today() + relativedelta(months=1)
+                    bills_df.loc[bills_df['BillID'] == int(bill_id), 'Amount'] = str(remaining_bill)
+                    bills_df.loc[bills_df['BillID'] == int(bill_id), 'DueDate'] = new_due_date.strftime("%Y-%m-%d")
+                    bills_df.to_csv(get_csv_path("bills.csv"), index=False)
+
+                    # Flash messages
+                    if archive_result["status"] == "success":
+                        flash_success(f"Partial payment applied. Remaining balance is ${remaining_bill:.2f}. Payment archived. Due date moved to {new_due_date.strftime('%Y-%m-%d')}.")
+                    else:
+                        flash_error(f"Partial payment applied, but archiving failed: {archive_result['message']}")
+
                 else:
-                    flash_error(f"Payment processed but archiving failed: {archive_result['message']}")
-
-                # Mortgage loan special handling
-                print("Bill exists — proceeding with payment.")
-                print("No bill found — scheduling new bill.")
-                print(f"Archive result: {archive_result}")
-
-                loan_archived = False
-                if account_type == "Mortgage Loan":
-                    updated_accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-                    loan_row = updated_accounts_df[
-                        (updated_accounts_df['AccountID'] == account_id) &
-                        (updated_accounts_df['AccountType'] == 'Mortgage Loan')
-                    ]
-                    if not loan_row.empty and Decimal(str(loan_row.iloc[0]['CurrBal'])) == Decimal("0.00"):
-                        loan_archive_result = archive("loan", account_id)
-                        if loan_archive_result["status"] == "success":
-                            flash_success("Mortgage loan fully paid and archived.")
-                            loan_archived = True
+                    # For a fully paid bill, force the balance to zero.
+                    remaining_bill = Decimal("0.00")
+                    bills_df.loc[bills_df['BillID'] == int(bill_id), 'Amount'] = str(remaining_bill)
+                    bills_df.to_csv(get_csv_path("bills.csv"), index=False)
+                    
+                    # For mortgage loans, archive from accounts.csv; otherwise, archive from bills.csv.
+                    if account_type == "Mortgage Loan":
+                        archive_result = archive("loan", account_id)
+                        if archive_result["status"] == "success":
+                            flash_success("Mortgage fully paid and archived successfully.")
                         else:
-                            flash_error(f"Loan archiving failed: {loan_archive_result['message']}")
-
-                # Schedule next bill if applicable
-                if not loan_archived:
-                    updated_accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-                    new_acc_row = updated_accounts_df[updated_accounts_df["AccountID"] == account_id].iloc[0]
-                    new_balance = Decimal(str(new_acc_row["CurrBal"])).quantize(Decimal("0.00"))
-                    if new_balance > Decimal("0.00"):
-                        next_due_date = due_date_input + timedelta(days=30)
-                        schedule_result = scheduleBillPayment(
-                            customerID=customer_id,
-                            payeeName=payee_name_input,
-                            payeeAddress=payee_address_input,
-                            amount=new_balance,
-                            dueDate=next_due_date.strftime("%Y-%m-%d"),
-                            paymentAccID=account_id
-                        )
-                        if schedule_result["status"] == "success":
-                            flash_success("Next bill scheduled.")
+                            flash_error(f"Mortgage payment processed but archiving failed: {archive_result['message']}")
+                    else:
+                        archive_result = archive("bill", int(bill_id), remove_record=True)
+                        if archive_result["status"] == "success":
+                            flash_success("Bill fully paid and archived successfully.")
                         else:
-                            flash_error(schedule_result["message"])
+                            flash_error(f"Payment processed but archiving failed: {archive_result['message']}")
 
-                return redirect(url_for("credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview", account_id=account_id))
-
+                target_page = "customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview"
+                return redirect(url_for(target_page, account_id=account_id))
 
             except Exception as e:
-                logger.error(f"Early bill payment failed: {e}", exc_info=True)
-                flash_error("An error occurred while processing early payment.")
-
-        # No current bill — schedule a new one
+                logger.error(f"Bill payment processing failed: {e}", exc_info=True)
+                flash_error("An error occurred while processing your payment.")
+                return redirect(url_for("customer.account_overview", account_id=account_id))
         else:
+            # If no active bill was found, create a new bill record.
             result = scheduleBillPayment(
                 customerID=customer_id,
                 payeeName=payee_name_input,
@@ -641,11 +657,12 @@ def pay_bill(account_id: int):
             )
             if result["status"] == "success":
                 flash_success(result["message"])
-                return redirect(url_for("customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview", account_id=account_id))
+                target_page = "customer.credit_mortgage_page" if account_type in ["Credit Card", "Mortgage Loan"] else "customer.account_overview"
+                return redirect(url_for(target_page, account_id=account_id))
             else:
                 flash_error(result["message"])
 
-    # Render the bill payment page
+    # Render the bill payment page.
     return render_template(
         "customer/bill_pay.html",
         form=form,
@@ -657,60 +674,49 @@ def pay_bill(account_id: int):
 
 
 
+
+
 # =============================================================================
 # API Endpoints
 # =============================================================================
 
 @customer_bp.route('/api/transactions/<int:account_id>')
-@login_required("customer")
+@login_required("customer_id")
 def get_transactions(account_id):
-    """
-    Retrieve transactions for a specific account, split into 'current' and 'past'
-    based on whether they occurred within the last 30 days.
-    """
     try:
-        # Load the transactions from CSV
         path = get_csv_path('transactions.csv')
         df = pd.read_csv(path)
 
-        # Filter transactions for the provided account ID
-        df = df[df['AccountID'] == account_id]
+        matching = df[df['AccountID'] == account_id].copy()
+        matching["TransDate"] = pd.to_datetime(matching["TransDate"], errors='coerce')
 
-        # Convert the TransDate column to datetime format
-        df['TransDate'] = pd.to_datetime(df['TransDate'], errors='coerce')
-
-        # Define time cutoff for current vs. past transactions
         today = datetime.today()
         cutoff = today - timedelta(days=30)
+        current_df = matching[matching['TransDate'] >= cutoff]
+        past_df = matching[matching['TransDate'] < cutoff]
 
-        # Separate into current and past based on transaction date
-        current_df = df[df['TransDate'] >= cutoff]
-        past_df = df[df['TransDate'] < cutoff]
-
-        # Helper function to format DataFrame rows for JSON
         def format_transactions(df):
             return [
                 {
                     "TransDate": row["TransDate"].strftime("%Y-%m-%d"),
-                    "description": row["TransType"].capitalize(),
+                    "description": str(row["TransactionType"]).capitalize(),
                     "amount": float(row["Amount"])
                 }
                 for _, row in df.iterrows()
             ]
 
-        # Return JSON with both current and past transactions
         return jsonify({
             "current_transactions": format_transactions(current_df),
             "past_transactions": format_transactions(past_df)
         })
 
     except Exception as e:
-        # Return error as JSON if something goes wrong
         return jsonify({"error": str(e)})
 
 
+
 @customer_bp.route('/archived-bills/<int:account_id>')
-@login_required("customer")
+@login_required("customer_id")
 def get_archived_bills(account_id: int):
     """
     Retrieve archived credit card bills for the currently logged-in customer,
@@ -726,7 +732,7 @@ def get_archived_bills(account_id: int):
         # Filter bills to only those related to the provided account ID
         filtered_bills = [
             bill for bill in archived_bills 
-            if bill.get("PaymentAccID") == account_id
+           if int(bill.get("PaymentAccID", -1)) == account_id
         ]
 
         # Return filtered bills in JSON
@@ -739,7 +745,7 @@ def get_archived_bills(account_id: int):
 
 
 @customer_bp.route('/api/account-balance/<int:account_id>')
-@login_required("customer")
+@login_required("customer_id")
 def get_account_balance(account_id: int):
     """
     Retrieve the current balance and type of the account.
@@ -769,12 +775,17 @@ def get_account_balance(account_id: int):
 
                 if not matching.empty:
                     # Find the earliest (upcoming) bill by due date
-                    matching["DueDate"] = pd.to_datetime(matching["DueDate"], errors="coerce")
+                    matching.loc[:, "DueDate"] = pd.to_datetime(matching["DueDate"], errors="coerce")
                     earliest_index = matching.sort_values("DueDate").index[0]
 
                     # Update the 'Amount' field with the new minimum payment
+                    # Update the 'MinPayment' field with the calculated minimum payment
                     old_amount = bills_df.at[earliest_index, "Amount"]
-                    bills_df.at[earliest_index, "Amount"] = float(amount_due)
+                    old_min_payment = bills_df.at[earliest_index, "MinPayment"]
+
+                    bills_df.at[earliest_index, "Amount"] = balance
+                    bills_df.at[earliest_index, "MinPayment"] = float(amount_due)
+
 
                     # Save the updated bills back to CSV
                     bills_df.to_csv(get_csv_path("bills.csv"), index=False)

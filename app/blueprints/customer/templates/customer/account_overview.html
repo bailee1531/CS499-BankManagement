@@ -29,9 +29,10 @@
         <p><span class="info-label">APR:</span> {{ "{:.2f}".format(extra_info.apr) }}%</p>
       {% endif %}
     </div>
-
+    
     <!-- Extra Transaction Buttons -->
     <div class="transaction-buttons">
+      {# 
       <button id="depositBtn" class="account-btn" type="button"
               onclick="window.location.href='/deposit/{{ account.AccountID }}';">
         Deposit
@@ -41,18 +42,19 @@
               onclick="window.location.href='/withdraw/{{ account.AccountID }}';">
         Withdraw
       </button>
+      #}
 
       <button id="transferBtn" class="account-btn" type="button"
         onclick="window.location.href='{{ url_for('customer.transfer_funds') | safe }}';">
         Transfer
       </button>
 
-
       <button id="payBillBtn" class="account-btn" type="button"
               onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">
         Pay Bill
       </button>
     </div>
+
 
 
     <!-- Collapsible: Transactions -->
