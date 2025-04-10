@@ -195,7 +195,8 @@ def register_step3():
                     payeeAddress="Somewhere In The World",
                     amount=Decimal("0"),
                     dueDate=(date.today() + timedelta(days=30)).isoformat(),
-                    paymentAccID=new_card["AccountID"]
+                    paymentAccID=new_card["AccountID"],
+                    minPayment = 0
                 )
 
                 # Handle result

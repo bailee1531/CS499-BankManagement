@@ -15,7 +15,7 @@
   <script src="{{ url_for('static', filename='js/update-archive.js') }}" defer></script>
   {% if account.AccountType == "Credit Card" %}
   <script src="{{ url_for('static', filename='js/update-bill-amount.js') }}" defer></script>
-{% endif %}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -24,32 +24,33 @@
     <h1>{{ account.AccountType }}</h1>
     <h2>Total Balance: $<span id="accountBalance">{{ "{:.2f}".format(account.CurrBal | default(0)) }}</span></h2>
 
-
-
     <!-- Account Details -->
     <div class="extra-account-info">
       <p><span class="info-label">Date Opened:</span> {{ account.DateOpened }}</p>
       <p><span class="info-label">Account ID:</span> {{ account.AccountID }}</p>
-      <p><span class="info-label">Bill Due Date:</span> {{ extra_info.due_date | default('N/A', true) }}</p>
-      <p><span class="info-label">Minimum Due:</span>
-        ${{ "{:.2f}".format(extra_info.minimum_due | default(0.0)) }} </p>     
-
-      {% if extra_info.apr is defined %}
-        <p><span class="info-label">APR:</span> {{ "{:.2f}".format(extra_info.apr) }}%</p>
+      {% if extra_info.minimum_due | default(0) != 0 %}
+        <p><span class="info-label">Bill Due Date:</span> {{ extra_info.due_date | default('N/A', true) }}</p>
+        <p><span class="info-label">Minimum Due:</span>
+          ${{ "{:.2f}".format(extra_info.minimum_due) }} </p>
+          {% if extra_info.apr is defined %}
+          <p><span class="info-label">APR:</span> {{ "{:.2f}".format(extra_info.apr) }}%</p>
+        {% endif %}
       {% endif %}
+
     </div>
 
     <!-- Pay Bill Button -->
-    {% if account.CurrBal > 0 %}
-    <div class="transaction-buttons">
-      <button id="payBillBtn" class="account-btn" type="button"
-              onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">
-        Pay Bill
-      </button>
-    </div>
+    {% set acc_type = account.AccountType.lower() %}
+    {% if (acc_type == "mortgage loan" and account.CurrBal < 0) or (acc_type == "credit card" and account.CurrBal > 0) %}
+      <div class="transaction-buttons">
+        <button id="payBillBtn" class="account-btn" type="button"
+                onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">
+          Pay Bill
+        </button>
+      </div>
     {% endif %}
     
-
+    
     {% if account.AccountType == "Credit Card" %}
       <!-- Collapsible: Transactions -->
       <div class="transactions-section">
