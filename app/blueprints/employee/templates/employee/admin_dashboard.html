@@ -33,7 +33,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeViewModal()">&times;</span>
             <h2>Teller Info</h2>
-            <p><strong>Username:</strong> <span id="modalUsername"></span></p>
+            <p><strong>Username:</strong> <span id="modalEmpUsername"></span></p>
             <p><strong>Employee ID:</strong> <span id="modalEmployeeID"></span></p>
             <input type="text" id="editUsernameInput" placeholder="New Username">
             <div class="modal-buttons">
@@ -124,12 +124,16 @@
           </div>
         </div>
       
-        <!-- User's Accounts Panel -->
-        <div id="userAccountsPanel" style="display: none;">
-          <h2>User's Accounts</h2>
-          <div id="userAccounts" class="readonly-field scroll-box"></div>
-        </div>
-      </div>
+    <!-- User's Accounts Panel -->
+    <div id="userAccountsPanel" style="display: none;">
+        <h2>User's Accounts</h2>
+        <div id="userAccounts" class="readonly-field scroll-box"></div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+</div>
+
 
 <script>
 function filterTellers() {
@@ -153,7 +157,7 @@ function closeCreateModal() {
 
 function openViewModal(id, username) {
     document.getElementById("modalEmployeeID").textContent = id;
-    document.getElementById("modalUsername").textContent = username;
+    document.getElementById("modalEmpUsername").textContent = username;
     document.getElementById("editUsernameInput").value = "";
     document.getElementById("viewModal").style.display = "flex";
 
@@ -216,7 +220,7 @@ function submitEdit() {
     .then(editData => {
         if (editData.success) {
             alert("Teller information updated successfully.");
-            document.getElementById('modalUsername').textContent = newUsername;
+            document.getElementById('modalEmpUsername').textContent = newUsername;
             closeViewModal();
         }
         else {
