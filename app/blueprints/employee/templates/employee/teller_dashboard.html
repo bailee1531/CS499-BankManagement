@@ -8,6 +8,7 @@
 
 <script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
 
 {% endblock %}
 
@@ -228,7 +229,8 @@
       <h2 style="text-align:center;">Deposit Funds</h2>
 
       <label for="depositAccountId">Account ID:</label>
-      <input type="number" id="depositAccountId" name="accountId" placeholder="Enter Account ID" required>
+      <select id="depositAccountId" name="accountId" required></select>
+
 
       <label for="depositAmount">Amount to Deposit:</label>
       <input type="number" step="0.01" id="depositAmount" name="amount" placeholder="Enter Amount (e.g., 100.50)" required>
@@ -246,7 +248,8 @@
       <h2 style="text-align:center;">Withdraw Funds</h2>
 
       <label for="withdrawAccountId">Account ID:</label>
-      <input type="number" id="withdrawAccountId" name="accountId" placeholder="Enter Account ID" required>
+      <select id="withdrawAccountId" name="accountId" required></select>
+
 
       <label for="withdrawAmount">Amount to Withdraw:</label>
       <input type="number" step="0.01" id="withdrawAmount" name="amount" placeholder="Enter Amount (e.g., 50.00)" required>
@@ -264,10 +267,10 @@
       <h2 style="text-align:center;">Transfer Funds</h2>
 
       <label for="sourceAccountId">Source Account ID:</label>
-      <input type="number" id="sourceAccountId" name="sourceAccountId" placeholder="Enter Source Account ID" required>
-
+      <select id="sourceAccountId" name="sourceAccountId" required></select>
+      
       <label for="destinationAccountId">Destination Account ID:</label>
-      <input type="number" id="destinationAccountId" name="destinationAccountId" placeholder="Enter Destination Account ID" required>
+      <select id="destinationAccountId" name="destinationAccountId" required></select>
 
       <label for="transferAmount">Amount to Transfer:</label>
       <input type="number" step="0.01" id="transferAmount" name="amount" placeholder="Enter Amount (e.g., 25.00)" required>
@@ -373,8 +376,10 @@ function closeCustomerModal() {
 }
 
 function openDepositModal() {
+    populateAccountDropdown(currentCustomerID, "depositAccountId");
     document.getElementById("depositModal").style.display = "block";
 }
+
 
 function closeDepositModal() {
     document.getElementById("depositModal").style.display = "none";
@@ -415,8 +420,10 @@ function submitDeposit() {
 }
 
 function openWithdrawModal() {
+    populateAccountDropdown(currentCustomerID, "withdrawAccountId");
     document.getElementById("withdrawModal").style.display = "block";
 }
+
 
 function closeWithdrawModal() {
     document.getElementById("withdrawModal").style.display = "none";
@@ -457,8 +464,11 @@ function submitWithdraw() {
 }
 
 function openTransferModal() {
+    populateAccountDropdown(currentCustomerID, "sourceAccountId");
+    populateAccountDropdown(currentCustomerID, "destinationAccountId");
     document.getElementById("transferModal").style.display = "block";
 }
+
 
 function closeTransferModal() {
     document.getElementById("transferModal").style.display = "none";
@@ -686,482 +696,6 @@ function submitAccountOpen() {
     else alert("Failed to open account: " + data.message);
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function closeAccountsModal() {
   document.getElementById("viewAccountsModal").style.display = "none";
