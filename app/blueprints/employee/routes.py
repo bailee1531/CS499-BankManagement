@@ -291,19 +291,14 @@ import os
 import pandas as pd
 
 @employee_bp.route("/check-accounts/<int:customer_id>", methods=["GET"])
-@login_required("teller")
+@login_required("teller", "admin")
 def check_customer_accounts(customer_id):
     try:
-        print(f"[DEBUG] Checking accounts for customer ID: {customer_id}")
-
         accounts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
         bills_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/bills.csv"))
 
         accounts_df = pd.read_csv(accounts_path)
         bills_df = pd.read_csv(bills_path)
-
-        print(f"[DEBUG] Loaded accounts: {len(accounts_df)} rows")
-        print(f"[DEBUG] Loaded bills: {len(bills_df)} rows")
 
         nonzero_balance = accounts_df[
             (accounts_df['CustomerID'] == customer_id) & 
@@ -315,16 +310,13 @@ def check_customer_accounts(customer_id):
             (bills_df['Amount'].astype(float) > 0.00)
         ]
 
-        print(f"[DEBUG] Non-zero balance accounts: {len(nonzero_balance)}")
-        print(f"[DEBUG] Unpaid bills: {len(unpaid_bills)}")
-
         has_balance = not nonzero_balance.empty
         has_unpaid = not unpaid_bills.empty
 
         return jsonify(success=True, hasOpenAccountsOrBills=has_balance or has_unpaid)
 
     except Exception as e:
-        print(f"[ERROR] Account status check failed: {e}")
+        print(f"Account status check failed: {e}")
         return jsonify(success=False, message=f"Error checking account status: {str(e)}"), 500
 
     
