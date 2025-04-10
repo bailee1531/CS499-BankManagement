@@ -1,1 +1,1 @@
-TransID,AccountID,TransType,Amount,TransDate
+TransactionID,AccountID,TransactionType,Amount,TransDate
