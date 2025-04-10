@@ -100,7 +100,12 @@ def load_csv(filename: str) -> pd.DataFrame:
     path = get_csv_path(filename)
     return pd.read_csv(path)
 
-
+@customer_bp.route('/terms')
+def terms_of_service() -> Response:
+    """
+    Render the Terms of Service page for customers.
+    """
+    return render_template("customer/terms.html")
 
 @customer_bp.route('/Dashboard')
 @login_required("customer_id")
@@ -788,4 +793,3 @@ def get_account_balance(account_id: int):
         # Log and return error if account info retrieval fails
         logger.error(f"Error retrieving balance for account {account_id}: {e}")
         return jsonify({"error": f"Failed to get balance: {str(e)}"}), 500
-

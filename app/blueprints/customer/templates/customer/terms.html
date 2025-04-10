@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service - Evergreen Bank{% endblock %}
+{% block meta_description %}Read the terms and conditions for using Evergreen Bank's services.{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/terms.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="terms-section">
+        <div class="terms-container">
+            <h1 class="terms-heading">Terms of Service</h1>
+            <p class="terms-intro">
+                Welcome to Evergreen Bank. By accessing or using our services, you agree to the following terms and conditions. Please read them carefully.
+            </p>
+
+            <div class="terms-block">
+                <h2>1. Eligibility</h2>
+                <p>You must be at least 18 years old or the age of majority in your jurisdiction to use our services.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>2. Account Responsibility</h2>
+                <p>You are responsible for maintaining the confidentiality of your login credentials and for any activity that occurs under your account.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>3. Services Provided</h2>
+                <p>Evergreen Bank offers personal banking, credit cards, mortgages, and other financial services. We reserve the right to change or discontinue services without prior notice.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>4. Acceptable Use</h2>
+                <ul>
+                    <li>No illegal, abusive, or fraudulent activities.</li>
+                    <li>Do not attempt to access accounts or systems without authorization.</li>
+                    <li>Respect the security and integrity of our platform.</li>
+                </ul>
+            </div>
+
+            <div class="terms-block">
+                <h2>5. Fees and Charges</h2>
+                <p>Certain services may incur fees, which are communicated via your account dashboard or customer support.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>6. Privacy</h2>
+                <p>Our <a href="#">Privacy Policy</a> outlines how we collect and protect your personal information.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>7. Intellectual Property</h2>
+                <p>All content on our site is property of Evergreen Bank and protected by copyright and trademark laws.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>8. Disclaimers</h2>
+                <p>We provide our services "as-is" without warranties of any kind. We are not liable for interruptions or external issues beyond our control.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>9. Limitation of Liability</h2>
+                <p>Evergreen Bank is not responsible for any indirect, incidental, or consequential damages resulting from your use of our services.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>10. Termination</h2>
+                <p>We may suspend or terminate access for violating these Terms or engaging in harmful conduct.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>11. Governing Law</h2>
+                <p>These Terms are governed by the laws of the jurisdiction in which Evergreen Bank is headquartered.</p>
+            </div>
+
+            <div class="terms-block">
+                <h2>12. Changes to Terms</h2>
+                <p>We may update these Terms periodically. Continued use of our services indicates acceptance of the latest version.</p>
+            </div>
+
+            <div class="terms-contact">
+                <p>For questions, please contact us at:</p>
+                <p><strong>Email:</strong> contact@evergreenbank.com</p>
+                <p><strong>Phone:</strong> +1 (256) 999-9999</p>
+                <p><strong>Address:</strong> 123 Evergreen Lane, Somewhere in the World</p>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

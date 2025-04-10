@@ -196,6 +196,14 @@ footer {
     /* Push footer to bottom using flex layout */
 }
 
+.footer__bottom p {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 /* Footer authentication button style (typically for logout or similar actions) */
 .footer__auth .btn {
     background: transparent;
@@ -228,6 +236,26 @@ footer {
 .footer__contact a:hover,
 .footer__bottom a:hover {
     text-decoration: underline;
+}
+
+/* Add bars before footer contact and bottom links */
+.footer__contact a::before,
+.footer__bottom a::before {
+    content: "|";
+    margin: 0 0.4rem;
+    color: var(--white);
+}
+
+/* Remove bar before the first contact link (email) */
+.footer__contact a:first-of-type::before {
+    content: "";
+    margin: 0;
+}
+
+/* Remove bar before the first bottom link (Privacy Policy) */
+.footer__bottom a:first-of-type::before {
+    content: "";
+    margin: 0;
 }
 
 .footer__content ul {

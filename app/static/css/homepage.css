@@ -33,10 +33,13 @@ main {
 }
 
 .landing-logo {
-    height: 250px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    max-width: 90%;
-    width: auto;
-    object-fit: contain;
-    animation: fadeIn 1.2s ease-in-out;
+    height: 200px;
+    background: white;
+    border-radius: var(--container-border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.landing-logo:hover {
+    transform: scale(1.02);
 }
