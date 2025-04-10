@@ -3,6 +3,10 @@
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+
+<script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
 {% endblock %}
 
 {% block title %}Admin Dashboard{% endblock %}
@@ -54,6 +58,28 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- View Accounts & Transactions Modal -->
+<div id="viewAccountsModal" class="modal">
+    <div class="modal-content accounts-section">
+      <span class="close" onclick="closeAccountsModal()">&times;</span>
+  
+      <div class="accounts-header-list">
+        <h2>Customer Accounts</h2>
+        <ul id="accountList" class="accounts-container">
+          <!-- Account boxes will be injected here -->
+        </ul>
+      </div>
+  
+      <div id="transactionSection" class="transaction-section hidden">
+        <h3 id="selectedAccountLabel">Transactions</h3>
+        <ul id="transactionList">
+          <!-- Transactions will be injected here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+  
 
 <script>
 function filterTellers() {
