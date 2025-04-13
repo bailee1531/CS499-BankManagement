@@ -61,24 +61,27 @@
 
 <!-- View Accounts & Transactions Modal -->
 <div id="viewAccountsModal" class="modal">
-    <div class="modal-content accounts-section">
+  <div class="modal-content accounts-section">
       <span class="close" onclick="closeAccountsModal()">&times;</span>
-  
-      <div class="accounts-header-list">
-        <h2>Customer Accounts</h2>
-        <ul id="accountList" class="accounts-container">
-          <!-- Account boxes will be injected here -->
-        </ul>
+
+      <div class="accounts-transactions-wrapper">
+          <div class="accounts-header-list">
+              <h2>Customer Accounts</h2>
+              <ul id="accountList" class="accounts-container">
+                  <!-- Account boxes here -->
+              </ul>
+          </div>
+
+          <div id="transactionSection" class="transaction-section hidden">
+              <h3 id="selectedAccountLabel">Transactions</h3>
+              <ul id="transactionList">
+                  <!-- Transactions here -->
+              </ul>
+          </div>
       </div>
-  
-      <div id="transactionSection" class="transaction-section hidden">
-        <h3 id="selectedAccountLabel">Transactions</h3>
-        <ul id="transactionList">
-          <!-- Transactions will be injected here -->
-        </ul>
-      </div>
-    </div>
   </div>
+</div>
+
   
 <div class="teller-dashboard">
     <h1>Customer Management</h1>
@@ -155,7 +158,7 @@
             </div>
 
             <!-- Toggle Button -->
-            <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+            <button onclick="openAccountsModal(currentCustomerID)">User Accounts</button>
         </div>
     </div>
 </div>
@@ -376,14 +379,15 @@ function openAccountModal(id) {
   document.getElementById("openAccountModal").style.display = "flex";
 }
 
-function closeAccountModal() {
-  document.getElementById("openAccountModal").style.display = "none";
+function closeAccountsModal() {
+  document.getElementById("viewAccountsModal").style.display = "none";
 }
 
 document.addEventListener("keydown", function(e) {
     if (e.key === "Escape") {
         closeCreateModal();
         closeViewModal();
+        closeAccountsModal();
     }
 });
 </script>
