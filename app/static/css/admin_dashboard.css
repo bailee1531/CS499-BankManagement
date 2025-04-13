@@ -215,7 +215,7 @@
 #logsTableContainer {
     overflow-y: auto;
     max-height: 750px;
-    width: 90%;
+    width: 60%;
     box-sizing: border-box;
     white-space: normal;
 }
