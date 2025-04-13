@@ -73,6 +73,7 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
 
     username: str = form.username.data
     password: str = form.password.data
+    username = username.lower()
 
     # Look up CustomerID if customer login
     if session_key == "customer":
