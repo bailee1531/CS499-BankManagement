@@ -4,7 +4,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
 <script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
@@ -15,7 +14,6 @@
 {% block content %}
 
 <div class="dashboard-container">
-
   <div class="admin-dashboard-column">
     <div class="admin-dashboard">
       <h1>Teller Management</h1>
@@ -36,6 +34,37 @@
         {% endfor %}
       </div>
     </div>
+  </div>
+
+  <div class="teller-dashboard-column">
+    <div class="teller-dashboard">
+      <h1>Customer Management</h1>
+
+      <div class="teller-controls">
+        <input type="text" id="customerSearchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+      </div>
+
+      <div class="customer-grid" id="customerGrid">
+        {% for customer in customers %}
+        <div class="customer-card" onclick="openCustomerModal(
+              '{{ customer.CustomerID }}',
+              '{{ customer.Username }}',
+              '{{ customer.FirstName }}',
+              '{{ customer.LastName }}',
+              '{{ customer.PhoneNum }}',
+              '{{ customer.Email }}',
+              '{{ customer.Address }}')">
+          <div class="avatar"></div>
+          <div class="customer-info">
+            <strong>{{ customer.Username }}</strong>
+            <p>Customer ID: {{ customer.CustomerID }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- View Accounts & Transactions Modal -->
@@ -60,36 +89,6 @@
       </div>
   </div>
 </div>
-
-  
-<div class="teller-dashboard">
-    <h1>Customer Management</h1>
-  
-    <div class="teller-controls">
-      <input type="text" id="customerSearchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
-    </div>
-  
-    <!-- Grid of customer cards -->
-    <div class="customer-grid" id="customerGrid">
-        {% for customer in customers %}
-        <div class="customer-card" onclick="openCustomerModal(
-              '{{ customer.CustomerID }}',
-              '{{ customer.Username }}',
-              '{{ customer.FirstName }}',
-              '{{ customer.LastName }}',
-              '{{ customer.PhoneNum }}',
-              '{{ customer.Email }}',
-              '{{ customer.Address }}')">
-          <div class="avatar"></div>
-          <div class="customer-info">
-            <strong>{{ customer.Username }}</strong>
-            <p>Customer ID: {{ customer.CustomerID }}</p>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
 
 </div> <div class="logs-section-wrapper">
     <h1>Logs</h1>
@@ -186,7 +185,7 @@
       </div>
 
             <!-- Toggle Button -->
-            <button onclick="openAccountsModal(currentCustomerID)">User Accounts</button>
+            <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
         </div>
     </div>
 </div>

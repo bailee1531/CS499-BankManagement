@@ -181,7 +181,6 @@
     display: flex; /* Enable flexbox */
     justify-content: space-between; /* Distribute space */
     gap: 20px; /* Add space between the columns */
-    /* padding: 20px 20px 0 20px; Padding top/sides, no bottom padding */
 }
 
 .admin-dashboard-column,
