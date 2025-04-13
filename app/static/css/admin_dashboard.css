@@ -1,7 +1,7 @@
 /* Admin Dashboard Layout */
 .admin-dashboard {
     max-width: 1000px;
-    margin: 2rem auto 6rem auto;
+    margin: 2rem auto 0 auto;
     padding: 2rem;
 }
 
@@ -124,7 +124,6 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    min-height: 400px;
 }
 
 .teller-card {
@@ -165,9 +164,9 @@
     overflow-y: auto;
     padding-right: 10px;
     box-sizing: border-box;
-  }
+}
   
-  .modal-content {
+.modal-content {
     max-height: 85vh;
     overflow: hidden;
     display: flex;
@@ -175,5 +174,46 @@
     padding: 2rem;
     width: 70%;
     max-width: 900px;
-  }
-  
+}
+
+/* Styles for side-by-side top columns */
+.dashboard-container {
+    display: flex; /* Enable flexbox */
+    justify-content: space-between; /* Distribute space */
+    gap: 20px; /* Add space between the columns */
+    /* padding: 20px 20px 0 20px; Padding top/sides, no bottom padding */
+}
+
+.admin-dashboard-column,
+.teller-dashboard-column {
+    flex: 1; /* Allow columns to grow and shrink equally */
+    min-width: 0; /* Prevent overflow issues with flex items */
+}
+
+  /* Styles for the Logs section */
+.logs-section-wrapper {
+    padding: 0 20px 20px 20px; /* Match side padding of container */
+}
+
+.logs-section-wrapper h1 {
+    text-align: center; /* Center the "Logs" heading */
+    margin-bottom: 20px; /* Space below heading */
+}
+
+.log-content {
+    display: flex;           /* Enable Flexbox */
+    justify-content: center; /* Center child horizontally */
+}
+
+/* Style the log container itself */
+#logsTableContainer {
+    overflow-y: auto;
+    max-height: 750px;
+    width: 90%;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.teller-grid, .customer-grid {
+  width: 100%;
+}

@@ -1,0 +1,180 @@
+@import "shared.css";
+
+/* Modal Background Layout */
+#viewAccountsModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+/* Modal Container */
+#viewAccountsModal .modal-content{
+    background-color: var(--dark-bg);
+    color: var(--white);
+    padding: 2rem;
+    border-radius: var(--container-border-radius);
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Close Button */
+#viewAccountsModal .close{
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    color: var(--white);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color var(--transition);
+}
+
+.modal .close:hover {
+    color: var(--accent-hover);
+}
+
+/* Section Headings */
+.modal-content h2,
+.modal-content h3 {
+    text-align: center;
+    color: var(--white);
+    margin-bottom: 1rem;
+}
+
+/* Account List Styling (UL) */
+#accountList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+/* View Accounts Modal - Account Box as Button */
+#viewAccountsModal #accountList .account-box {
+    background-color: var(--bg-box);
+    color: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--container-border-radius);
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    border: 2px solid transparent;
+    transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition), border var(--transition);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#viewAccountsModal #accountList .account-box:hover {
+    background-color: var(--accent);
+    color: var(--white);
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--accent-hover);
+}
+
+#viewAccountsModal #accountList .account-box:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    background-color: var(--accent-hover);
+}
+
+/* Scoped inner text for account buttons */
+#viewAccountsModal .account-box h3,
+#viewAccountsModal .account-box p {
+    margin: 0.5rem 0;
+    color: inherit;
+    transition: color var(--transition);
+}
+
+.accounts-header-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.accounts-header-list h2 {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+
+
+/* Selected Account Label */
+#selectedAccountLabel {
+    color: var(--white);
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+/* Transaction Section */
+#transactionSection {
+    margin-top: 2rem;
+}
+
+/* Transactions List */
+#transactionList {
+    list-style: none;
+    padding: 0;
+}
+
+#transactionList li {
+    background-color: var(--bg-box);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    color: var(--white);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+#transactionList li:hover {
+    transform: scale(1.02);
+    border: 1px solid var(--accent);
+}
+
+/* Fade-in Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ensure vertical stacking */
+.accounts-transactions-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Optional: Ensure accounts container uses full width */
+.accounts-container {
+    width: 100%;
+}
+
+

@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 import csv
 from datetime import date
 from decimal import Decimal
@@ -7,7 +8,7 @@ from Crypto.PublicKey import ECC
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, Response
 from app.blueprints.auth.forms import LoginForm
 from app.blueprints.sharedUtilities import (
-    get_csv_path, login_required, flash_error, flash_success
+    get_csv_path, login_required, flash_error, flash_success, get_account_transactions, get_customer_accounts
 )
 from scripts.createTeller import create_teller
 from scripts.customer.modifyInfo import modify_info as modify_username
@@ -59,12 +60,15 @@ def admin_dashboard():
     customers_df = pd.read_csv(get_csv_path("customers.csv"))
     persons_df = pd.read_csv(get_csv_path("persons.csv"))
     accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+    log_df = pd.read_csv(get_csv_path("logs.csv"))
 
     # Convert IDs to int for consistency
     customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
     persons_df["ID"] = persons_df["ID"].astype(int)
     accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
     accounts_df["AccountID"] = accounts_df["AccountID"].astype(int)
+    log_df["LogID"] = log_df["LogID"].astype(int)
+    log_df["UserID"] = log_df["UserID"].astype(int)
 
     try:
         # Merge customers + persons to get full profile
@@ -78,6 +82,7 @@ def admin_dashboard():
         merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
 
         customers = merged_df.to_dict(orient="records")
+        logs = log_df.to_dict(orient="records")
         if os.path.exists(employeePath) and os.path.getsize(employeePath) > 0:
             df = pd.read_csv(employeePath)
 
@@ -95,9 +100,10 @@ def admin_dashboard():
         flash(f"Error reading CSV: {e}", "danger")
         tellers = []
         customers = []
+        logs = []
         return jsonify(success=False, message=str(e)), 500
 
-    return render_template("employee/admin_dashboard.html", tellers=tellers, customers=customers)
+    return render_template("employee/admin_dashboard.html", tellers=tellers, customers=customers, logs=logs)
 
 # Create Teller Route
 @employee_bp.route("/create-teller", methods=["POST"])
@@ -742,7 +748,7 @@ def get_customer_transactions(customer_id):
         return jsonify(filtered.to_dict(orient="records"))
 
     except Exception as e:
-        print(f"[ERROR] Failed to load transactions (teller): {e}")
+        print(f"Failed to load transactions (teller): {e}")
         return jsonify([])
 
 
@@ -852,3 +858,42 @@ def admin_settings():
     form.email.data = per_df.at[idx, 'Email']
 
     return render_template("employee/admin_settings.html", form=form)
+
+
+# ---------------------------
+#Display All Customer Accounts
+# ---------------------------
+@employee_bp.route("/customer/<int:customer_id>/accounts", methods=["GET"])
+def get_customer_accounts_route(customer_id):
+    """
+    Returns all accounts associated with a specific customer.
+    Replaces NaN/NaT values in the DataFrame with None before sending the response.
+    """
+    try:
+        df = get_customer_accounts(customer_id)
+        df = df.replace({pd.NA: None, pd.NaT: None, float('nan'): None})  # Clean NaN values
+
+        response_data = {
+            "success": True,
+            "accounts": df.to_dict(orient="records")
+        }
+        return Response(json.dumps(response_data), mimetype='application/json')
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
+
+# ---------------------------
+#Display Account Transactions
+# ---------------------------
+@employee_bp.route("/account/<int:account_id>/transactions", methods=["GET"])
+def get_account_transactions_route(account_id):
+    """
+    Returns a sorted list of transactions for a specific account, 
+    ordered by transaction date (most recent first).
+    """
+    try:
+        df = get_account_transactions(account_id)
+        df_sorted = df.sort_values(by="TransDate", ascending=False)
+
+        return jsonify(success=True, transactions=df_sorted.to_dict(orient="records"))
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
