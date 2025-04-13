@@ -12,7 +12,7 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-
+<h1 class="main-dashboard-title">Admin Dashboard</h1>
 <div class="dashboard-container">
   <div class="admin-dashboard-column">
     <div class="admin-dashboard">
@@ -90,12 +90,34 @@
   </div>
 </div>
 
-</div> <div class="logs-section-wrapper">
-    <h1>Logs</h1>
-    <div class="log-content">
-        <div id="logsTableContainer" class="readonly-field scroll-box">
-            </div>
+<div class="logs-section-wrapper">
+  <h1>Logs</h1>
+  <div class="log-content">
+    <div id="logsTableContainer" class="readonly-field scroll-box">
+      {% if logs %}
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              {% for header in logs[0].keys() %}
+                <th style="text-align: left; color: white;">{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for log_entry in logs %}
+              <tr>
+                {% for value in log_entry.values() %}
+                  <td style="border: 1px solid white; padding: 6px; color:white;">{{ value }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No log entries found.</p>
+      {% endif %}
     </div>
+  </div>
 </div>
 
 
@@ -318,33 +340,6 @@ function setModalTextContent(ids, values) {
   });
 }
 
-function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
-  currentCustomerID = customerID;
-
-  setModalTextContent(
-    [
-      "modalUsername",
-      "modalCustomerID",
-      "modalFirstName",
-      "modalLastName",
-      "modalPhone",
-      "modalEmail",
-      "modalAddress"
-    ],
-    [
-      username,
-      customerID,
-      firstName,
-      lastName,
-      phone,
-      email,
-      address
-    ]
-  );
-
-  document.getElementById("customerModal").style.display = "flex";
-}
-
 function closeCustomerModal() {
   document.getElementById("customerModal").style.display = "none";
 }
@@ -432,29 +427,6 @@ function openCustomerModal(customerID, username, firstName, lastName, phone, ema
 
   document.getElementById("customerModal").style.display = "flex";
 }
-
-function displayLogs() {
-  fetch(`/employee/transactions-json/admin/logs`)
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("logsTableContainer");
-      let table = "<table style='width:100%; border-collapse: collapse;'>";
-      table += "<thead><tr><th>Transaction ID</th><th>Account ID</th><th>Type</th><th>Amount</th><th>Date</th></tr></thead><tbody>";
-      data.forEach(tx => {
-        table += `<tr>
-          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransactionID}</td>
-          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.AccountID}</td>
-          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransactionType}</td>
-          <td style='border: 1px solid #ccc; padding: 6px;'>$${parseFloat(tx.Amount).toFixed(2)}</td>
-          <td style='border: 1px solid #ccc; padding: 6px;'>${tx.TransDate}</td>
-        </tr>`;
-      });
-      table += "</tbody></table>";
-      container.innerHTML = table;
-      document.getElementById("logsModal").style.display = "flex";
-    });
-}
-
 
 </script>
 {% endblock %}

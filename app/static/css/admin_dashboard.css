@@ -6,7 +6,7 @@
 }
 
 .admin-dashboard h1 {
-    color: #2e3c4e;
+    color: #434343;
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -176,6 +176,12 @@
     max-width: 900px;
 }
 
+.main-dashboard-title {
+    text-align: center;
+    color: #434343;
+    margin-top: 2rem;
+}
+
 /* Styles for side-by-side top columns */
 .dashboard-container {
     display: flex; /* Enable flexbox */
@@ -195,6 +201,7 @@
 }
 
 .logs-section-wrapper h1 {
+    color: #434343;
     text-align: center; /* Center the "Logs" heading */
     margin-bottom: 20px; /* Space below heading */
 }
@@ -209,8 +216,13 @@
     overflow-y: auto;
     max-height: 750px;
     width: 90%;
-    border: 1px solid #ccc;
     box-sizing: border-box;
+    white-space: normal;
+}
+
+#logsTableContainer table {
+    margin-top: 1rem;
+    margin-bottom: 0;
 }
 
 .teller-grid, .customer-grid {
