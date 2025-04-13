@@ -31,7 +31,7 @@ function updateArchivedBills() {
               billsContainer.appendChild(li);
             });
           } else {
-            billsContainer.innerHTML = '<li>No archived credit card bills found.</li>';
+            billsContainer.innerHTML = '<li>No archived bills found.</li>';
           }
         }
       })
