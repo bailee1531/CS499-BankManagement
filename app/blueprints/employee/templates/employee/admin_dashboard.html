@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
 <script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
@@ -35,16 +36,41 @@
         {% endfor %}
       </div>
     </div>
-  </div>
+</div>
 
-  <div class="teller-dashboard-column">
-    <div class="teller-dashboard">
-      <h1>Customer Management</h1>
-      <div class="teller-controls">
-        <input type="text" id="customerSearchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+<!-- View Accounts & Transactions Modal -->
+<div id="viewAccountsModal" class="modal">
+  <div class="modal-content accounts-section">
+      <span class="close" onclick="closeAccountsModal()">&times;</span>
+
+      <div class="accounts-transactions-wrapper">
+          <div class="accounts-header-list">
+              <h2>Customer Accounts</h2>
+              <ul id="accountList" class="accounts-container">
+                  <!-- Account boxes here -->
+              </ul>
+          </div>
+
+          <div id="transactionSection" class="transaction-section hidden">
+              <h3 id="selectedAccountLabel">Transactions</h3>
+              <ul id="transactionList">
+                  <!-- Transactions here -->
+              </ul>
+          </div>
       </div>
+  </div>
+</div>
 
-      <div class="customer-grid" id="customerGrid">
+  
+<div class="teller-dashboard">
+    <h1>Customer Management</h1>
+  
+    <div class="teller-controls">
+      <input type="text" id="customerSearchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+    </div>
+  
+    <!-- Grid of customer cards -->
+    <div class="customer-grid" id="customerGrid">
         {% for customer in customers %}
         <div class="customer-card" onclick="openCustomerModal(
               '{{ customer.CustomerID }}',
@@ -159,9 +185,10 @@
         <div id="userAccounts" class="readonly-field scroll-box"></div>
       </div>
 
-      <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+            <!-- Toggle Button -->
+            <button onclick="openAccountsModal(currentCustomerID)">User Accounts</button>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
@@ -379,14 +406,15 @@ function openAccountModal(id) {
   document.getElementById("openAccountModal").style.display = "flex";
 }
 
-function closeAccountModal() {
-  document.getElementById("openAccountModal").style.display = "none";
+function closeAccountsModal() {
+  document.getElementById("viewAccountsModal").style.display = "none";
 }
 
 document.addEventListener("keydown", function(e) {
     if (e.key === "Escape") {
         closeCreateModal();
         closeViewModal();
+        closeAccountsModal();
     }
 });
 

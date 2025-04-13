@@ -10,6 +10,12 @@
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+
+<script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
+
 {% endblock %}
 
 {% block title %}Teller Dashboard{% endblock %}
@@ -739,7 +745,6 @@ const payload = {
   lastName: document.getElementById("newLastName").value,
   username: document.getElementById("newUsername").value,
   password: document.getElementById("newPassword").value,
-  address: document.getElementById("newAddress").value,
   ssn: document.getElementById("newSSN").value,
   email: document.getElementById("newEmail").value,
   phone: document.getElementById("newPhone").value,
@@ -767,7 +772,12 @@ fetch("/employee/open-account", {
 .catch(err => {
   alert("Failed to open account.");
   console.error(err);
-  });
+});
 }
+
+function closeAccountsModal() {
+  document.getElementById("viewAccountsModal").style.display = "none";
+}
+
 </script>
 {% endblock %}
