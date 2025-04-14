@@ -16,6 +16,7 @@ from scripts.customer.modifyInfo import modify_info as modify_username
 from scripts.customer import modifyInfo
 from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
 
+from scripts.deleteAccount import deleteAcc
 from scripts.transactionLog import generate_transaction_ID
 from scripts.withdrawMoney import withdraw as withdraw_money
 from scripts.fundTransfer import transferFunds as transfer_funds
@@ -409,31 +410,68 @@ def open_account_route():
         print(f"[ERROR] Account creation failed: {e}")
         return jsonify(success=False, message="Account creation failed.")
 
+@employee_bp.route("/create-account", methods=["POST"])
+@login_required("teller")
+def create_account_existing_customer():
+    from scripts.customer.openAcc import open_account as open_standard_account
+    from scripts.createCreditCard import openCreditCardAccount
+    from scripts.createLoan import createMortgageLoanAccount
+
+    data = request.get_json()
+
+    try:
+        customer_id = int(data.get("customerID"))
+        account_type = data.get("accountType", "").strip()
+        deposit = Decimal(str(data.get("depositAmount", "0.00")))
+
+        if account_type in ["Checking", "Savings", "Money Market"]:
+            result = open_standard_account(customer_id, account_type, deposit)
+
+        elif account_type == "Travel Visa":
+            result = openCreditCardAccount(customer_id)
+
+        elif account_type == "Home Mortgage Loan":
+            loan_amt = Decimal(str(data.get("loanAmount", "0.00")))
+            loan_term = int(data.get("loanTerm", 0))
+            result = createMortgageLoanAccount(customer_id, loan_amt, loan_term)
+
+        else:
+            return jsonify({"status": "error", "message": f"Unsupported account type: {account_type}"}), 400
+
+        if result["status"] == "success":
+            return jsonify(success=True, message=result["message"])
+        else:
+            return jsonify(success=False, message=result["message"])
+
+    except Exception as e:
+        print(f"[ERROR] Creating account failed: {e}")
+        return jsonify(success=False, message="Account creation failed.")
 
 @employee_bp.route("/delete-account", methods=["POST"])
 @login_required("teller")
 def delete_account():
     data = request.get_json()
-    account_id = int(data.get("accountID"))
+    cust_id = data.get("customerID")
+    acc_id = data.get("accountID")
 
-    # Load accounts CSV
-    acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
-    acc_df = pd.read_csv(acc_path)
+    if not cust_id or not acc_id:
+        return jsonify({"status": "error", "message": "Missing customer or account ID."})
 
-    # Find the account
-    account_row = acc_df[acc_df["AccountID"] == account_id]
-    if account_row.empty:
-        return jsonify(success=False, message="Account not found.")
+    username = session.get("teller")
+    if not username:
+        return jsonify({"status": "error", "message": "No authenticated user found."})
 
-    balance = float(account_row["CurrBal"].iloc[0])
-    if balance != 0.00:
-        return jsonify(success=False, message="Account must have a balance of $0.00 to be deleted.")
+    # Load employees.csv to get performed_by_id
+    employees_df = pd.read_csv(get_csv_path("employees.csv"))
+    user_row = employees_df[employees_df["Username"] == username]
 
-    # Delete the account
-    acc_df = acc_df[acc_df["AccountID"] != account_id]
-    acc_df.to_csv(acc_path, index=False)
+    if user_row.empty:
+        return jsonify({"status": "error", "message": f"User '{username}' not found in employees.csv"})
 
-    return jsonify(success=True, message="Account successfully deleted.")
+    performed_by_id = int(user_row["EmployeeID"].iloc[0])
+
+    result = deleteAcc(int(cust_id), int(acc_id), performed_by_id)
+    return jsonify(result)
 
 @employee_bp.route("/delete-customer", methods=["POST"])
 @login_required("teller")

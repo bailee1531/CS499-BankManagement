@@ -28,10 +28,15 @@ function openAccountsModal(customerId) {
           const li = document.createElement("li");
           li.classList.add("account-box");
   
+          const isDeletable = parseFloat(account.CurrBal) === 0;
+
           li.innerHTML = `
             <h3>${account.AccountType}</h3>
             <p>ID: ${account.AccountID}</p>
-            <p>$${account.CurrBal}</p>
+            <p>$${parseFloat(account.CurrBal).toFixed(2)}</p>
+            <button class="delete-account-btn" ${!isDeletable ? "disabled title='Balance must be $0.00 to delete'" : ""} onclick="deleteAccountFromModal(${account.AccountID})">
+              Delete
+            </button>
           `;
   
           li.onclick = () => loadTransactions(account.AccountID, account.AccountType);

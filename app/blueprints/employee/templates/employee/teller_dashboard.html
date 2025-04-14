@@ -47,7 +47,6 @@
         <strong>{{ customer.Username }}</strong>
         <p>Customer ID: {{ customer.CustomerID }}</p>
       </div>
-      <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
     </div>
     {% endfor %}
   </div>
@@ -627,14 +626,25 @@ function viewCustomerAccounts() {
       if (!container) return;
 
       if (data.success && data.accounts.length > 0) {
-        const formatted = data.accounts.map(acc =>
-          `• AccountID: ${acc.AccountID}
-  Type: ${acc.AccountType}
-  Balance: $${parseFloat(acc.CurrBal).toFixed(2)}
-  Opened: ${acc.DateOpened}${acc.CreditLimit ? `\n  Credit Limit: $${parseFloat(acc.CreditLimit).toFixed(2)}` : ""}`
-        ).join('\n\n');
+        const formatted = data.accounts.map(acc => {
+          const balance = parseFloat(acc.CurrBal).toFixed(2);
+          const creditLimit = acc.CreditLimit ? `<br>Credit Limit: $${parseFloat(acc.CreditLimit).toFixed(2)}` : "";
+          const deleteButton = (parseFloat(acc.CurrBal) === 0.0)
+            ? `<button class="delete-account-btn" onclick="deleteAccount(${acc.AccountID})">Delete</button>`
+            : `<button class="delete-account-btn" disabled title="Balance must be $0.00 to delete">Delete</button>`;
 
-        container.textContent = formatted;
+          return `
+            <div class="account-box">
+              <strong>${acc.AccountType}</strong><br>
+              ID: ${acc.AccountID}<br>
+              Balance: $${balance}<br>
+              Opened: ${acc.DateOpened}${creditLimit}<br>
+              ${deleteButton}
+            </div>
+          `;
+        }).join("");
+
+        container.innerHTML = formatted;
       } else {
         container.textContent = "This user has no accounts.";
       }
@@ -643,6 +653,30 @@ function viewCustomerAccounts() {
       console.error("Error fetching accounts:", err);
       document.getElementById("userAccounts").textContent = "Error loading accounts.";
     });
+}
+
+function deleteAccountFromModal(accountID) {
+  if (!currentCustomerID) return alert("Customer ID not found.");
+  if (!confirm(`Are you sure you want to delete Account ID ${accountID}?`)) return;
+
+  fetch("/employee/delete-account", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ customerID: currentCustomerID, accountID: accountID })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert(data.message);
+      openAccountsModal(currentCustomerID); // Refresh the modal
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error("Failed to delete account:", err);
+    alert("Server error during account deletion.");
+  });
 }
 
 let showingAccounts = false;
@@ -679,12 +713,16 @@ function closeAccountModal() {
 
 function submitAccountOpen() {
   const type = document.getElementById("accountType").value;
-  let payload = { customerID: currentCustomerID, accountType: type };
+  let payload = {
+  customerID: currentCustomerID,
+  accountType: type
+  };
 
   if (["Checking", "Savings", "Money Market"].includes(type)) {
     const deposit = parseFloat(document.getElementById("initialDeposit").value);
     if (isNaN(deposit)) return alert("Enter a valid deposit amount.");
     payload.depositAmount = deposit;
+
   } else if (type === "Home Mortgage Loan") {
     const amount = parseFloat(document.getElementById("loanAmount").value);
     const years = parseInt(document.getElementById("loanTerm").value);
@@ -693,7 +731,7 @@ function submitAccountOpen() {
     payload.loanTerm = years;
   }
 
-  fetch("/employee/open-account", {
+  fetch("/employee/create-account", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -747,6 +785,7 @@ const payload = {
   lastName: document.getElementById("newLastName").value,
   username: document.getElementById("newUsername").value,
   password: document.getElementById("newPassword").value,
+  address: document.getElementById("newAddress").value,
   ssn: document.getElementById("newSSN").value,
   email: document.getElementById("newEmail").value,
   phone: document.getElementById("newPhone").value,

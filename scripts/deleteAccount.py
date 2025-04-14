@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from scripts.transactionLog import generate_transaction_ID
 
-def deleteAcc(custID: int, accID: int) -> dict:
+def deleteAcc(custID: int, accID: int, performedByID: int) -> dict:
     """
     Deletes an account if the balance is zero and logs the deletion.
 
@@ -13,6 +13,8 @@ def deleteAcc(custID: int, accID: int) -> dict:
         The Customer ID associated with the account.
     accID : int
         The Account ID of the account to be deleted.
+    performedByID : int
+        The User ID (Teller or Admin) performing the deletion.
 
     Returns
     -------
@@ -29,7 +31,7 @@ def deleteAcc(custID: int, accID: int) -> dict:
     - The function reads from `accounts.csv` located in `../csvFiles/`.
     - Only accounts with a zero balance can be deleted.
     - If an account is deleted, the updated dataset is saved back to the CSV file.
-    - A deletion log entry is created in `logs.csv` for tracking.
+    - A deletion log entry is created in `logs.csv` including the ID of the user who performed it.
     """
 
     # Define file paths
@@ -64,8 +66,9 @@ def deleteAcc(custID: int, accID: int) -> dict:
 
     # Log account deletion
     log_entry = pd.DataFrame([{
-        "LogID": logID,
-        "CustomerID": custID,
+        "LogID": int(logID),
+        "UserID": int(performedByID),
+        "CustomerID": int(custID),
         "LogMessage": "Account Deleted"
     }])
 
