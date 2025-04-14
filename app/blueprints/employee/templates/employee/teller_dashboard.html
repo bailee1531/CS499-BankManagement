@@ -40,7 +40,9 @@
       '{{ customer.PhoneNum }}',
       '{{ customer.Email }}',
       '{{ customer.Address }}')">
-      <div class="avatar"></div>
+      <div class="avatar">
+              <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
+            </div>
       <div class="customer-info">
         <strong>{{ customer.Username }}</strong>
         <p>Customer ID: {{ customer.CustomerID }}</p>
