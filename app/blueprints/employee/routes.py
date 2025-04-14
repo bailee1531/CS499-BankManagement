@@ -31,6 +31,7 @@ def admin_login():
 
     if request.method == "POST":
         username = request.form.get("username")
+        username = username.lower()
 
         teller_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
         df = pd.read_csv(teller_path)
