@@ -21,7 +21,8 @@ def create_teller(firstName, lastName):
     while employeeID in employeeInfo['EmployeeID'].values:
         employeeID = random.randint(1299, 5999)
 
-    username = firstName + '.' + lastName
+    username = str(firstName + '.' + lastName)
+    username = username.lower()
     newEmployeeRow = {'Username': username,
                       'EmployeeID': employeeID,
                       'Position': 'Teller'}

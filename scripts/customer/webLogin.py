@@ -5,7 +5,7 @@ import hashlib
 import random
 import os
 
-def login_page_button_pressed(new_or_returning, type, username, password, *argv):
+def login_page_button_pressed(new_or_returning, type, username: str, password, *argv):
     """
     Handles user account creation and login authentication.
 
@@ -29,6 +29,8 @@ def login_page_button_pressed(new_or_returning, type, username, password, *argv)
     custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/customers.csv'))
     perPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/persons.csv'))
     employeePath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/employees.csv'))
+
+    username = username.lower()
 
     def new_account(userID) -> dict:
         """

@@ -352,6 +352,7 @@ def register_teller_step2():
 
     # Pre-fill and disable username and email
     form.username.data = registration['username']
+    form.username.data = form.username.data.lower()
     form.email.data = registration['email']
     form.confirm_email.data = registration['email']
 

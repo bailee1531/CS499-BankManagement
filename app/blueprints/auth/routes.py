@@ -205,7 +205,7 @@ def teller_login():
         return redirect(next_url or redirect_url)
 
     return render_template("auth/login.html", form=form,
-                           title="UAH Bank - Teller Login",
+                           title="Evergreen Bank - Teller Login",
                            header_text="Teller Login",
                            login_instructions="Please enter your teller username and password to log in.",
                            form_action=url_for('auth.teller_login'),
@@ -225,7 +225,7 @@ def admin_login():
         return redirect(next_url or redirect_url)
 
     return render_template("auth/login.html", form=form,
-                           title="UAH Bank - Admin Login",
+                           title="Evergreen Bank - Admin Login",
                            header_text="Admin Login",
                            login_instructions="Enter your administrator credentials to log in.",
                            form_action=url_for('auth.admin_login'),
