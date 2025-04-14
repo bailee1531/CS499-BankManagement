@@ -112,7 +112,7 @@ def register_step2():
         # Store login and security details in session
         registration = session.get('registration', {})
         registration.update({
-            'username': form.username.data,
+            'username': form.username.data.lower(),
             'password': form.password.data,
             'email': form.email.data,
             'security_question_1': form.security_question_1.data,
