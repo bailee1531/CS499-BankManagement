@@ -47,7 +47,6 @@
         <strong>{{ customer.Username }}</strong>
         <p>Customer ID: {{ customer.CustomerID }}</p>
       </div>
-      <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
     </div>
     {% endfor %}
   </div>
