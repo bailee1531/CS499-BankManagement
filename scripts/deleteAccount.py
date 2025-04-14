@@ -66,9 +66,8 @@ def deleteAcc(custID: int, accID: int, performedByID: int) -> dict:
 
     # Log account deletion
     log_entry = pd.DataFrame([{
-        "LogID": logID,
-        "UserID": performedByID,
-        "CustomerID": custID,
+        "LogID": int(logID),
+        "UserID": int(performedByID),
         "LogMessage": "Account Deleted"
     }])
 
