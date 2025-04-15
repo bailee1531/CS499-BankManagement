@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
+
+<script src="{{ url_for('static', filename='js/modal-context.js') }}"></script>
+<script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tellers.js') }}"></script>
+{% endblock %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="main-dashboard-title">Admin Dashboard</h1>
+<div class="dashboard-container">
+  <div class="admin-dashboard-column">
+    <div class="admin-dashboard">
+      <h1>Teller Management</h1>
+      <div class="admin-controls">
+        <input type="text" id="tellerSearchBar" placeholder="Search Teller ID or Name..." onkeyup="filterTellers()">
+        <button class="create-btn" onclick="openCreateModal()">Create Teller Account</button>
+      </div>
+
+      <div class="teller-grid" id="tellerGrid">
+        {% for teller in tellers %}
+        <div class="teller-card" onclick="openViewModal('{{ teller.EmployeeID }}', '{{ teller.Username }}')">
+          <div class="avatar">
+            <img src="{{ teller.avatar_url }}" alt="{{ teller.Username }}'s Avatar" class="avatar-image">
+          </div>
+          <div class="teller-info">
+            <strong>{{ teller.Username }}</strong>
+            <p>Employee ID: {{ teller.EmployeeID }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="teller-dashboard-column">
+    <div class="teller-dashboard">
+      <h1>Customer Management</h1>
+
+      <div class="teller-controls">
+        <input type="text" id="customerSearchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+      </div>
+
+      <div class="customer-grid" id="customerGrid">
+        {% for customer in customers %}
+        <div class="customer-card" onclick="openCustomerModal(
+                '{{ customer.CustomerID }}',
+                '{{ customer.Username }}',
+                '{{ customer.FirstName }}',
+                '{{ customer.LastName }}',
+                '{{ customer.PhoneNum }}',
+                '{{ customer.Email }}',
+                '{{ customer.Address }}')">
+            <div class="avatar">
+              <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
+            </div>
+            <div class="customer-info">
+                <strong>{{ customer.Username }}</strong>
+                <p>Customer ID: {{ customer.CustomerID }}</p>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- View Accounts & Transactions Modal -->
+<div id="viewAccountsModal" class="modal">
+  <div class="modal-content accounts-section">
+      <span class="close" onclick="closeAccountsModal()">&times;</span>
+
+      <div class="accounts-transactions-wrapper">
+          <div class="accounts-header-list">
+              <h2>Customer Accounts</h2>
+              <ul id="accountList" class="accounts-container">
+                  <!-- Account boxes here -->
+              </ul>
+          </div>
+
+          <div id="transactionSection" class="transaction-section hidden">
+              <h3 id="selectedAccountLabel">Transactions</h3>
+              <ul id="transactionList">
+                  <!-- Transactions here -->
+              </ul>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="logs-section-wrapper">
+  <h1>Logs</h1>
+  <div class="log-content">
+    <div id="logsTableContainer" class="readonly-field scroll-box">
+      {% if logs %}
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              {% for header in logs[0].keys() %}
+                <th style="text-align: left; color: white;">{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for log_entry in logs %}
+              <tr>
+                {% for value in log_entry.values() %}
+                  <td style="border: 1px solid white; padding: 6px; color:white;">{{ value }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No log entries found.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div id="createFormModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCreateModal()">&times;</span>
+    <h2>Create Teller</h2>
+    <input type="text" id="firstNameInput" placeholder="First Name" required>
+    <input type="text" id="lastNameInput" placeholder="Last Name" required>
+    <button onclick="submitTeller()">Submit</button>
+  </div>
+</div>
+
+<div id="viewModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeViewModal()">&times;</span>
+    <h2>Teller Info</h2>
+    <p><strong>Username:</strong> <span id="modalEmpUsername"></span></p>
+    <p><strong>Employee ID:</strong> <span id="modalEmployeeID"></span></p>
+    <input type="text" id="editUsernameInput" placeholder="New Username">
+    <div class="modal-buttons">
+      <button id="edit-btn" onclick="submitEdit()">Edit</button>
+      <button onclick="submitDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="viewAccountsModal" class="modal">
+  <div class="modal-content accounts-section">
+    <span class="close" onclick="closeAccountsModal()">&times;</span>
+
+    <div class="accounts-header-list">
+      <h2>Customer Accounts</h2>
+      <ul id="accountList" class="accounts-container">
+        </ul>
+    </div>
+
+    <div id="transactionSection" class="transaction-section hidden">
+      <h3 id="selectedAccountLabel">Transactions</h3>
+      <ul id="transactionList">
+        </ul>
+    </div>
+  </div>
+</div>
+
+<div id="customerModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCustomerModal()">&times;</span>
+
+    <div class="modal-left scroll-panel">
+      <div id="customerInfoPanel">
+        <h2>Customer Info</h2>
+
+        <div class="form-group">
+          <label>Username</label>
+          <div id="modalUsername" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Customer ID</label>
+          <div id="modalCustomerID" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>First Name</label>
+          <div id="modalFirstName" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <div id="modalLastName" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <div id="modalPhone" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <div id="modalEmail" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <div id="modalAddress" class="readonly-field"></div>
+        </div>
+      </div>
+
+      <div id="userAccountsPanel" style="display: none;">
+        <h2>User's Accounts</h2>
+        <div id="userAccounts" class="readonly-field scroll-box"></div>
+      </div>
+
+            <!-- Toggle Button -->
+            <button id="toggleAccountsBtn" onclick="toggleCustomerView()">User's Accounts</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
