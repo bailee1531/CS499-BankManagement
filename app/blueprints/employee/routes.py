@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import json
 import csv
+import hashlib
 from datetime import date
 from decimal import Decimal
 from Crypto.PublicKey import ECC
@@ -23,6 +24,13 @@ from .forms import TellerSettingsForm, AdminSettingsForm, DepositForm
 
 # Blueprint for employee routes
 employee_bp = Blueprint('employee', __name__, template_folder='templates')
+
+def get_unique_identicon_url(username):
+    # Hash the username
+    unique_hash = hashlib.md5(username.encode('utf-8')).hexdigest()
+    
+    # Generate the Gravatar URL using the hashed value
+    return f"https://www.gravatar.com/avatar/{unique_hash}?s=50&d=initials&name={username}"
 
 # Admin Login Route
 @employee_bp.route("/admin-login", methods=["GET", "POST"])
@@ -83,6 +91,9 @@ def admin_dashboard():
         merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
 
         customers = merged_df.to_dict(orient="records")
+        for customer in customers:
+            customer["avatar_url"] = get_unique_identicon_url(customer["Username"])
+
         logs = log_df.to_dict(orient="records")
         if os.path.exists(employeePath) and os.path.getsize(employeePath) > 0:
             df = pd.read_csv(employeePath)
@@ -90,6 +101,8 @@ def admin_dashboard():
             # Check if required columns exist
             if all(col in df.columns for col in ["Username", "EmployeeID", "Position"]):
                 tellers = df[df["Position"] == "Teller"].to_dict(orient="records")
+                for teller in tellers:
+                    teller["avatar_url"] = get_unique_identicon_url(teller["Username"])
             else:
                 flash("CSV file missing required columns.", "danger")
                 tellers = []
@@ -203,6 +216,9 @@ def teller_dashboard():
         merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
 
         customers = merged_df.to_dict(orient="records")
+        for customer in customers:
+            customer["avatar_url"] = get_unique_identicon_url(customer["Username"])
+
     except Exception as e:
         customers = []
         return jsonify(success=False, message=str(e)), 500

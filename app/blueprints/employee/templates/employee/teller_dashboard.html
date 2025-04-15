@@ -40,12 +40,13 @@
       '{{ customer.PhoneNum }}',
       '{{ customer.Email }}',
       '{{ customer.Address }}')">
-      <div class="avatar"></div>
+      <div class="avatar">
+              <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
+            </div>
       <div class="customer-info">
         <strong>{{ customer.Username }}</strong>
         <p>Customer ID: {{ customer.CustomerID }}</p>
       </div>
-      <button class="open-account-btn" onclick="event.stopPropagation(); openAccountModal('{{ customer.CustomerID }}')">Open Account</button>
     </div>
     {% endfor %}
   </div>
@@ -745,6 +746,7 @@ const payload = {
   lastName: document.getElementById("newLastName").value,
   username: document.getElementById("newUsername").value,
   password: document.getElementById("newPassword").value,
+  address: document.getElementById("newAddress").value,
   ssn: document.getElementById("newSSN").value,
   email: document.getElementById("newEmail").value,
   phone: document.getElementById("newPhone").value,
