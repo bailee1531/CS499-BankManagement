@@ -20,7 +20,7 @@ The stylesheet (employee_home.css) is added in addition to the base styles.
         <h2 id="login-heading">{{ header_text or "Employee Login" }}</h2>
         <div class="employee-home-buttons">
             <a href="{{ url_for('auth.teller_login') }}" class="btn btn--login">Teller Login</a>
-            <a href="{{ url_for('employee.admin_login') }}" class="btn btn--login">Admin Login</a>
+            <a href="{{ url_for('admin.admin_login') }}" class="btn btn--login">Admin Login</a>
         </div>
     </div>
 </main>
