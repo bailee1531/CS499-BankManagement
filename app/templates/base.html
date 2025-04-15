@@ -52,11 +52,11 @@
                 Dashboard
             </a>
             {% elif 'teller' in session %}
-                <a href="{{ url_for('employee.teller_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                <a href="{{ url_for('teller.teller_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                     Dashboard
                 </a>
             {% elif 'admin' in session %}
-                <a href="{{ url_for('employee.admin_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                     Dashboard
                 </a>
             {% endif %}
@@ -66,11 +66,11 @@
                 Settings
             </a>
             {% elif 'teller' in session %}
-                <a href="{{ url_for('employee.teller_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                <a href="{{ url_for('teller.teller_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                     Settings
                 </a>
             {% elif 'admin' in session %}
-                <a href="{{ url_for('employee.admin_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
+                <a href="{{ url_for('admin.admin_settings') }}" class="btn btn--sign-up" style="margin-right: 0.5rem;">
                     Settings
                 </a>
             {% endif %}
