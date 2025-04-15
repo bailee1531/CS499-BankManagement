@@ -24,7 +24,7 @@ function submitDeposit() {
         amount: amount
     };
 
-    fetch("/employee/deposit", {
+    fetch("/teller/deposit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -68,7 +68,7 @@ function submitWithdraw() {
         amount: amount
     };
 
-    fetch("/employee/withdraw", {
+    fetch("/teller/withdraw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -115,7 +115,7 @@ function submitTransfer() {
         amount: amount
     };
 
-    fetch("/employee/transfer", {
+    fetch("/teller/transfer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

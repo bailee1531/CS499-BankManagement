@@ -41,7 +41,7 @@ def admin_login():
         if not match.empty:
             session['admin'] = username
             session['role'] = 'admin'
-            return redirect(url_for("employee.admin_dashboard"))
+            return redirect(url_for("admin.admin_dashboard"))
         else:
             flash("Invalid credentials. Try again.", "danger")
 

@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <form id="settings-form" action="{{ form_action or url_for('employee.admin_settings') }}" method="post" novalidate>
+    <form id="settings-form" action="{{ form_action or url_for('admin.admin_settings') }}" method="post" novalidate>
       {{ form.hidden_tag() }}
 
       <!-- Email -->

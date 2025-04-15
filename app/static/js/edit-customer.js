@@ -5,7 +5,7 @@ function submitUsernameEdit() {
   
     if (!newUsername) return alert("Please enter a new username.");
   
-    fetch("/employee/edit-username", {
+    fetch("/teller/edit-username", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -33,7 +33,7 @@ function submitUsernameEdit() {
       return alert("Please enter both the old and new passwords.");
     }
   
-    fetch("/employee/reset-password", {
+    fetch("/teller/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -51,7 +51,7 @@ function submitUsernameEdit() {
     if (!confirm("Are you sure you want to delete this customer?")) return;
   
     // Step 1: Check if user still has active accounts or bills
-    fetch(`/employee/check-accounts/${currentCustomerID}`)
+    fetch(`/teller/check-accounts/${currentCustomerID}`)
       .then(res => res.json())
       .then(data => {
         if (!data.success) {
@@ -65,7 +65,7 @@ function submitUsernameEdit() {
         }
   
         // Step 2: Delete
-        fetch("/employee/delete-customer", {
+        fetch("/teller/delete-customer", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ customerID: currentCustomerID })

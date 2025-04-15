@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <form id="settings-form" action="{{ form_action or url_for('employee.teller_settings') }}" method="post" novalidate>
+    <form id="settings-form" action="{{ form_action or url_for('teller.teller_settings') }}" method="post" novalidate>
       {{ form.hidden_tag() }}
 
       <!-- First Name -->

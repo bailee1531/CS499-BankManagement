@@ -1,5 +1,5 @@
 function populateAccountDropdown(customerID, dropdownId) {
-    fetch(`/employee/get-accounts/${customerID}`)
+    fetch(`/teller/get-accounts/${customerID}`)
     .then(res => res.json())
     .then(data => {
         const dropdown = document.getElementById(dropdownId);

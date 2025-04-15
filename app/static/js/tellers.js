@@ -13,7 +13,7 @@ function openViewModal(id, username) {
     document.getElementById("editUsernameInput").value = "";
     document.getElementById("viewModal").style.display = "flex";
 
-    fetch("/employee/check-employee", {
+    fetch("/admin/check-employee", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeID: id })
@@ -41,7 +41,7 @@ function submitTeller() {
         return;
     }
 
-    fetch("/employee/create-teller", {
+    fetch("/admin/create-teller", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName })
@@ -63,7 +63,7 @@ function submitEdit() {
         return;
     }
 
-    fetch('/employee/edit-teller', {
+    fetch('/admin/edit-teller', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({employeeID: id, newUsername: newUsername})
@@ -86,7 +86,7 @@ function submitDelete() {
 
     if (!confirm("Are you sure you want to delete this teller?")) return;
 
-    fetch("/employee/delete-teller", {
+    fetch("/admin/delete-teller", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ employeeID: id })

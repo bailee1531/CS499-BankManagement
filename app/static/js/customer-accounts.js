@@ -36,7 +36,7 @@ function closeCustomerModal() {
 }
 
 function openAccountsModal(customerId, firstName, lastName) {
-  fetch(`/employee/customer/${customerId}/accounts`)
+  fetch(`/teller/customer/${customerId}/accounts`)
     .then(res => res.json())
     .then(data => {
       const list = document.getElementById("accountList");
@@ -137,7 +137,7 @@ function submitAccountOpen() {
     payload.loanTerm = years;
   }
 
-  fetch("/employee/create-account", {
+  fetch("/teller/create-account", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -202,7 +202,7 @@ const payload = {
   accountType: window.selectedAccountType
 };
 
-fetch("/employee/open-account", {
+fetch("/teller/open-account", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(payload)
@@ -229,7 +229,7 @@ function closeAccountsModal() {
 function viewCustomerAccounts() {
   if (!currentCustomerID) return;
 
-  fetch(`/employee/get-accounts/${currentCustomerID}`)
+  fetch(`/teller/get-accounts/${currentCustomerID}`)
     .then(res => res.json())
     .then(data => {
       const container = document.getElementById("userAccounts");

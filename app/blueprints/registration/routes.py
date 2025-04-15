@@ -381,6 +381,6 @@ def register_teller_step2():
         session['teller'] = registration['username']
         session['role'] = 'teller'
         flash_success("Welcome to your dashboard!")
-        return redirect(url_for("employee.teller_dashboard"))
+        return redirect(url_for("teller.teller_dashboard"))
 
     return render_template("registration/register_teller_step2.html", form=form, disable_username=True, disable_email_field=True, disable_confirm_email_field=True)
