@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+
+<script src="{{ url_for('static', filename='js/modal-context.js') }}"></script>
+<script src="{{ url_for('static', filename='js/edit-customer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/complete-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
+<script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
+{% endblock %}
+
+{% block title %}Teller Dashboard{% endblock %}
+
+{% block content %}
+<div class="teller-dashboard">
+  <h1>Customer Management</h1>
+
+  <div class="teller-controls">
+    <input type="text" id="searchBar" placeholder="Search Customer Name or Account..." onkeyup="filterCustomers()">
+    <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
+  </div>
+
+  <!-- Grid of customer cards -->
+  <div class="customer-grid" id="customerGrid">
+    {% for customer in customers %}
+    <div class="customer-card" onclick="openCustomerModal(
+      '{{ customer.CustomerID }}',
+      '{{ customer.Username }}',
+      '{{ customer.FirstName }}',
+      '{{ customer.LastName }}',
+      '{{ customer.PhoneNum }}',
+      '{{ customer.Email }}',
+      '{{ customer.Address }}')">
+      <div class="avatar">
+              <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
+            </div>
+      <div class="customer-info">
+        <strong>{{ customer.Username }}</strong>
+        <p>Customer ID: {{ customer.CustomerID }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div id="customerModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCustomerModal()">&times;</span>
+    
+    <div class="modal-left scroll-panel">
+      <!-- Customer Info Panel -->
+      <div id="customerInfoPanel">
+        <h2>Customer Info</h2>
+    
+        <div class="form-group">
+          <label>Username</label>
+          <div id="modalUsername" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Customer ID</label>
+          <div id="modalCustomerID" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>First Name</label>
+          <div id="modalFirstName" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <div id="modalLastName" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <div id="modalPhone" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <div id="modalEmail" class="readonly-field"></div>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <div id="modalAddress" class="readonly-field"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-right scroll-panel">
+      <!-- Edit Username -->
+      <h3>Edit Username</h3>
+      <input type="text" id="editUsernameInput" placeholder="New Username">
+      <button onclick="submitUsernameEdit()">Update Username</button>
+      <hr>
+    
+      <!-- Reset Password -->
+      <h3>Reset Password</h3>
+      <input type="password" id="oldPasswordInput" placeholder="Old Password">
+      <input type="password" id="newPasswordInput" placeholder="New Password">
+      <button onclick="resetCustomerPassword()">Reset Password</button>
+      <hr>
+
+      <!-- Toggle Button -->
+      <button onclick="openAccountsModal(currentCustomerID, document.getElementById('modalFirstName').textContent,
+        document.getElementById('modalLastName').textContent)">User Accounts</button>    
+      <!-- Open New Account + Transaction Buttons -->
+      <h3>Open New Account</h3>
+      <select id="accountType" onchange="toggleAccountInputs()">
+        <option value="Checking">Checking</option>
+        <option value="Savings">Savings</option>
+        <option value="Money Market">Money Market</option>
+        <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+        <option value="Travel Visa">Travel Visa</option>
+      </select>
+      <!-- Deposit input -->
+      <input type="number" id="initialDeposit" placeholder="Initial Deposit">
+
+      <!-- Mortgage inputs -->
+      <input type="number" id="loanAmount" placeholder="Loan Amount" style="display:none;">
+      <input type="number" id="loanTerm" placeholder="Years" style="display:none;">
+
+      <!-- Credit card note -->
+      <input type="text" id="creditNote" placeholder="N/A for credit cards" disabled style="display:none; background-color: #eee; color: #888;">
+
+      <button onclick="submitAccountOpen()">Open Account</button>
+    
+      <div class="modal-buttons" style="margin-top: 10px;">
+        <button onclick="openDepositModal()">Deposit</button>
+        <button onclick="openWithdrawModal()">Withdraw</button>
+        <button onclick="openTransferModal()">Transfer</button>
+      </div>
+    
+      <hr>
+      <!-- Delete Button Last -->
+      <div class="modal-buttons" style="margin-top: 10px;">
+        <button onclick="submitCustomerDelete()">Delete Customer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="openAccountModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAccountModal()">&times;</span>
+    <div id="modalScrollWrapper" style="max-height: 75vh; overflow-y: auto; padding-right: 10px;">
+      <div id="accountTypePage">
+        <h2 style="text-align:center;">Step 1: Select Account Type</h2>
+        <select id="accountTypeSelect">
+          <option value="" disabled selected>Select Account Type</option>
+          <option value="Checking">Checking</option>
+          <option value="Savings">Savings</option>
+          <option value="Money Market">Money Market</option>
+          <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+          <option value="Travel Visa">Travel Visa</option>
+        </select>
+        <button class="create-btn" onclick="goToAccountInfoPage()">Next</button>
+      </div>
+
+      <div id="accountInfoPage" style="display: none;">
+        <h2 style="text-align:center;">Step 2: Customer Info</h2>
+        <input type="text" id="newFirstName" placeholder="First Name" required>
+        <input type="text" id="newLastName" placeholder="Last Name" required>
+        <input type="text" id="newUsername" placeholder="Username" required>
+        <input type="password" id="newPassword" placeholder="Password" required>
+        <input type="text" id="newAddress" placeholder="Address" name="address" required>
+        <input type="text" id="newSSN" placeholder="SSN (e.g. 123-45-6789)" required>
+        <input type="email" id="newEmail" placeholder="Email" required>
+        <input type="tel" id="newPhone" placeholder="Phone (e.g. 000-000-0000)" required>
+
+        <select id="securityQuestion1" required>
+          <option value="" disabled selected>Select First Security Question</option>
+          <option value="mother_child">Who is your Mother's favorite child?</option>
+          <option value="chicken_name">What would you name a chicken if you owned one?</option>
+          <option value="first_gamertag">What was your first gamertag?</option>
+          <option value="childhood_dream">What was your dream career as a child?</option>
+          <option value="least_favorite_relative">Who is your least favorite relative?</option>
+          <option value="first_anime">What was your first anime?</option>
+          <option value="longest_word">What is the longest word you can spell without spell check?</option>
+          <option value="favorite_food">What is your favorite food?</option>
+          <option value="never_visit">Where would you never visit even if you were on your last breath?</option>
+          <option value="remove_kindly">If you could kindly remove someone from the history books, who would it be?</option>
+          <option value="only_eat">If you could only eat one meal for the rest of your life, what would it be?</option>
+          <option value="musical_experts">What musical do you know well enough to sing every song?</option>
+          <option value="best_spiderman">Who was the best Spider-Man?</option>
+          <option value="worst_film">What was the worst film ever created?</option>
+        </select>
+        <input type="text" id="securityAnswer1" placeholder="Answer to First Question" required>
+        
+        <select id="securityQuestion2" required>
+          <option value="" disabled selected>Select Second Security Question</option>
+          <option value="mother_child">Who is your Mother's favorite child?</option>
+          <option value="chicken_name">What would you name a chicken if you owned one?</option>
+          <option value="first_gamertag">What was your first gamertag?</option>
+          <option value="childhood_dream">What was your dream career as a child?</option>
+          <option value="least_favorite_relative">Who is your least favorite relative?</option>
+          <option value="first_anime">What was your first anime?</option>
+          <option value="longest_word">What is the longest word you can spell without spell check?</option>
+          <option value="favorite_food">What is your favorite food?</option>
+          <option value="never_visit">Where would you never visit even if you were on your last breath?</option>
+          <option value="remove_kindly">If you could kindly remove someone from the history books, who would it be?</option>
+          <option value="only_eat">If you could only eat one meal for the rest of your life, what would it be?</option>
+          <option value="musical_experts">What musical do you know well enough to sing every song?</option>
+          <option value="best_spiderman">Who was the best Spider-Man?</option>
+          <option value="worst_film">What was the worst film ever created?</option>
+        </select>
+        <input type="text" id="securityAnswer2" placeholder="Answer to Second Question" required>
+
+        <div class="modal-buttons">
+          <button onclick="goBackToAccountType()">Back</button>
+          <button class="create-btn" onclick="submitOpenAccount()">Create Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Deposit Modal -->
+<div id="depositModal" class="modal">
+  <div class="modal-content">
+      <span class="close" onclick="closeDepositModal()">&times;</span>
+      <h2 style="text-align:center;">Deposit Funds</h2>
+
+      <label for="depositAccountId">Account ID:</label>
+      <select id="depositAccountId" name="accountId" required></select>
+
+
+      <label for="depositAmount">Amount to Deposit:</label>
+      <input type="number" step="0.01" id="depositAmount" name="amount" placeholder="Enter Amount (e.g., 100.50)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeDepositModal()">Cancel</button>
+          <button class="action-btn" onclick="submitDeposit()">Deposit</button>
+      </div>
+  </div>
+</div>
+
+<div id="withdrawModal" class="modal">
+  <div class="modal-content">
+      <span class="close" onclick="closeWithdrawModal()">&times;</span>
+      <h2 style="text-align:center;">Withdraw Funds</h2>
+
+      <label for="withdrawAccountId">Account ID:</label>
+      <select id="withdrawAccountId" name="accountId" required></select>
+
+
+      <label for="withdrawAmount">Amount to Withdraw:</label>
+      <input type="number" step="0.01" id="withdrawAmount" name="amount" placeholder="Enter Amount (e.g., 50.00)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeWithdrawModal()">Cancel</button>
+          <button class="action-btn" onclick="submitWithdraw()">Withdraw</button>
+      </div>
+  </div>
+</div>
+
+<div id="transferModal" class="modal">
+  <div class="modal-content">
+      <span class="close" onclick="closeTransferModal()">&times;</span>
+      <h2 style="text-align:center;">Transfer Funds</h2>
+
+      <label for="sourceAccountId">Source Account ID:</label>
+      <select id="sourceAccountId" name="sourceAccountId" required></select>
+      
+      <label for="destinationAccountId">Destination Account ID:</label>
+      <select id="destinationAccountId" name="destinationAccountId" required></select>
+
+      <label for="transferAmount">Amount to Transfer:</label>
+      <input type="number" step="0.01" id="transferAmount" name="amount" placeholder="Enter Amount (e.g., 25.00)" required>
+
+      <div class="modal-buttons">
+          <button onclick="closeTransferModal()">Cancel</button>
+          <button class="action-btn" onclick="submitTransfer()">Transfer</button>
+      </div>
+  </div>
+</div>
+
+<!-- Open Account Modal -->
+<div id="openAccountModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAccountModal()">&times;</span>
+    <h2>Open New Account</h2>
+    <select id="accountType">
+      <option value="Checking">Checking</option>
+      <option value="Savings">Savings</option>
+      <option value="Money Market">Money Market</option>
+      <option value="Home Mortgage Loan">Home Mortgage Loan</option>
+      <option value="Travel Visa">Travel Visa</option>
+    </select>
+    <input type="number" id="initialDeposit" placeholder="Initial Deposit">
+    <button onclick="submitAccountOpen()">Open</button>
+  </div>
+</div>
+
+<!-- View Accounts & Transactions Modal -->
+<div id="viewAccountsModal" class="modal">
+  <div class="modal-content accounts-section">
+    <span class="close" onclick="closeAccountsModal()">&times;</span>
+
+    <div class="accounts-transactions-wrapper">
+      <h2 id="accountsModalTitle">Customer's Accounts</h2>
+    
+      <ul id="accountList" class="accounts-container">
+        <!-- Account boxes will be injected here -->
+      </ul>
+    
+      <div id="transactionSection" class="transaction-section hidden">
+        <h3 id="selectedAccountLabel">Transactions</h3>
+        <ul id="transactionList">
+          <!-- Transactions will be injected here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -2,11 +2,8 @@ from flask import Blueprint, Response, request, session, current_app, render_tem
 from app.blueprints.sharedUtilities import (
     get_csv_path, login_required, flash_error, flash_success, get_account_transactions, get_customer_accounts
 )
-from scripts.customer.deleteUser import delete_user_button_pressed as delete_customer_logic
-from scripts.createTeller import create_teller
 from app.blueprints.auth.forms import LoginForm
 from .forms import AdminSettingsForm
-from Crypto.PublicKey import ECC
 import pandas as pd
 import hashlib
 import json
@@ -122,6 +119,7 @@ def admin_dashboard():
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @login_required('admin')
 def admin_settings():
+    from Crypto.PublicKey import ECC
     form = AdminSettingsForm()
     username = session.get("admin")
     if not username:
@@ -198,6 +196,9 @@ def admin_settings():
 
     return render_template("admin/admin_settings.html", form=form)
 
+
+### Teller Management ###
+
 # ---------------------------------------
 # Check If a Teller Has Set Up Login Info
 # ---------------------------------------
@@ -224,7 +225,8 @@ def check_employee():
 # ---------------
 @admin_bp.route("/create-teller", methods=["POST"])
 @login_required("admin")
-def create_teller():
+def create_teller_route():
+    from scripts.createTeller import create_teller
     data = request.get_json()
     first = data.get("firstName", "").strip()
     last = data.get("lastName", "").strip()
@@ -269,11 +271,12 @@ def edit_teller():
 @admin_bp.route("/delete-teller", methods=["POST"])
 @login_required("admin")
 def delete_teller():
+    from scripts.customer.deleteUser import delete_user_button_pressed
     data = request.get_json()
     employee_id = int(data.get("employeeID", 0))
 
     try:
-        result = delete_customer_logic("Teller", employee_id, is_admin=True)
+        result = delete_user_button_pressed("Teller", employee_id, is_admin=True)
         if result["status"] == "success":
             return jsonify(success=True)
         else:
@@ -342,7 +345,7 @@ def check_customer_accounts(customer_id):
 # Display All Customer Accounts
 # -----------------------------
 @admin_bp.route("/customer/<int:customer_id>/accounts", methods=["GET"])
-def get_customer_accounts(customer_id):
+def get_customer_accounts_route(customer_id):
     """
     Returns all accounts associated with a specific customer.
     Replaces NaN/NaT values in the DataFrame with None before sending the response.
@@ -382,7 +385,7 @@ def transactions_for_customer(customer_id):
 # Display Account Transactions
 # ----------------------------
 @admin_bp.route("/account/<int:account_id>/transactions", methods=["GET"])
-def get_account_transactions(account_id):
+def get_account_transactions_route(account_id):
     """
     Returns a sorted list of transactions for a specific account, 
     ordered by transaction date (most recent first).

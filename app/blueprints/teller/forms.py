@@ -4,9 +4,9 @@ from wtforms import StringField, PasswordField, DecimalField, SelectField, Submi
 from wtforms.validators import Regexp, Optional, Length, Email, NumberRange, DataRequired
 from app.blueprints.sharedUtilities import get_customer_accounts, flash_error
 
-# -----------------------------------------------------------------------------
-# TellerSettingsForm: Tellers can modify their personal information.
-# -----------------------------------------------------------------------------
+# ---------------------------------------------
+# Tellers can modify their personal information
+# ---------------------------------------------
 class TellerSettingsForm(FlaskForm):
     first_name = StringField('First Name', validators=[Optional(), Length(max=50)])
     last_name = StringField('Last Name', validators=[Optional(), Length(max=50)])
@@ -17,15 +17,9 @@ class TellerSettingsForm(FlaskForm):
     password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
     current_password = PasswordField('Current Password', validators=[Optional()])
 
-# -----------------------------------------------------------------------------
-# AdminSettingsForm: Modify admin password only.
-# -----------------------------------------------------------------------------
-class AdminSettingsForm(FlaskForm):
-    email = StringField('Email')
-    password = PasswordField('New Password', validators=[Optional(), Length(min=8)])
-    current_password = PasswordField('Current Password', validators=[Optional()])
-
-
+# ---------------------
+# Base Transaction Form
+# ---------------------
 class AccountTransactionForm(FlaskForm):
     """
     Base form for common account transactions (Deposit/Withdraw).
@@ -45,23 +39,27 @@ class AccountTransactionForm(FlaskForm):
         ]
     )
 
-
+# ------------
+# Deposit Form
+# ------------
 class DepositForm(AccountTransactionForm):
     """
     Form for making deposits to a selected account.
     """
     submit: SubmitField = SubmitField('Deposit')
 
-
+# ---------------
+# Withdrawal Form
+# ---------------
 class WithdrawForm(AccountTransactionForm):
     """
     Form for withdrawing funds from a selected account.
     """
     submit: SubmitField = SubmitField('Withdraw')
 
-# -----------------------------------------------------------------------------
-# TransferForm: Form for transferring funds.
-# -----------------------------------------------------------------------------
+# -------------
+# Transfer Form
+# -------------
 class TransferForm(FlaskForm):
     src_account = SelectField('', choices=[])
     dest_account = SelectField('', choices=[])
@@ -70,6 +68,9 @@ class TransferForm(FlaskForm):
         validators=[DataRequired(), NumberRange(min=0, message="Amount must be positive.")]
     )
 
+# --------------------------------
+# Dropdown for Choosing an Account
+# --------------------------------
 def choose_account():
     """
     Populates the dropdown fields with valid accounts.
