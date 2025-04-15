@@ -236,10 +236,16 @@ def admin_login():
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password_page():
     form = ResetPasswordForm()
+    next_url = (
+        request.args.get("next") or
+        request.form.get("next") or
+        "/"  # Fallback to homepage
+    )
+
     if form.validate_on_submit():
         user_id = form.user_id.data
-        answer1 = form.question1.data
-        answer2 = form.question2.data
+        answer1 = form.answer1.data
+        answer2 = form.answer2.data
         new_password = form.new_password.data
 
         try:
@@ -249,9 +255,10 @@ def forgot_password_page():
             return render_template("auth/forgot_password.html", form=form)
 
         result = resetPassword.forgot_password(user_id, answer1, answer2, new_password)
+
         if result["status"] == "success":
             flash_success(result["message"])
-            return redirect(url_for('auth.customer_login'))
+            return redirect(next_url)
         else:
             flash_error(result["message"])
 
