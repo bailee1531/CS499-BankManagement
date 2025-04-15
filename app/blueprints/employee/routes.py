@@ -31,6 +31,7 @@ def admin_login():
 
     if request.method == "POST":
         username = request.form.get("username")
+        username = username.lower()
 
         teller_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
         df = pd.read_csv(teller_path)
@@ -45,7 +46,7 @@ def admin_login():
             flash("Invalid credentials. Try again.", "danger")
 
     return render_template("auth/login.html", form=form,
-                       title="UAH Bank - Admin Login",
+                       title="Evergreen Bank - Admin Login",
                        header_text="Admin Login",
                        login_instructions="Enter your administrator credentials to log in.",
                        form_action=url_for('employee.admin_login'),
@@ -599,6 +600,7 @@ def teller_login():
     if request.method == "POST":
         username = request.form.get("username")
         employee_id = request.form.get("employeeId")
+        username = username.lower()
 
         teller_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/employees.csv"))
         df = pd.read_csv(teller_path)
