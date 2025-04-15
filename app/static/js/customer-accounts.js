@@ -1,18 +1,22 @@
 /**
  * Fetches and displays all accounts for a given customer in a modal.
  */
-function openAccountsModal(customerId) {
+function openAccountsModal(customerId, firstName, lastName) {
     fetch(`/employee/customer/${customerId}/accounts`)
       .then(res => res.json())
       .then(data => {
         const list = document.getElementById("accountList");
         const transactionSection = document.getElementById("transactionSection");
         const modal = document.getElementById("viewAccountsModal");
+        const modalTitle = document.getElementById("accountsModalTitle");
   
         // Clear previous content
         list.innerHTML = "";
         transactionSection.style.display = "none";
   
+        // Set the modal title to "custID's Accounts"
+        modalTitle.textContent = `${firstName} ${lastName}'s Accounts`;
+
         if (!data.success) {
           alert("Failed to fetch accounts.");
           return;

@@ -108,8 +108,8 @@
       <hr>
 
       <!-- Toggle Button -->
-      <button onclick="openAccountsModal(currentCustomerID)">User Accounts</button>
-    
+      <button onclick="openAccountsModal(currentCustomerID, document.getElementById('modalFirstName').textContent,
+        document.getElementById('modalLastName').textContent)">User Accounts</button>    
       <!-- Open New Account + Transaction Buttons -->
       <h3>Open New Account</h3>
       <select id="accountType" onchange="toggleAccountInputs()">
@@ -305,7 +305,7 @@
     <span class="close" onclick="closeAccountsModal()">&times;</span>
 
     <div class="accounts-transactions-wrapper">
-      <h2>Your Accounts</h2>
+      <h2 id="accountsModalTitle">Customer's Accounts</h2>
     
       <ul id="accountList" class="accounts-container">
         <!-- Account boxes will be injected here -->
