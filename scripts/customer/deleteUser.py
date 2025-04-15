@@ -73,6 +73,9 @@ def delete_user_button_pressed(user_type: str, user_id: int, password: str = Non
             cust_df = pd.read_csv(customers_path)
             cust_df = cust_df[cust_df['CustomerID'] != user_id]
             cust_df.to_csv(customers_path, index=False)
+
+            accounts_df = accounts_df[accounts_df['CustomerID'] != user_id]
+            accounts_df.to_csv(accounts_path, index=False)
         except Exception as e:
             return {"status": "error", "message": f"Failed to update customers.csv: {e}"}
     elif user_type == 'Teller':

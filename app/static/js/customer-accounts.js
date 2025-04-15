@@ -1,25 +1,24 @@
 /**
  * Fetches and displays all accounts for a given customer in a modal.
  */
-function openAccountsModal(customerId) {
+function openAccountsModal(customerId, firstName, lastName) {
     fetch(`/employee/customer/${customerId}/accounts`)
       .then(res => res.json())
       .then(data => {
         const list = document.getElementById("accountList");
         const transactionSection = document.getElementById("transactionSection");
         const modal = document.getElementById("viewAccountsModal");
+        const modalTitle = document.getElementById("accountsModalTitle");
   
         // Clear previous content
         list.innerHTML = "";
         transactionSection.style.display = "none";
   
+        // Set the modal title to "custID's Accounts"
+        modalTitle.textContent = `${firstName} ${lastName}'s Accounts`;
+
         if (!data.success) {
           alert("Failed to fetch accounts.");
-          return;
-        }
-  
-        if (data.accounts.length === 0) {
-          list.innerHTML = "<li>No accounts found.</li>";
           return;
         }
   
@@ -28,10 +27,15 @@ function openAccountsModal(customerId) {
           const li = document.createElement("li");
           li.classList.add("account-box");
   
+          const isDeletable = parseFloat(account.CurrBal) === 0;
+
           li.innerHTML = `
             <h3>${account.AccountType}</h3>
             <p>ID: ${account.AccountID}</p>
-            <p>$${account.CurrBal}</p>
+            <p>$${parseFloat(account.CurrBal).toFixed(2)}</p>
+            <button class="delete-account-btn" ${!isDeletable ? "disabled title='Balance must be $0.00 to delete'" : ""} onclick="deleteAccountFromModal(${account.AccountID})">
+              Delete
+            </button>
           `;
   
           li.onclick = () => loadTransactions(account.AccountID, account.AccountType);

@@ -29,6 +29,7 @@ def login_page_button_pressed(new_or_returning, type, username: str, password, *
     custPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/customers.csv'))
     perPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/persons.csv'))
     employeePath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/employees.csv'))
+    logsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/logs.csv'))
 
     username = username.lower()
 
@@ -78,10 +79,26 @@ def login_page_button_pressed(new_or_returning, type, username: str, password, *
                         'APRRangeID': aprRangeID}        # creates dict of new user information
             custInfo.loc[len(custInfo)] = newCustRow     # adds information from dict to end of dataframe
             custInfo.to_csv(custPath, index=False)       # exports dataframe to customer.csv to overwrite with new information
+
+            logID = random.randint(1299, 5999)
+            while logID in logInfo['LogID'].values:
+                logID = random.randint(1299, 5999)
+
+            print(logID)
+            newLogRow = {'LogID': logID, 'UserID': newID, 'LogMessage': 'New Customer Created'}
+            logInfo.loc[len(logInfo)] = newLogRow
+            logInfo.to_csv(logsPath, index=False)
         else:
             employeeIndex = employeeInfo[(employeeInfo['EmployeeID'] == newID)]
             if employeeIndex.empty:
                 return {"status": "error", "message": "Cannot create user account until employee account has been created by the administrator."}
+
+            logID = random.randint(1299, 5999)
+            while logID in logInfo['LogID'].values:
+                logID = random.randint(1299, 5999)
+            newLogRow = {'LogID': logID, 'UserID': newID, 'LogMessage': 'Teller Has Set Up Log In'}
+            logInfo.loc[len(logInfo)] = newLogRow
+            logInfo.to_csv(logsPath, index=False)
             
         newPerRow = {'UserType': type,
                      'ID': newID,
@@ -128,6 +145,7 @@ def login_page_button_pressed(new_or_returning, type, username: str, password, *
     perInfo = pd.read_csv(perPath)
     custInfo = pd.read_csv(custPath)
     employeeInfo = pd.read_csv(employeePath)
+    logInfo = pd.read_csv(logsPath)
 
     # Create account
     if new_or_returning == 1:
