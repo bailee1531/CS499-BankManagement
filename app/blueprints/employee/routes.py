@@ -60,12 +60,15 @@ def admin_dashboard():
     customers_df = pd.read_csv(get_csv_path("customers.csv"))
     persons_df = pd.read_csv(get_csv_path("persons.csv"))
     accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+    log_df = pd.read_csv(get_csv_path("logs.csv"))
 
     # Convert IDs to int for consistency
     customers_df["CustomerID"] = customers_df["CustomerID"].astype(int)
     persons_df["ID"] = persons_df["ID"].astype(int)
     accounts_df["CustomerID"] = accounts_df["CustomerID"].astype(int)
     accounts_df["AccountID"] = accounts_df["AccountID"].astype(int)
+    log_df["LogID"] = log_df["LogID"].astype(int)
+    log_df["UserID"] = log_df["UserID"].astype(int)
 
     try:
         # Merge customers + persons to get full profile
@@ -79,6 +82,7 @@ def admin_dashboard():
         merged_df = merged_df.rename(columns={"AccountID": "AccountNumber"})
 
         customers = merged_df.to_dict(orient="records")
+        logs = log_df.to_dict(orient="records")
         if os.path.exists(employeePath) and os.path.getsize(employeePath) > 0:
             df = pd.read_csv(employeePath)
 
@@ -96,9 +100,10 @@ def admin_dashboard():
         flash(f"Error reading CSV: {e}", "danger")
         tellers = []
         customers = []
+        logs = []
         return jsonify(success=False, message=str(e)), 500
 
-    return render_template("employee/admin_dashboard.html", tellers=tellers, customers=customers)
+    return render_template("employee/admin_dashboard.html", tellers=tellers, customers=customers, logs=logs)
 
 # Create Teller Route
 @employee_bp.route("/create-teller", methods=["POST"])
@@ -288,22 +293,38 @@ def get_accounts(customer_id):
     except Exception as e:
         return jsonify(success=False, message=str(e))
 
+import os
+import pandas as pd
+
 @employee_bp.route("/check-accounts/<int:customer_id>", methods=["GET"])
 @login_required("teller", "admin")
 def check_customer_accounts(customer_id):
     try:
-        accounts_path = get_csv_path("accounts.csv")
-        bills_path = get_csv_path("bills.csv")
+        accounts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+        bills_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/bills.csv"))
 
         accounts_df = pd.read_csv(accounts_path)
         bills_df = pd.read_csv(bills_path)
 
-        has_accounts = not accounts_df[accounts_df['CustomerID'] == customer_id].empty
-        has_bills = not bills_df[bills_df['CustomerID'] == customer_id].empty
+        nonzero_balance = accounts_df[
+            (accounts_df['CustomerID'] == customer_id) & 
+            (accounts_df['CurrBal'].astype(float) > 0.00)
+        ]
 
-        return jsonify(success=True, hasOpenAccountsOrBills=has_accounts or has_bills)
+        unpaid_bills = bills_df[
+            (bills_df['CustomerID'] == customer_id) & 
+            (bills_df['Amount'].astype(float) > 0.00)
+        ]
+
+        has_balance = not nonzero_balance.empty
+        has_unpaid = not unpaid_bills.empty
+
+        return jsonify(success=True, hasOpenAccountsOrBills=has_balance or has_unpaid)
+
     except Exception as e:
+        print(f"Account status check failed: {e}")
         return jsonify(success=False, message=f"Error checking account status: {str(e)}"), 500
+
     
 
 @employee_bp.route("/open-account", methods=["POST"])
@@ -317,6 +338,7 @@ def open_account_route():
         last = data.get("lastName").strip()
         username = data.get("username").strip()
         password = data.get("password").strip()
+        address = data.get("address").strip()
         ssn = data.get("ssn").strip()
         email = data.get("email").strip()
         phone = data.get("phone").strip()
@@ -326,7 +348,7 @@ def open_account_route():
         # Call existing function to handle CSV + key logic
         result = login_page_button_pressed(
             1, "Customer", username, password,
-            first, last, "N/A", email, phone, ssn, q1, q2
+            first, last, address, email, phone, ssn, q1, q2
         )
 
         if result["status"] != "success":
@@ -395,6 +417,42 @@ def delete_account():
     acc_df.to_csv(acc_path, index=False)
 
     return jsonify(success=True, message="Account successfully deleted.")
+
+@employee_bp.route("/delete-customer", methods=["POST"])
+@login_required("teller")
+def delete_customer():
+    from scripts.customer.deleteUser import delete_user_button_pressed
+
+    data = request.get_json()
+    customer_id = int(data.get("customerID"))
+
+    try:
+        accounts_path = get_csv_path("accounts.csv")
+        bills_path = get_csv_path("bills.csv")
+
+        acc_df = pd.read_csv(accounts_path)
+        bills_df = pd.read_csv(bills_path)
+
+        # Delete only $0.00 accounts
+        acc_df = acc_df[~((acc_df["CustomerID"] == customer_id) & (acc_df["CurrBal"].astype(float) == 0.00))]
+
+        # Delete only $0.00 bills
+        bills_df = bills_df[~((bills_df["CustomerID"] == customer_id) & (bills_df["Amount"].astype(float) == 0.00))]
+
+        # Save updated files
+        acc_df.to_csv(accounts_path, index=False)
+        bills_df.to_csv(bills_path, index=False)
+
+        # Now attempt delete
+        result = delete_user_button_pressed("Customer", customer_id, is_admin=True)
+
+        if result["status"] == "success":
+            return jsonify(success=True, message=result["message"])
+        else:
+            return jsonify(success=False, message=result["message"]), 400
+
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {e}"), 500
 
 
 @employee_bp.route("/deposit", methods=["POST"])
@@ -670,6 +728,54 @@ def teller_settings():
     form.username.data = username
 
     return render_template("employee/teller_settings.html", form=form)
+
+@employee_bp.route("/transactions-json/teller/<customer_id>")
+@login_required("teller")
+def get_customer_transactions(customer_id):
+    try:
+        import pandas as pd
+        import os
+
+        trans_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/transactions.csv"))
+        acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+
+        trans_df = pd.read_csv(trans_path)
+        acc_df = pd.read_csv(acc_path)
+
+        customer_accounts = acc_df[acc_df["CustomerID"] == int(customer_id)]["AccountID"].tolist()
+        filtered = trans_df[trans_df["AccountID"].isin(customer_accounts)]
+
+        return jsonify(filtered.to_dict(orient="records"))
+
+    except Exception as e:
+        print(f"Failed to load transactions (teller): {e}")
+        return jsonify([])
+
+
+
+@employee_bp.route("/transactions-json/admin/<customer_id>")
+@login_required("admin")
+def transactions_for_customer(customer_id):
+    try:
+        import pandas as pd
+        import os
+
+        acc_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/accounts.csv"))
+        tx_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../csvFiles/transactions.csv"))
+
+        acc_df = pd.read_csv(acc_path)
+        tx_df = pd.read_csv(tx_path)
+
+        acc_ids = acc_df[acc_df["CustomerID"] == int(customer_id)]["AccountID"].tolist()
+        filtered_tx = tx_df[tx_df["AccountID"].isin(acc_ids)]
+
+        return jsonify(filtered_tx.to_dict(orient="records"))
+
+    except Exception as e:
+        print(f"[ERROR] Failed to load transactions (admin): {e}")
+        return jsonify([])
+
+
 
 # ---------------------------
 #Admin Settings

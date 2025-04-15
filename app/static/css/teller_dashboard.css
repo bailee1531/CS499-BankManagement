@@ -8,7 +8,7 @@
 }
 
 .teller-dashboard h1 {
-  color: #2e3c4e;
+  color: #434343;
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -48,7 +48,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  min-height: 400px;
 }
 
 .customer-card {
@@ -134,8 +133,8 @@
   color: var(--white);
   padding: 2rem;
   border-radius: var(--container-border-radius);
-  width: 85%;
-  max-width: 1000px;
+  width: 70%;
+  max-width: 800px;
   display: flex;
   flex-direction: row;
   gap: 2rem;
@@ -348,4 +347,11 @@
 
 .create-btn:hover {
   background-color: #005c2a;
+}
+
+.scroll-panel {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 10px;
+  box-sizing: border-box;
 }

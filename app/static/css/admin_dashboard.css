@@ -1,12 +1,12 @@
 /* Admin Dashboard Layout */
 .admin-dashboard {
     max-width: 1000px;
-    margin: 2rem auto 6rem auto;
+    margin: 2rem auto 0 auto;
     padding: 2rem;
 }
 
 .admin-dashboard h1 {
-    color: #2e3c4e;
+    color: #434343;
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -124,7 +124,6 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    min-height: 400px;
 }
 
 .teller-card {
@@ -158,4 +157,74 @@
 
 .hidden {
     display: none;
+}
+
+.scroll-panel {
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+  
+.modal-content {
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    padding: 2rem;
+    width: 70%;
+    max-width: 900px;
+}
+
+.main-dashboard-title {
+    text-align: center;
+    color: #434343;
+    margin-top: 2rem;
+}
+
+/* Styles for side-by-side top columns */
+.dashboard-container {
+    display: flex; /* Enable flexbox */
+    justify-content: space-between; /* Distribute space */
+    gap: 20px; /* Add space between the columns */
+}
+
+.admin-dashboard-column,
+.teller-dashboard-column {
+    flex: 1; /* Allow columns to grow and shrink equally */
+    min-width: 0; /* Prevent overflow issues with flex items */
+}
+
+  /* Styles for the Logs section */
+.logs-section-wrapper {
+    padding: 0 20px 20px 20px; /* Match side padding of container */
+}
+
+.logs-section-wrapper h1 {
+    color: #434343;
+    text-align: center; /* Center the "Logs" heading */
+    margin-bottom: 20px; /* Space below heading */
+}
+
+.log-content {
+    display: flex;           /* Enable Flexbox */
+    justify-content: center; /* Center child horizontally */
+}
+
+/* Style the log container itself */
+#logsTableContainer {
+    overflow-y: auto;
+    max-height: 750px;
+    width: 60%;
+    box-sizing: border-box;
+    white-space: normal;
+}
+
+#logsTableContainer table {
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.teller-grid, .customer-grid {
+  width: 100%;
 }

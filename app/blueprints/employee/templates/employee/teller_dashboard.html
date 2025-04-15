@@ -10,6 +10,12 @@
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+
+<script src="{{ url_for('static', filename='js/view-transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
+
 {% endblock %}
 
 {% block title %}Teller Dashboard{% endblock %}
@@ -48,10 +54,9 @@
 <!-- Customer Modal -->
 <div id="customerModal" class="modal">
   <div class="modal-content">
-    <a href="{{ url_for('employee.teller_dashboard') }}" class="exit-to-dashboard" title="Exit to Dashboard">Exit</a>
     <span class="close" onclick="closeCustomerModal()">&times;</span>
     
-    <div class="modal-left">
+    <div class="modal-left scroll-panel">
       <!-- Customer Info Panel -->
       <div id="customerInfoPanel">
         <h2>Customer Info</h2>
@@ -87,7 +92,7 @@
       </div>
     </div>
 
-    <div class="modal-right">
+    <div class="modal-right scroll-panel">
       <!-- Edit Username -->
       <h3>Edit Username</h3>
       <input type="text" id="editUsernameInput" placeholder="New Username">
@@ -163,6 +168,7 @@
         <input type="text" id="newLastName" placeholder="Last Name" required>
         <input type="text" id="newUsername" placeholder="Username" required>
         <input type="password" id="newPassword" placeholder="Password" required>
+        <input type="text" id="newAddress" placeholder="Address" name="address" required>
         <input type="text" id="newSSN" placeholder="SSN (e.g. 123-45-6789)" required>
         <input type="email" id="newEmail" placeholder="Email" required>
         <input type="tel" id="newPhone" placeholder="Phone (e.g. 000-000-0000)" required>
@@ -341,6 +347,7 @@ function setModalTextContent(ids, values) {
 
 function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
   currentCustomerID = customerID;
+  selectedCustomerID = customerID;
 
   setModalTextContent(
     [
