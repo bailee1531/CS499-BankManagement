@@ -11,8 +11,8 @@ from flask import (
 )
 
 # App imports: Forms, business logic, and shared utilities
-from app.blueprints.auth.forms import LoginForm
-from scripts.customer import webLogin
+from app.blueprints.auth.forms import LoginForm, ResetPasswordForm
+from scripts.customer import webLogin, resetPassword
 from app.blueprints.sharedUtilities import (
     get_csv_path,
     flash_success, flash_error
@@ -189,6 +189,7 @@ def customer_login():
                            header_text="Customer Login",
                            login_instructions="Enter your username and password to securely access your UAH Bank account.",
                            form_action=url_for('auth.customer_login'),
+                           forgot_password_url=url_for('auth.forgot_password_page'),
                            show_signup_button=True,
                            signup_url=url_for("registration.register_step1"))
 
@@ -209,7 +210,7 @@ def teller_login():
                            header_text="Teller Login",
                            login_instructions="Please enter your teller username and password to log in.",
                            form_action=url_for('auth.teller_login'),
-                           forgot_password_url="#",  # Add proper URL later
+                           forgot_password_url=url_for('auth.forgot_password_page'),
                            show_signup_button=False)
 
 @auth_bp.route('/admin/login', methods=['GET', 'POST'])
@@ -229,8 +230,32 @@ def admin_login():
                            header_text="Admin Login",
                            login_instructions="Enter your administrator credentials to log in.",
                            form_action=url_for('auth.admin_login'),
-                           forgot_password_url="#",  # Add proper URL later
+                           forgot_password_url=url_for('auth.forgot_password_page'),
                            show_signup_button=False)
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password_page():
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user_id = form.user_id.data
+        answer1 = form.question1.data
+        answer2 = form.question2.data
+        new_password = form.new_password.data
+
+        try:
+            user_id = int(float(user_id))
+        except (ValueError, TypeError):
+            flash_error("Invalid user ID format.")
+            return render_template("auth/forgot_password.html", form=form)
+
+        result = resetPassword.forgot_password(user_id, answer1, answer2, new_password)
+        if result["status"] == "success":
+            flash_success(result["message"])
+            return redirect(url_for('auth.customer_login'))
+        else:
+            flash_error(result["message"])
+
+    return render_template("auth/forgot_password.html", form=form)
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
