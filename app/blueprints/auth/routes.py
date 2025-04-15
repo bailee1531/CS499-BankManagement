@@ -61,9 +61,9 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
         if session_key == "customer":
             return url_for('customer.customer_dashboard'), None
         elif session_key == "teller":
-            return url_for('employee.teller_dashboard'), None
+            return url_for('teller.teller_dashboard'), None
         elif session_key == "admin":
-            return url_for('employee.admin_dashboard'), None
+            return url_for('admin.admin_dashboard'), None
         else:
             return None, "Unknown session type"
 
@@ -111,9 +111,9 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
     if session_key == "customer":
         return url_for('customer.customer_dashboard'), None
     elif session_key == "teller":
-        return url_for('employee.teller_dashboard'), None
+        return url_for('teller.teller_dashboard'), None
     elif session_key == "admin":
-        return url_for('employee.admin_dashboard'), None
+        return url_for('admin.admin_dashboard'), None
 
     return None, "Unknown session type"
 
@@ -185,7 +185,7 @@ def customer_login():
         return redirect(next_url or redirect_url)
 
     return render_template("auth/login.html", form=form,
-                           title="UAH Bank - Login",
+                           title="Evergreen Bank - Login",
                            header_text="Customer Login",
                            login_instructions="Enter your username and password to securely access your UAH Bank account.",
                            form_action=url_for('auth.customer_login'),

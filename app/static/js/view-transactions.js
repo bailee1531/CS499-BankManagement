@@ -2,7 +2,7 @@
  * Loads and displays transactions for a specific account.
  */
 function loadTransactions(accountId, accountType) {
-    fetch(`/employee/account/${accountId}/transactions`)
+    fetch(`/teller/account/${accountId}/transactions`)
       .then(res => res.json())
       .then(data => {
         const section = document.getElementById("transactionSection");

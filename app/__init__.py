@@ -48,9 +48,13 @@ def create_app(test_config=None):
     from app.blueprints.registration.routes import register_bp
     app.register_blueprint(register_bp)  
 
-    # Register the employee blueprint (handles employee stuff)
-    from app.blueprints.employee.routes import employee_bp
-    app.register_blueprint(employee_bp, url_prefix="/employee")
+    # Register the admin blueprint (handles admin stuff)
+    from app.blueprints.admin.routes import admin_bp
+    app.register_blueprint(admin_bp, url_prefix="/admin")
+
+    # Register the teller blueprint (handles teller stuff)
+    from app.blueprints.teller.routes import teller_bp
+    app.register_blueprint(teller_bp, url_prefix="/teller")
 
 
     # ---------------------------
