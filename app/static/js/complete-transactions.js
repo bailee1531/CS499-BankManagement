@@ -1,5 +1,3 @@
-let currentCustomerID = null;
-
 function openDepositModal() {
     populateAccountDropdown(currentCustomerID, "depositAccountId");
     document.getElementById("depositModal").style.display = "block";

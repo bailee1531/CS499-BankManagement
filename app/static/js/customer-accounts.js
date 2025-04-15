@@ -1,4 +1,3 @@
-let currentCustomerID = null;
 let openAccountCustomerID = null;
 
 function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
