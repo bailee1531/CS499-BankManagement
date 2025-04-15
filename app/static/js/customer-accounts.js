@@ -18,11 +18,6 @@ function openAccountsModal(customerId) {
           return;
         }
   
-        if (data.accounts.length === 0) {
-          list.innerHTML = "<li>No accounts found.</li>";
-          return;
-        }
-  
         // Populate accounts list
         data.accounts.forEach(account => {
           const li = document.createElement("li");
