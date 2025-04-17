@@ -47,12 +47,23 @@ function openAccountsModal(customerId, firstName, lastName) {
       list.innerHTML = "";
       transactionSection.style.display = "none";
   
-      // Set the modal title to "custID's Accounts"
-      modalTitle.textContent = `${firstName} ${lastName}'s Accounts`;
+      // Set the modal title to "First Last's Accounts" or fallback
+      if (firstName && lastName) {
+        modalTitle.textContent = `${firstName} ${lastName}'s Accounts`;
+      } else {
+        modalTitle.textContent = "Customer's Accounts";
+      }
 
       if (!data.success) {
         alert("Failed to fetch accounts.");
         return;
+      }
+
+      // Show default message where accounts would be, if no accounts are found
+      if (data.accounts.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "This user has no accounts.";
+        list.appendChild(li);
       }
   
       // Populate accounts list
@@ -277,7 +288,9 @@ function deleteAccountFromModal(accountID) {
   .then(data => {
     if (data.status === "success") {
       alert(data.message);
-      openAccountsModal(currentCustomerID); // Refresh the modal
+      const firstName = document.getElementById("modalFirstName").textContent;
+      const lastName = document.getElementById("modalLastName").textContent;
+      openAccountsModal(currentCustomerID, firstName, lastName);
     } else {
       alert("Error: " + data.message);
     }
