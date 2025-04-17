@@ -1,6 +1,6 @@
 function openDepositModal() {
     populateAccountDropdown(currentCustomerID, "depositAccountId");
-    document.getElementById("depositModal").style.display = "block";
+    document.getElementById("depositModal").style.display = "flex";
 }
 
 
@@ -44,7 +44,7 @@ function submitDeposit() {
 
 function openWithdrawModal() {
     populateAccountDropdown(currentCustomerID, "withdrawAccountId");
-    document.getElementById("withdrawModal").style.display = "block";
+    document.getElementById("withdrawModal").style.display = "flex";
 }
 
 
@@ -89,7 +89,7 @@ function submitWithdraw() {
 function openTransferModal() {
     populateAccountDropdown(currentCustomerID, "sourceAccountId");
     populateAccountDropdown(currentCustomerID, "destinationAccountId");
-    document.getElementById("transferModal").style.display = "block";
+    document.getElementById("transferModal").style.display = "flex";
 }
 
 

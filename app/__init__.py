@@ -8,6 +8,7 @@ It sets up configuration values, registers blueprints, and defines a basic home 
 from datetime import timedelta
 from flask import Flask, render_template, session, request, jsonify
 import secrets
+import os
 
 def create_app(test_config=None):
     """
@@ -23,7 +24,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
 
     # Set a secret key for securely signing the session cookie
-    app.secret_key = secrets.token_hex()
+    app.secret_key = os.environ.get('FLASK_SECRET_KEY', secrets.token_hex(32))
 
     # Configure the session lifetime (e.g., 30 minutes)
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
