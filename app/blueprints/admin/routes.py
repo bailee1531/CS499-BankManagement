@@ -28,30 +28,24 @@ def get_unique_identicon_url(username):
 # -----------
 @admin_bp.route("/login", methods=["GET", "POST"])
 def admin_login():
-    form = LoginForm()
-
     if request.method == "POST":
         username = request.form.get("username")
+        employee_id = request.form.get("employeeId")
         username = username.lower()
 
         df = pd.read_csv(get_csv_path("employees.csv"))
 
-        match = df[(df["Username"] == username) & (df["Position"] == "Admin")]
+        match = df[(df["Username"] == username) & (df["EmployeeID"].astype(str) == str(employee_id)) & (df["Position"] == "Admin")]
 
         if not match.empty:
             session['admin'] = username
+            session['employee_id'] = int(match.iloc[0]["EmployeeID"])
             session['role'] = 'admin'
             return redirect(url_for("admin.admin_dashboard"))
         else:
-            flash("Invalid credentials. Try again.", "danger")
+            flash("Invalid Admin credentials", "danger")
 
-    return render_template("auth/login.html", form=form,
-                       title="Evergreen Bank - Admin Login",
-                       header_text="Admin Login",
-                       login_instructions="Enter your administrator credentials to log in.",
-                       form_action=url_for('admin.admin_login'),
-                       forgot_password_url="#",
-                       show_signup_button=False)
+    return render_template("auth/admin_login.html")
 
 # ---------------
 # Admin Dashboard

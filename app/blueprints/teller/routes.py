@@ -51,7 +51,7 @@ def teller_login():
 # ----------------
 # Teller Dashboard
 # ----------------
-@teller_bp.route("/teller-dashboard", methods=["GET", "POST"])
+@teller_bp.route("/dashboard", methods=["GET", "POST"])
 @login_required("teller")
 def teller_dashboard():
     try:
