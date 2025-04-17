@@ -114,9 +114,7 @@ class RegistrationStep2Form(FlaskForm):
         ("first_anime", "What was your first anime?"),
         ("longest_word", "What is the longest word you can spell without spell check?"),
         ("favorite_food", "What is your favorite food?"),
-        ("never_visit", "Where would you never visit even if you were on your last breath?"),
-        ("remove_kindly", "If you could kindly remove someone from the history books, who would it be?"),
-        ("only_eat", "If you could only eat one meal for the rest of your life, what would it be?"),
+        ("never_visit", "Where would you never visit?"),
         ("musical_experts", "What musical do you know well enough to sing every song?"),
         ("best_spiderman", "Who was the best Spider-Man?"),
         ("worst_film", "What was the worst film ever created?")
