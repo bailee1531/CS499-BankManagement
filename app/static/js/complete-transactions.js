@@ -13,7 +13,7 @@ function submitDeposit() {
     const amount = document.getElementById("depositAmount").value;
 
     if (!accountId || !amount) {
-        alert("Please enter both Account ID and the deposit amount.");
+        injectFlashMessage("danger", "Please enter both Account ID and the deposit amount.");
         return;
     }
 
@@ -30,14 +30,17 @@ function submitDeposit() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            injectFlashMessage("success", data.message);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
         } else {
-            alert("Error: " + data.message);
+            injectFlashMessage("danger", "Error: " + data.message);
         }
     })
     .catch(err => {
-        alert("Failed to process deposit.");
+        injectFlashMessage("danger", "Failed to process deposit.");
         console.error(err);
     });
 }
@@ -57,7 +60,7 @@ function submitWithdraw() {
     const amount = document.getElementById("withdrawAmount").value;
 
     if (!accountId || !amount) {
-        alert("Please enter both Account ID and the withdrawal amount.");
+        injectFlashMessage("danger", "Please enter both Account ID and the withdrawal amount.");
         return;
     }
 
@@ -74,14 +77,17 @@ function submitWithdraw() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            injectFlashMessage("success", data.message);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
         } else {
-            alert("Error: " + data.message);
+            injectFlashMessage("danger", "Error: " + data.message);
         }
     })
     .catch(err => {
-        alert("Failed to process withdrawal.");
+        injectFlashMessage("danger", "Failed to process withdrawal.");
         console.error(err);
     });
 }
@@ -103,7 +109,7 @@ function submitTransfer() {
     const amount = document.getElementById("transferAmount").value;
 
     if (!sourceAccountId || !destinationAccountId || !amount) {
-        alert("Please enter Source Account ID, Destination Account ID, and the transfer amount.");
+        injectFlashMessage("danger", "Please enter Source Account ID, Destination Account ID, and the transfer amount.");
         return;
     }
 
@@ -121,14 +127,17 @@ function submitTransfer() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            injectFlashMessage("success", data.message);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
         } else {
-            alert("Error: " + data.message);
+            injectFlashMessage("danger", "Error: " + data.message);
         }
     })
     .catch(err => {
-        alert("Failed to process transfer.");
+        injectFlashMessage("danger", "Failed to process transfer.");
         console.error(err);
     });
 }

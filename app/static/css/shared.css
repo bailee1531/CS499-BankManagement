@@ -310,12 +310,18 @@ footer {
 }
 
 /* Flash Messages */
+.flash-messages {
+    position: relative;
+    z-index: 9999;       /* Ensure it's above modals, overlays, etc. */
+}
 /* Flash Messages: Generic alert styling remains */
 .flash-messages .alert {
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
     color: var(--white);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
 }
 
 /* Success messages (flash green) */
@@ -329,6 +335,11 @@ footer {
     background-color: var(--danger);
     border: 1px solid var(--danger);
 }
+
+/* When fade-out is triggered */
+.flash-messages .alert.fade-out {
+    opacity: 0;
+  }
 
 /* Main Content Area */
 /* Center the main content using flexbox */

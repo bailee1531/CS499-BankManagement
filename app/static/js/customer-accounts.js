@@ -55,7 +55,7 @@ function openAccountsModal(customerId, firstName, lastName) {
       }
 
       if (!data.success) {
-        alert("Failed to fetch accounts.");
+        injectFlashMessage("danger", "Failed to fetch accounts.");
         return;
       }
 
@@ -91,7 +91,7 @@ function openAccountsModal(customerId, firstName, lastName) {
     })
     .catch(error => {
       console.error("Error fetching accounts:", error);
-      alert("An error occurred while loading accounts.");
+      injectFlashMessage("danger", "An error occurred while loading accounts.");
     });
 }
 
@@ -136,13 +136,19 @@ function submitAccountOpen() {
 
   if (["Checking", "Savings", "Money Market"].includes(type)) {
     const deposit = parseFloat(document.getElementById("initialDeposit").value);
-    if (isNaN(deposit)) return alert("Enter a valid deposit amount.");
+    if (isNaN(deposit)) {
+      injectFlashMessage("danger", "Enter a valid deposit amount.");
+      return;
+    }
     payload.depositAmount = deposit;
 
   } else if (type === "Home Mortgage Loan") {
     const amount = parseFloat(document.getElementById("loanAmount").value);
     const years = parseInt(document.getElementById("loanTerm").value);
-    if (isNaN(amount) || isNaN(years)) return alert("Enter valid loan details.");
+    if (isNaN(amount) || isNaN(years)) {
+      injectFlashMessage("danger", "Enter valid loan details.");
+      return;
+    }
     payload.loanAmount = amount;
     payload.loanTerm = years;
   }
@@ -152,8 +158,11 @@ function submitAccountOpen() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   }).then(res => res.json()).then(data => {
-    if (data.success) location.reload();
-    else alert("Failed to open account: " + data.message);
+    if (data.success) {
+      injectFlashMessage("success", data.message);
+    } else {
+      injectFlashMessage("danger", "Failed to open account: " + data.message);
+    }
   });
 }
 
@@ -183,53 +192,59 @@ if (["Checking", "Savings", "Money Market"].includes(type)) {
 }
 
 function goToAccountInfoPage() {
-const selectedType = document.getElementById("accountTypeSelect").value;
-if (!selectedType) return alert("Please select an account type.");
-window.selectedAccountType = selectedType;
-document.getElementById("accountTypePage").style.display = "none";
-document.getElementById("accountInfoPage").style.display = "block";
+  const selectedType = document.getElementById("accountTypeSelect").value;
+  if (!selectedType) {
+    injectFlashMessage("danger", "Please select an account type.");
+    return;
+  }
+  window.selectedAccountType = selectedType;
+  document.getElementById("accountTypePage").style.display = "none";
+  document.getElementById("accountInfoPage").style.display = "block";
 }
 
 function goBackToAccountType() {
-document.getElementById("accountTypePage").style.display = "block";
-document.getElementById("accountInfoPage").style.display = "none";
+  document.getElementById("accountTypePage").style.display = "block";
+  document.getElementById("accountInfoPage").style.display = "none";
 }
 
 function submitOpenAccount() {
-const payload = {
-  firstName: document.getElementById("newFirstName").value,
-  lastName: document.getElementById("newLastName").value,
-  username: document.getElementById("newUsername").value,
-  password: document.getElementById("newPassword").value,
-  address: document.getElementById("newAddress").value,
-  ssn: document.getElementById("newSSN").value,
-  email: document.getElementById("newEmail").value,
-  phone: document.getElementById("newPhone").value,
-  securityQuestion1: document.getElementById("securityQuestion1").value,
-  securityAnswer1: document.getElementById("securityAnswer1").value,
-  securityQuestion2: document.getElementById("securityQuestion2").value,
-  securityAnswer2: document.getElementById("securityAnswer2").value,
-  accountType: window.selectedAccountType
-};
+  const payload = {
+    firstName: document.getElementById("newFirstName").value,
+    lastName: document.getElementById("newLastName").value,
+    username: document.getElementById("newUsername").value,
+    password: document.getElementById("newPassword").value,
+    address: document.getElementById("newAddress").value,
+    ssn: document.getElementById("newSSN").value,
+    email: document.getElementById("newEmail").value,
+    phone: document.getElementById("newPhone").value,
+    securityQuestion1: document.getElementById("securityQuestion1").value,
+    securityAnswer1: document.getElementById("securityAnswer1").value,
+    securityQuestion2: document.getElementById("securityQuestion2").value,
+    securityAnswer2: document.getElementById("securityAnswer2").value,
+    accountType: window.selectedAccountType
+  };
 
-fetch("/teller/open-account", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload)
-})
-.then(res => res.json())
-.then(data => {
-  if (data.success) {
-    alert(data.message);
-    location.reload();
-  } else {
-    alert("Error: " + data.message);
-  }
-})
-.catch(err => {
-  alert("Failed to open account.");
-  console.error(err);
-});
+  fetch("/teller/open-account", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      injectFlashMessage("success", data.message);
+      // Wait for a tiny delay
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    } else {
+      injectFlashMessage("danger", "Error: " + data.message);
+    }
+  })
+  .catch(err => {
+    injectFlashMessage("danger", "Failed to open account.");
+    console.error(err);
+  });
 }
 
 function closeAccountsModal() {
@@ -276,28 +291,33 @@ function viewCustomerAccounts() {
 }
 
 function deleteAccountFromModal(accountID) {
-  if (!currentCustomerID) return alert("Customer ID not found.");
-  if (!confirm(`Are you sure you want to delete Account ID ${accountID}?`)) return;
+  if (!currentCustomerID) {
+    injectFlashMessage("danger", "Customer ID not found.");
+    return;
+  }
 
-  fetch("/teller/delete-account", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerID: currentCustomerID, accountID: accountID })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "success") {
-      alert(data.message);
-      const firstName = document.getElementById("modalFirstName").textContent;
-      const lastName = document.getElementById("modalLastName").textContent;
-      openAccountsModal(currentCustomerID, firstName, lastName);
-    } else {
-      alert("Error: " + data.message);
-    }
-  })
-  .catch(err => {
-    console.error("Failed to delete account:", err);
-    alert("Server error during account deletion.");
+  showConfirm(`Are you sure you want to delete Account ID ${accountID}?`, () => {
+    fetch("/teller/delete-account", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customerID: currentCustomerID, accountID: accountID })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        injectFlashMessage("success", data.message);
+        // Wait for a tiny delay
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+          injectFlashMessage("danger", "Error: " + data.message);
+      }
+    })
+    .catch(err => {
+      console.error("Failed to delete account:", err);
+      injectFlashMessage("danger", "Server error during account deletion.");
+    });
   });
 }
 

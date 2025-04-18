@@ -37,7 +37,7 @@ function submitTeller() {
     const lastName = document.getElementById("lastNameInput").value.trim();
 
     if (!firstName || !lastName) {
-        alert("Please enter both first and last name.");
+        injectFlashMessage("danger", "Please enter both first and last name.");
         return;
     }
 
@@ -48,10 +48,16 @@ function submitTeller() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) location.reload();
-        else alert("Failed to create teller: " + data.message);
+        if (data.success) {
+            injectFlashMessage("success", `Teller ${firstName} ${lastName} has been successfully created.`);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 1000);
+        }
+        else injectFlashMessage("danger", "Failed to create teller: " + data.message);
     })
-    .catch(err => alert("Something went wrong."));
+    .catch(err => injectFlashMessage("danger", "Something went wrong."));
 }
 
 function submitEdit() {
@@ -59,7 +65,7 @@ function submitEdit() {
     const newUsername = document.getElementById("editUsernameInput").value.trim();
 
     if (!newUsername) {
-        alert("Please enter a new username.");
+        injectFlashMessage("danger", "Please enter a new username.");
         return;
     }
 
@@ -71,12 +77,12 @@ function submitEdit() {
     .then(res => res.json())
     .then(editData => {
         if (editData.success) {
-            alert("Teller information updated successfully.");
+            injectFlashMessage("success", data.message);
             document.getElementById('modalEmpUsername').textContent = newUsername;
             closeViewModal();
         }
         else {
-            alert("Failed to update teller information: " + editData.message);
+            injectFlashMessage("danger", "Failed to update teller information: " + editData.message);
         }
     })
 }
@@ -84,17 +90,26 @@ function submitEdit() {
 function submitDelete() {
     const id = document.getElementById("modalEmployeeID").textContent;
 
-    if (!confirm("Are you sure you want to delete this teller?")) return;
-
-    fetch("/admin/delete-teller", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeID: id })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert("Failed to delete teller: " + data.message);
+    showConfirm(`Are you sure you want to delete this teller?`, () => {
+        fetch("/admin/delete-teller", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ employeeID: id })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                injectFlashMessage("success", `Teller ${id} has been successfully deleted.`);
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                injectFlashMessage("danger", "Failed to delete teller: " + data.message);
+            }
+        })
+        .catch(err => {
+            injectFlashMessage("danger", data.message);
+        });
     });
 }
 

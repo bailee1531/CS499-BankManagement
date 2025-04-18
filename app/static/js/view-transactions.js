@@ -14,7 +14,7 @@ function loadTransactions(accountId, accountType) {
         label.textContent = `${accountType} (ID: ${accountId})`;
   
         if (!data.success) {
-          alert("Error fetching transactions.");
+          injectFlashMessage("danger", "Error fetching transactions.");
           return;
         }
   
@@ -34,7 +34,7 @@ function loadTransactions(accountId, accountType) {
       })
       .catch(error => {
         console.error("Failed to load transactions:", error);
-        alert("An unexpected error occurred while loading transactions.");
+        injectFlashMessage("danger", "An unexpected error occurred while loading transactions.");
       });
   }
   
