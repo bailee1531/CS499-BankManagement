@@ -53,7 +53,7 @@ function submitTeller() {
             // Wait for a tiny delay
             setTimeout(() => {
               location.reload();
-            }, 1000);
+            }, 3000);
         }
         else injectFlashMessage("danger", "Failed to create teller: " + data.message);
     })
@@ -102,7 +102,7 @@ function submitDelete() {
                 injectFlashMessage("success", `Teller ${id} has been successfully deleted.`);
                 setTimeout(() => {
                     location.reload();
-                }, 1000);
+                }, 3000);
             } else {
                 injectFlashMessage("danger", "Failed to delete teller: " + data.message);
             }

@@ -34,7 +34,7 @@ function submitDeposit() {
             // Wait for a tiny delay
             setTimeout(() => {
               location.reload();
-            }, 1000);
+            }, 3000);
         } else {
             injectFlashMessage("danger", "Error: " + data.message);
         }
@@ -81,7 +81,7 @@ function submitWithdraw() {
             // Wait for a tiny delay
             setTimeout(() => {
               location.reload();
-            }, 1000);
+            }, 3000);
         } else {
             injectFlashMessage("danger", "Error: " + data.message);
         }
@@ -131,7 +131,7 @@ function submitTransfer() {
             // Wait for a tiny delay
             setTimeout(() => {
               location.reload();
-            }, 1000);
+            }, 3000);
         } else {
             injectFlashMessage("danger", "Error: " + data.message);
         }

@@ -236,7 +236,7 @@ function submitOpenAccount() {
       // Wait for a tiny delay
       setTimeout(() => {
         location.reload();
-      }, 1000);
+      }, 3000);
     } else {
       injectFlashMessage("danger", "Error: " + data.message);
     }
@@ -309,7 +309,7 @@ function deleteAccountFromModal(accountID) {
         // Wait for a tiny delay
         setTimeout(() => {
           location.reload();
-        }, 1000);
+        }, 3000);
       } else {
           injectFlashMessage("danger", "Error: " + data.message);
       }

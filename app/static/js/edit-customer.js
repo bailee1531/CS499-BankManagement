@@ -22,7 +22,7 @@ function submitUsernameEdit() {
         // Wait for a tiny delay
         setTimeout(() => {
           location.reload();
-        }, 1000);
+        }, 3000);
       } else {
         injectFlashMessage("danger", "Failed to edit username: " + data.message);
       }
@@ -83,7 +83,7 @@ function submitCustomerDelete() {
           // Wait for a tiny delay
           setTimeout(() => {
             location.reload();
-          }, 1000);
+          }, 3000);
         } else {
           injectFlashMessage("danger", "Failed to delete customer: " + data.message);
         }
