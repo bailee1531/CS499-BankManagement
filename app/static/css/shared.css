@@ -339,7 +339,7 @@ footer {
 /* When fade-out is triggered */
 .flash-messages .alert.fade-out {
     opacity: 0;
-  }
+}
 
 /* Main Content Area */
 /* Center the main content using flexbox */
@@ -428,6 +428,14 @@ main {
 .btn--default {
     background: var(--dark-bg);
     color: var(--white);
+}
+
+/* Disabled button styling */
+button.disabled,
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Accessibility - Visually Hidden Content */

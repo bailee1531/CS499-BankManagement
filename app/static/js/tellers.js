@@ -35,11 +35,17 @@ function closeViewModal() {
 function submitTeller() {
     const firstName = document.getElementById("firstNameInput").value.trim();
     const lastName = document.getElementById("lastNameInput").value.trim();
+    const submitBtn = document.querySelector('#createFormModal button');
+
 
     if (!firstName || !lastName) {
         injectFlashMessage("danger", "Please enter both first and last name.");
         return;
     }
+
+    // Disable button temporarily
+    submitBtn.disabled = true;
+    submitBtn.classList.add("disabled");
 
     fetch("/admin/create-teller", {
         method: "POST",
@@ -55,9 +61,21 @@ function submitTeller() {
               location.reload();
             }, 3000);
         }
-        else injectFlashMessage("danger", "Failed to create teller: " + data.message);
+        else {
+            injectFlashMessage("danger", "Failed to create teller: " + data.message);
+        }
     })
-    .catch(err => injectFlashMessage("danger", "Something went wrong."));
+    .catch(() => {
+        injectFlashMessage("danger", "Something went wrong.");
+    })
+
+    .finally(() => {
+        // Re-enable after 4 seconds
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("disabled");
+        }, 4000);
+    });
 }
 
 function submitEdit() {
@@ -89,6 +107,11 @@ function submitEdit() {
 
 function submitDelete() {
     const id = document.getElementById("modalEmployeeID").textContent;
+    const deleteBtn = document.querySelector('#viewModal .modal-buttons button:nth-child(2)');
+
+    // Disable button temporarily
+    deleteBtn.disabled = true;
+    deleteBtn.classList.add("disabled");
 
     showConfirm(`Are you sure you want to delete this teller?`, () => {
         fetch("/admin/delete-teller", {
@@ -107,8 +130,15 @@ function submitDelete() {
                 injectFlashMessage("danger", "Failed to delete teller: " + data.message);
             }
         })
-        .catch(err => {
-            injectFlashMessage("danger", data.message);
+        .catch(() => {
+            injectFlashMessage("danger", "Something went wrong.");
+        })
+        .finally(() => {
+            // Re-enable after 4 seconds
+            setTimeout(() => {
+                deleteBtn.disabled = false;
+                deleteBtn.classList.remove("disabled");
+            }, 4000);
         });
     });
 }

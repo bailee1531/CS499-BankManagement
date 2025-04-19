@@ -11,11 +11,16 @@ function closeDepositModal() {
 function submitDeposit() {
     const accountId = document.getElementById("depositAccountId").value;
     const amount = document.getElementById("depositAmount").value;
+    const depositBtn = document.querySelector('#depositModal .modal-buttons .action-btn');
 
     if (!accountId || !amount) {
         injectFlashMessage("danger", "Please enter both Account ID and the deposit amount.");
         return;
     }
+    
+    // Disable button temporarily
+    depositBtn.disabled = true;
+    depositBtn.classList.add("disabled");
 
     const payload = {
         accountId: accountId,
@@ -42,6 +47,12 @@ function submitDeposit() {
     .catch(err => {
         injectFlashMessage("danger", "Failed to process deposit.");
         console.error(err);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            depositBtn.disabled = false;
+            depositBtn.classList.remove("disabled");
+        }, 4000);
     });
 }
 
@@ -58,11 +69,16 @@ function closeWithdrawModal() {
 function submitWithdraw() {
     const accountId = document.getElementById("withdrawAccountId").value;
     const amount = document.getElementById("withdrawAmount").value;
+    const withdrawBtn = document.querySelector('#withdrawModal .modal-buttons .action-btn');
 
     if (!accountId || !amount) {
         injectFlashMessage("danger", "Please enter both Account ID and the withdrawal amount.");
         return;
     }
+
+    // Disable button temporarily
+    withdrawBtn.disabled = true;
+    withdrawBtn.classList.add("disabled");
 
     const payload = {
         accountId: accountId,
@@ -89,6 +105,12 @@ function submitWithdraw() {
     .catch(err => {
         injectFlashMessage("danger", "Failed to process withdrawal.");
         console.error(err);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            withdrawBtn.disabled = false;
+            withdrawBtn.classList.remove("disabled");
+        }, 4000);
     });
 }
 
@@ -107,11 +129,16 @@ function submitTransfer() {
     const sourceAccountId = document.getElementById("sourceAccountId").value;
     const destinationAccountId = document.getElementById("destinationAccountId").value;
     const amount = document.getElementById("transferAmount").value;
+    const transferBtn = document.querySelector('#transferModal .modal-buttons .action-btn');
 
     if (!sourceAccountId || !destinationAccountId || !amount) {
         injectFlashMessage("danger", "Please enter Source Account ID, Destination Account ID, and the transfer amount.");
         return;
     }
+
+    // Disable button temporarily
+    transferBtn.disabled = true;
+    transferBtn.classList.add("disabled");
 
     const payload = {
         sourceAccountId: sourceAccountId,
@@ -139,6 +166,12 @@ function submitTransfer() {
     .catch(err => {
         injectFlashMessage("danger", "Failed to process transfer.");
         console.error(err);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            transferBtn.disabled = false;
+            transferBtn.classList.remove("disabled");
+        }, 4000);
     });
 }
 
