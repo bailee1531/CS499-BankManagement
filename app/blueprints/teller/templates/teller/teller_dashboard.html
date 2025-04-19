@@ -90,24 +90,12 @@
     </div>
 
     <div class="modal-right scroll-panel">
-      <!-- Edit Username -->
-      <h3>Edit Username</h3>
-      <input type="text" id="editUsernameInput" placeholder="New Username">
-      <button onclick="submitUsernameEdit()">Update Username</button>
-      <hr>
-    
-      <!-- Reset Password -->
-      <h3>Reset Password</h3>
-      <input type="password" id="oldPasswordInput" placeholder="Old Password">
-      <input type="password" id="newPasswordInput" placeholder="New Password">
-      <button onclick="resetCustomerPassword()">Reset Password</button>
-      <hr>
-
+      <h3>Account Information</h3>
       <!-- Toggle Button -->
       <button onclick="openAccountsModal(currentCustomerID, document.getElementById('modalFirstName').textContent,
-        document.getElementById('modalLastName').textContent)">User Accounts</button>    
+        document.getElementById('modalLastName').textContent)">View Accounts</button>
+        
       <!-- Open New Account + Transaction Buttons -->
-      <h3>Open New Account</h3>
       <select id="accountType" onchange="toggleAccountInputs()">
         <option value="Checking">Checking</option>
         <option value="Savings">Savings</option>
@@ -117,17 +105,28 @@
       </select>
       <!-- Deposit input -->
       <input type="number" id="initialDeposit" placeholder="Initial Deposit">
-
+    
       <!-- Mortgage inputs -->
       <input type="number" id="loanAmount" placeholder="Loan Amount" style="display:none;">
       <input type="number" id="loanTerm" placeholder="Years" style="display:none;">
-
+    
       <!-- Credit card note -->
       <input type="text" id="creditNote" placeholder="N/A for credit cards" disabled style="display:none; background-color: #eee; color: #888;">
-
-      <button onclick="submitAccountOpen()">Open Account</button>
     
-      <div class="modal-buttons" style="margin-top: 10px;">
+      <button onclick="submitAccountOpen()">Open Account</button>
+      <hr>
+
+      <h3>Edit Login</h3>
+      <!-- Edit Username -->
+      <input type="text" id="editUsernameInput" placeholder="New Username">
+      <button onclick="submitUsernameEdit()">Update Username</button>
+      <!-- Reset Password -->
+      <input type="password" id="oldPasswordInput" placeholder="Old Password">
+      <input type="password" id="newPasswordInput" placeholder="New Password">
+      <button onclick="resetCustomerPassword()">Reset Password</button>
+      <hr>
+    
+      <div class="modal-buttons" style="margin-top: 30px;">
         <button onclick="openDepositModal()">Deposit</button>
         <button onclick="openWithdrawModal()">Withdraw</button>
         <button onclick="openTransferModal()">Transfer</button>
