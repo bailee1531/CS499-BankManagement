@@ -20,6 +20,8 @@
     /* Dark background color for footer or other sections */
     --accent: #d9534f;
     /* Accent color for highlights and interactive elements */
+    --accent-hover: #fa4343;
+    /* Accent hover color for highlights and interactive elements */
     --light-accent: #7e7f9a;
     /* Less vibrant accent */
     --white: #ffffff;
@@ -148,6 +150,12 @@ header {
     /* Smooth transitions */
     cursor: pointer;
     text-align: center;
+}
+
+/* Global: Underline text for all buttons on hover */
+button:hover,
+.btn:hover {
+  text-decoration: underline;
 }
 
 /* Header Buttons */
@@ -310,12 +318,18 @@ footer {
 }
 
 /* Flash Messages */
+.flash-messages {
+    position: relative;
+    z-index: 9999;       /* Ensure it's above modals, overlays, etc. */
+}
 /* Flash Messages: Generic alert styling remains */
 .flash-messages .alert {
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
     color: var(--white);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
 }
 
 /* Success messages (flash green) */
@@ -328,6 +342,11 @@ footer {
 .flash-messages .alert-danger {
     background-color: var(--danger);
     border: 1px solid var(--danger);
+}
+
+/* When fade-out is triggered */
+.flash-messages .alert.fade-out {
+    opacity: 0;
 }
 
 /* Main Content Area */
@@ -417,6 +436,14 @@ main {
 .btn--default {
     background: var(--dark-bg);
     color: var(--white);
+}
+
+/* Disabled button styling */
+button.disabled,
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Accessibility - Visually Hidden Content */

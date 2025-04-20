@@ -17,6 +17,7 @@ function populateAccountDropdown(customerID, dropdownId) {
             option.value = "";
             option.textContent = "No accounts found";
             dropdown.appendChild(option);
+            injectFlashMessage("danger", "Accounts could not be loaded.");
         }
     })
     .catch(err => {

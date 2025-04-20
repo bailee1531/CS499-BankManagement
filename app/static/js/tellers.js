@@ -35,11 +35,17 @@ function closeViewModal() {
 function submitTeller() {
     const firstName = document.getElementById("firstNameInput").value.trim();
     const lastName = document.getElementById("lastNameInput").value.trim();
+    const submitBtn = document.querySelector('#createFormModal button');
+
 
     if (!firstName || !lastName) {
-        alert("Please enter both first and last name.");
+        injectFlashMessage("danger", "Please enter both first and last name.");
         return;
     }
+
+    // Disable button temporarily
+    submitBtn.disabled = true;
+    submitBtn.classList.add("disabled");
 
     fetch("/admin/create-teller", {
         method: "POST",
@@ -48,10 +54,28 @@ function submitTeller() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) location.reload();
-        else alert("Failed to create teller: " + data.message);
+        if (data.success) {
+            injectFlashMessage("success", `Teller ${firstName} ${lastName} has been successfully created.`);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
+        }
+        else {
+            injectFlashMessage("danger", "Failed to create teller: " + data.message);
+        }
     })
-    .catch(err => alert("Something went wrong."));
+    .catch(() => {
+        injectFlashMessage("danger", "Something went wrong.");
+    })
+
+    .finally(() => {
+        // Re-enable after 4 seconds
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("disabled");
+        }, 4000);
+    });
 }
 
 function submitEdit() {
@@ -59,7 +83,7 @@ function submitEdit() {
     const newUsername = document.getElementById("editUsernameInput").value.trim();
 
     if (!newUsername) {
-        alert("Please enter a new username.");
+        injectFlashMessage("danger", "Please enter a new username.");
         return;
     }
 
@@ -71,30 +95,51 @@ function submitEdit() {
     .then(res => res.json())
     .then(editData => {
         if (editData.success) {
-            alert("Teller information updated successfully.");
+            injectFlashMessage("success", data.message);
             document.getElementById('modalEmpUsername').textContent = newUsername;
             closeViewModal();
         }
         else {
-            alert("Failed to update teller information: " + editData.message);
+            injectFlashMessage("danger", "Failed to update teller information: " + editData.message);
         }
     })
 }
 
 function submitDelete() {
     const id = document.getElementById("modalEmployeeID").textContent;
+    const deleteBtn = document.querySelector('#viewModal .modal-buttons button:nth-child(2)');
 
-    if (!confirm("Are you sure you want to delete this teller?")) return;
+    showConfirm(`Are you sure you want to delete this teller?`, () => {
+        // Disable button temporarily
+        deleteBtn.disabled = true;
+        deleteBtn.classList.add("disabled");
 
-    fetch("/admin/delete-teller", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeID: id })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert("Failed to delete teller: " + data.message);
+        fetch("/admin/delete-teller", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ employeeID: id })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                injectFlashMessage("success", `Teller ${id} has been successfully deleted.`);
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            } else {
+                injectFlashMessage("danger", "Failed to delete teller: " + data.message);
+            }
+        })
+        .catch(() => {
+            injectFlashMessage("danger", "Something went wrong.");
+        })
+        .finally(() => {
+            // Re-enable after 4 seconds
+            setTimeout(() => {
+                deleteBtn.disabled = false;
+                deleteBtn.classList.remove("disabled");
+            }, 4000);
+        });
     });
 }
 

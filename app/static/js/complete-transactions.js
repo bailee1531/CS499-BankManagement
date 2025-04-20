@@ -11,11 +11,16 @@ function closeDepositModal() {
 function submitDeposit() {
     const accountId = document.getElementById("depositAccountId").value;
     const amount = document.getElementById("depositAmount").value;
+    const depositBtn = document.querySelector('#depositModal .modal-buttons .action-btn');
 
     if (!accountId || !amount) {
-        alert("Please enter both Account ID and the deposit amount.");
+        injectFlashMessage("danger", "Please enter both Account ID and the deposit amount.");
         return;
     }
+    
+    // Disable button temporarily
+    depositBtn.disabled = true;
+    depositBtn.classList.add("disabled");
 
     const payload = {
         accountId: accountId,
@@ -30,15 +35,24 @@ function submitDeposit() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            injectFlashMessage("success", data.message);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
         } else {
-            alert("Error: " + data.message);
+            injectFlashMessage("danger", "Error: " + data.message);
         }
     })
     .catch(err => {
-        alert("Failed to process deposit.");
+        injectFlashMessage("danger", "Failed to process deposit.");
         console.error(err);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            depositBtn.disabled = false;
+            depositBtn.classList.remove("disabled");
+        }, 4000);
     });
 }
 
@@ -55,11 +69,16 @@ function closeWithdrawModal() {
 function submitWithdraw() {
     const accountId = document.getElementById("withdrawAccountId").value;
     const amount = document.getElementById("withdrawAmount").value;
+    const withdrawBtn = document.querySelector('#withdrawModal .modal-buttons .action-btn');
 
     if (!accountId || !amount) {
-        alert("Please enter both Account ID and the withdrawal amount.");
+        injectFlashMessage("danger", "Please enter both Account ID and the withdrawal amount.");
         return;
     }
+
+    // Disable button temporarily
+    withdrawBtn.disabled = true;
+    withdrawBtn.classList.add("disabled");
 
     const payload = {
         accountId: accountId,
@@ -74,15 +93,24 @@ function submitWithdraw() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            injectFlashMessage("success", data.message);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
         } else {
-            alert("Error: " + data.message);
+            injectFlashMessage("danger", "Error: " + data.message);
         }
     })
     .catch(err => {
-        alert("Failed to process withdrawal.");
+        injectFlashMessage("danger", "Failed to process withdrawal.");
         console.error(err);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            withdrawBtn.disabled = false;
+            withdrawBtn.classList.remove("disabled");
+        }, 4000);
     });
 }
 
@@ -101,11 +129,16 @@ function submitTransfer() {
     const sourceAccountId = document.getElementById("sourceAccountId").value;
     const destinationAccountId = document.getElementById("destinationAccountId").value;
     const amount = document.getElementById("transferAmount").value;
+    const transferBtn = document.querySelector('#transferModal .modal-buttons .action-btn');
 
     if (!sourceAccountId || !destinationAccountId || !amount) {
-        alert("Please enter Source Account ID, Destination Account ID, and the transfer amount.");
+        injectFlashMessage("danger", "Please enter Source Account ID, Destination Account ID, and the transfer amount.");
         return;
     }
+
+    // Disable button temporarily
+    transferBtn.disabled = true;
+    transferBtn.classList.add("disabled");
 
     const payload = {
         sourceAccountId: sourceAccountId,
@@ -121,15 +154,24 @@ function submitTransfer() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            injectFlashMessage("success", data.message);
+            // Wait for a tiny delay
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
         } else {
-            alert("Error: " + data.message);
+            injectFlashMessage("danger", "Error: " + data.message);
         }
     })
     .catch(err => {
-        alert("Failed to process transfer.");
+        injectFlashMessage("danger", "Failed to process transfer.");
         console.error(err);
+    })
+    .finally(() => {
+        setTimeout(() => {
+            transferBtn.disabled = false;
+            transferBtn.classList.remove("disabled");
+        }, 4000);
     });
 }
 

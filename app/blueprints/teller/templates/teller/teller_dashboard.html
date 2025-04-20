@@ -12,6 +12,7 @@
 <script src="{{ url_for('static', filename='js/complete-transactions.js') }}"></script>
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
+<script src="{{ url_for('static', filename='js/flash-messages.js') }}"></script>
 {% endblock %}
 
 {% block title %}Teller Dashboard{% endblock %}
@@ -307,6 +308,17 @@
           <!-- Transactions will be injected here -->
         </ul>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Confirm Modal -->
+<div id="confirmModal">
+  <div class="modal-content">
+    <div id="confirmModalMessage">Are you sure?</div>
+    <div class="modal-buttons modal-buttons--compact">
+      <button id="confirmYesBtn" class="btn btn--modal btn--confirm">Yes</button>
+      <button id="confirmNoBtn" class="btn btn--modal btn--cancel">No</button>
     </div>
   </div>
 </div>
