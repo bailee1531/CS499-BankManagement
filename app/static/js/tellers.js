@@ -109,11 +109,11 @@ function submitDelete() {
     const id = document.getElementById("modalEmployeeID").textContent;
     const deleteBtn = document.querySelector('#viewModal .modal-buttons button:nth-child(2)');
 
-    // Disable button temporarily
-    deleteBtn.disabled = true;
-    deleteBtn.classList.add("disabled");
-
     showConfirm(`Are you sure you want to delete this teller?`, () => {
+        // Disable button temporarily
+        deleteBtn.disabled = true;
+        deleteBtn.classList.add("disabled");
+
         fetch("/admin/delete-teller", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

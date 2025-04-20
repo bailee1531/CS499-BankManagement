@@ -20,6 +20,8 @@
     /* Dark background color for footer or other sections */
     --accent: #d9534f;
     /* Accent color for highlights and interactive elements */
+    --accent-hover: #fa4343;
+    /* Accent hover color for highlights and interactive elements */
     --light-accent: #7e7f9a;
     /* Less vibrant accent */
     --white: #ffffff;
@@ -148,6 +150,12 @@ header {
     /* Smooth transitions */
     cursor: pointer;
     text-align: center;
+}
+
+/* Global: Underline text for all buttons on hover */
+button:hover,
+.btn:hover {
+  text-decoration: underline;
 }
 
 /* Header Buttons */

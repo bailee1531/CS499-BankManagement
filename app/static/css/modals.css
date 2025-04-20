@@ -59,7 +59,7 @@ z-index: 10000; /* higher than flash messages or modals */
   text-align: left;
 }
 
-/* The message should be left-aligned, and vertically centered */
+/* Message is left-aligned, and vertically centered */
 #confirmModalMessage {
   flex: 1;
   font-size: 1rem;
@@ -69,40 +69,36 @@ z-index: 10000; /* higher than flash messages or modals */
   margin: 0;
 }
 
-/* Compact horizontal layout for buttons */
+/* Layout for Confirm Buttons */
 .modal-buttons--compact {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 
-/* Button style */
+/* Base Button Style */
 .btn--modal {
   padding: 0.25rem 0.6rem;
   font-size: 0.85rem;
   border-radius: var(--border-radius);
-  background-color: var(--light-accent);
-  color: white;
   border: none;
   min-width: 50px;
   max-width: 70px;
-
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  transition: background-color 0.2s ease-in-out;
 }
 
-.btn--modal:hover {
-  background-color: #6b6c8a;
+/* PRIMARY ACTION: Confirm (Yes) */
+.btn--modal.btn--confirm {
+  background-color: var(--accent);
 }
 
-.btn--cancel {
-  background-color: #888;
-}
-
-.btn--cancel:hover {
-  background-color: #777;
+.btn--modal.btn--confirm:hover {
+  background-color: var(--accent-hover);
 }
 
 /* Close Button */
