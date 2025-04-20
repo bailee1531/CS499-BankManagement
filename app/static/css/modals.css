@@ -101,6 +101,15 @@ z-index: 10000; /* higher than flash messages or modals */
   background-color: var(--accent-hover);
 }
 
+/* SECONDARY ACTION: Cancel (No) */
+.btn--modal.btn--cancel {
+  background-color: #777;
+}
+
+.btn--modal.btn--cancel:hover {
+  background-color: #888;
+}
+
 /* Close Button */
 #viewAccountsModal .close{
     position: absolute;
