@@ -129,6 +129,8 @@ function closeAccountModal() {
 
 function submitAccountOpen() {
   const type = document.getElementById("accountType").value;
+  const actOpenBtn = document.querySelector('#customerModal .modal-right button[onclick="submitAccountOpen()"]');
+  
   let payload = {
   customerID: currentCustomerID,
   accountType: type
@@ -153,6 +155,12 @@ function submitAccountOpen() {
     payload.loanTerm = years;
   }
 
+  // Disable the button temporarily
+  if (actOpenBtn) {
+    actOpenBtn.disabled = true;
+    actOpenBtn.classList.add("disabled");
+  }
+
   fetch("/teller/create-account", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -163,6 +171,17 @@ function submitAccountOpen() {
     } else {
       injectFlashMessage("danger", "Failed to open account: " + data.message);
     }
+  })
+  .catch(() => {
+    injectFlashMessage("danger", "Server error during account creation.");
+  })
+  .finally(() => {
+    setTimeout(() => {
+      if (actOpenBtn) {
+        actOpenBtn.disabled = false;
+        actOpenBtn.classList.remove("disabled");
+      }
+    }, 4000);
   });
 }
 
@@ -208,6 +227,8 @@ function goBackToAccountType() {
 }
 
 function submitOpenAccount() {
+  const openActBtn = document.querySelector('#openAccountModal button[onclick="submitOpenAccount()"]');
+
   const payload = {
     firstName: document.getElementById("newFirstName").value,
     lastName: document.getElementById("newLastName").value,
@@ -223,6 +244,11 @@ function submitOpenAccount() {
     securityAnswer2: document.getElementById("securityAnswer2").value,
     accountType: window.selectedAccountType
   };
+
+  if (openActBtn) {
+    openActBtn.disabled = true;
+    openActBtn.classList.add("disabled");
+  }
 
   fetch("/teller/open-account", {
     method: "POST",
@@ -242,8 +268,16 @@ function submitOpenAccount() {
     }
   })
   .catch(err => {
-    injectFlashMessage("danger", "Failed to open account.");
     console.error(err);
+    injectFlashMessage("danger", "Failed to open account.");
+  })
+  .finally(() => {
+    setTimeout(() => {
+      if (openActBtn) {
+        openActBtn.disabled = false;
+        openActBtn.classList.remove("disabled");
+      }
+    }, 4000);
   });
 }
 
@@ -296,7 +330,13 @@ function deleteAccountFromModal(accountID) {
     return;
   }
 
+  const deleteBtn = document.querySelector(`.account-box button[onclick*="${accountID}"]`);
+
   showConfirm(`Are you sure you want to delete Account ID ${accountID}?`, () => {
+    // Disable button temporarily
+    deleteBtn.disabled = true;
+    deleteBtn.classList.add("disabled");
+
     fetch("/teller/delete-account", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -311,12 +351,18 @@ function deleteAccountFromModal(accountID) {
           location.reload();
         }, 3000);
       } else {
-          injectFlashMessage("danger", "Error: " + data.message);
+        injectFlashMessage("danger", "Error: " + data.message);
       }
     })
     .catch(err => {
       console.error("Failed to delete account:", err);
       injectFlashMessage("danger", "Server error during account deletion.");
+    })
+    .finally(() => {
+      setTimeout(() => {
+        deleteBtn.disabled = false;
+        deleteBtn.classList.remove("disabled");
+      }, 4000);
     });
   });
 }
