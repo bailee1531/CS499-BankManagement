@@ -1,16 +1,27 @@
 {% extends "base.html" %}
+
 {% block title %}Teller Username Verification{% endblock %}
+
+{% block meta_description %}
+Secure username verification for Evergreen Bank teller registration.
+{% endblock %}
+
+{% block header_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}">
+{% endblock %}
 
 {% block content %}
 <main>
   <section class="register-container">
     <h2>Teller Registration</h2>
+    <p class="verification-instruction">Please enter the username created for you by an administrator.</p>
+    
     <form method="post">
       {{ form.hidden_tag() }}
 
       <div class="form-group">
-        <label for="username">Enter your Admin created username.</label>
-        {{ form.username(class="form-control", placeholder="username") }}
+        <label for="username">Admin-Created Username *</label>
+        {{ form.username(class="form-control", placeholder="Enter your username") }}
         {% if form.username.errors %}
         <div class="error-message">
           {% for error in form.username.errors %}
