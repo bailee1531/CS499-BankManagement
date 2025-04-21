@@ -48,8 +48,8 @@ body {
     /* Set full height for the page */
     font-family: Arial, sans-serif;
     /* Use Arial or a sans-serif font as fallback */
-    background-color: var(--primary-bg);
-    /* Set the primary background color */
+    background-color: var(--dark-bg);
+    /* Changed to dark background color */
     line-height: 1.6;
     /* Set line height for better readability */
     display: flex;
@@ -183,6 +183,26 @@ header .header__auth .btn {
     background: var(--accent);
     color: var(--white);
     border: none;
+}
+
+/* Content Wrapper */
+/* Add a wrapper with green background for the main content */
+main, .content-wrapper {
+    background-color: var(--primary-bg);
+    color: var(--black);
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing);
+    width: 100%;
+}
+
+/* Add this to handle content that might be inside the block content section */
+.content {
+    background-color: var(--primary-bg);
+    min-height: 300px; /* Ensure minimal content height */
+    width: 100%;
 }
 
 /* Footer Styles */
@@ -338,6 +358,7 @@ main {
     justify-content: center;
     align-items: center;
     padding: var(--spacing);
+    background-color: var(--primary-bg); /* Keep main content green */
 }
 
 /* Login Container */
@@ -440,4 +461,9 @@ input[disabled] {
     opacity: 1;
     cursor: not-allowed;
     font-style: italic;
+}
+
+/* Override for any template-specific content areas that might be green */
+{% block content %}{% endblock %} {
+    background-color: var(--primary-bg);
 }

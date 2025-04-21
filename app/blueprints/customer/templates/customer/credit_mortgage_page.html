@@ -13,7 +13,7 @@
   </script>
   <script src="{{ url_for('static', filename='js/update-transactions.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/update-archive.js') }}" defer></script>
-  {% if account.AccountType == "Credit Card" %}
+  {% if account.AccountType == "Credit Card" or account.AccountType == "Mortgage Loan" %}
   <script src="{{ url_for('static', filename='js/update-bill-amount.js') }}" defer></script>
   {% endif %}
 {% endblock %}
@@ -28,6 +28,9 @@
     <div class="extra-account-info">
       <p><span class="info-label">Date Opened:</span> {{ account.DateOpened }}</p>
       <p><span class="info-label">Account ID:</span> {{ account.AccountID }}</p>
+      {% if account.AccountType == "Credit Card" and account.CreditLimit is defined %}
+        <p><span class="info-label">Credit Limit:</span> ${{ "{:.2f}".format(account.CreditLimit) }}</p>
+      {% endif %}
       {% if extra_info.minimum_due | default(0) != 0 %}
         <p><span class="info-label">Bill Due Date:</span> {{ extra_info.due_date | default('N/A', true) }}</p>
         <p><span class="info-label">Minimum Due:</span>
@@ -41,7 +44,7 @@
 
     <!-- Pay Bill Button -->
     {% set acc_type = account.AccountType.lower() %}
-    {% if (acc_type == "mortgage loan" and account.CurrBal < 0) or (acc_type == "credit card" and account.CurrBal > 0) %}
+    {% if (acc_type == "mortgage loan" and account.CurrBal < 0) or (acc_type == "credit card" and account.CurrBal < 0) %}
       <div class="transaction-buttons">
         <button id="payBillBtn" class="account-btn" type="button"
                 onclick="window.location.href='/pay-bill/{{ account.AccountID }}?bill_id={{ extra_info.bill_id }}';">

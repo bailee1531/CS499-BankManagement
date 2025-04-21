@@ -67,10 +67,6 @@ def personal_accounts() -> Response:
 # Route: /credit-cards
 # Handles credit card actions 
 # -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-# Route: /credit-cards
-# Handles credit card actions 
-# -----------------------------------------------------------------------------
 @accounts_bp.route('/credit-cards')
 def credit_cards() -> Response:
     """
@@ -92,37 +88,20 @@ def credit_cards() -> Response:
                 accounts_df = get_customer_accounts(customer_id)
                 credit_cards = accounts_df[accounts_df["AccountType"] == "Credit Card"]
 
-                if len(credit_cards) >= 2:
+                if len(credit_cards) >= 1:
                     flash_error("You can only have up to 2 credit cards.")
                     return redirect(url_for("accounts.credit_cards"))
 
                 # Create the credit card account
-                createCreditCard.openCreditCardAccount(customer_id)
+                result = createCreditCard.openCreditCardAccount(customer_id)
 
-                # Reload accounts.csv to find the newly added credit card
-                accounts_df = get_customer_accounts(customer_id)
-                new_card = accounts_df[accounts_df["AccountType"] == "Credit Card"].iloc[-1]
-
-                # Schedule first credit card bill payment and capture the result
-                bill_payment_result = scheduleBillPayment(
-                    customerID=customer_id,
-                    payeeName="Evergreen Bank",
-                    payeeAddress="Somewhere In The World",
-                    amount=Decimal("0"),
-                    dueDate=(date.today() + timedelta(days=30)).isoformat(),
-                    paymentAccID=new_card["AccountID"],
-                    minPayment = 0
-                )
-
-                # Flash the appropriate message based on the bill payment result
-                if bill_payment_result.get("status") == "success":
-                    flash_success(bill_payment_result.get("message"))
+                # Only show success if account was created successfully
+                if result.get("status") == "success":
+                    flash_success("Credit card opened successfully!")
+                    return redirect(url_for("customer.customer_dashboard"))
                 else:
-                    flash_error(bill_payment_result.get("message"))
-
-                # Flash the credit card account creation success message
-                flash_success("Credit card opened successfully! Your first bill is due in 30 days.")
-                return redirect(url_for("customer.customer_dashboard"))
+                    flash_error(result.get("message"))
+                    return redirect(url_for("accounts.credit_cards"))
 
             flash_error("Invalid credit card selection.")
             return redirect(url_for("accounts.credit_cards"))
@@ -205,24 +184,6 @@ def mortgage_application():
         # Attempt to create new mortgage loan
         result = createLoan.createMortgageLoanAccount(customer_id, loan_amount, loan_term)
         if result.get("status") == "success":
-            accounts_df = get_customer_accounts(customer_id)
-            new_mortgage = accounts_df[accounts_df["AccountType"].str.lower() == "mortgage loan"].iloc[-1]
-
-            bill_payment_result = scheduleBillPayment(
-                customerID=customer_id,
-                payeeName="Evergreen Bank",
-                payeeAddress="Somewhere In The World",
-                amount=loan_amount,
-                dueDate=(date.today() + timedelta(days=30)).isoformat(),
-                paymentAccID=new_mortgage["AccountID"],
-                minPayment = loan_amount / (loan_term * 12)
-            )
-
-            if bill_payment_result.get("status") == "success":
-                flash_success(bill_payment_result.get("message"))
-            else:
-                flash_error(bill_payment_result.get("message"))
-
             flash_success(result.get("message"))
             return redirect(url_for('customer.customer_dashboard'))
         else:

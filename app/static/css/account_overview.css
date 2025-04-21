@@ -3,6 +3,9 @@
 :root {
     --bg-box: #3a3a3a;
     --accent-hover: #b52d3b;
+    --debit-color: #ff7070;
+    --credit-color: #70d870;
+    --payment-bg: rgba(255, 255, 255, 0.08);
 }
 
 /* Page Layout */
@@ -52,15 +55,13 @@
     flex-wrap: wrap; 
 }
 
-
 /* Collapsible Transactions Section */
 .transactions-section {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    margin-bottom: 2rem; /* Add this line */
+    margin-bottom: 2rem;
 }
-
 
 /* Styling for Collapsible Transaction Boxes */
 .transactions-box {
@@ -89,33 +90,57 @@ li {
     margin-bottom: 0.75rem;
 }
 
-/* New styling for transaction items */
+/* Enhanced styling for transaction items */
 .transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease;
 }
 
 .transaction-item:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .transaction-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Payment transaction styling */
+.payment-transaction {
+    background-color: var(--payment-bg);
+    border-left: 3px solid var(--accent);
 }
 
 .transaction-date {
-  font-size: 0.9rem;
-  color: #ccc;
-  margin-right: 1rem;
+    min-width: 100px;
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-right: 1rem;
 }
 
-.transaction-info {
-  font-size: 1.1rem;
+.transaction-desc {
+    flex-grow: 1;
+    font-size: 1.1rem;
+    padding: 0 1rem;
+}
+
+.transaction-amount {
+    min-width: 90px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Add styling for debit/credit amounts */
+.debit-amount {
+    color: var(--debit-color);
+}
+
+.credit-amount {
+    color: var(--credit-color);
 }
 
 /* Account Button Styling */
@@ -170,11 +195,23 @@ li {
     margin-right: 0.5rem;
 }
 
-.transaction-item {
-    flex-wrap: wrap;
-  }
-  .transaction-date,
-  .transaction-info {
-    flex: 1 1 100%;
-  }
-  
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+    .transaction-item {
+        flex-wrap: wrap;
+    }
+    
+    .transaction-date {
+        flex: 1 0 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .transaction-desc {
+        flex: 1 0 60%;
+        padding-left: 0;
+    }
+    
+    .transaction-amount {
+        flex: 0 0 40%;
+    }
+}

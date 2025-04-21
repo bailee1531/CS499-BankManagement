@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectField, SubmitField, StringField, DateField, PasswordField
+from wtforms import DecimalField, SelectField, SubmitField, StringField, DateField, PasswordField, HiddenField,BooleanField
 from wtforms.validators import DataRequired, NumberRange, InputRequired, Optional, Length, Regexp, Email
 from app.blueprints.sharedUtilities import (
     get_logged_in_customer,
@@ -97,10 +97,13 @@ class SettingsForm(FlaskForm):
     submit = SubmitField('Update Settings')
 
 class BillPaymentForm(FlaskForm):
-    bill_id = StringField("Bill ID", validators=[DataRequired()])
+    bill_id = StringField("Bill ID")
     payee_name = StringField("Payee Name")
     payee_address = StringField("Payee Address")
     amount = DecimalField("Amount", validators=[DataRequired(), NumberRange(min=0.01)], places=2)
     due_date = DateField("Due Date", format='%Y-%m-%d', validators=[InputRequired()])
     paymentAccID = SelectField("Payment Account", choices=[], coerce=int)
+    is_recurring = BooleanField("Recurring Payment", default=False)
+    # Keep bill_type field in the form for data submission, but don't display it in the template
+    bill_type = HiddenField("Bill Type")
     submit = SubmitField("Pay Bill")
