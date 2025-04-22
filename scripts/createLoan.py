@@ -4,11 +4,11 @@ import random
 import os
 from decimal import Decimal
 from datetime import date, timedelta
+from scripts.billPayment import scheduleBillPayment
 
 def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: int) -> dict:
     """
-    Creates a home mortgage loan account using APRRangeID for mortgage rate range
-    and stores it in accounts.csv.
+    Creates a home mortgage loan account and schedules the first monthly payment bill.
 
     Parameters
     ----------
@@ -95,7 +95,31 @@ def createMortgageLoanAccount(customerID: int, loanAmount: Decimal, termYears: i
 
     newLog = {'LogID': log_id, 'UserID': customerID, 'LogMessage': 'Opened a Mortgage Loan Account'}
     logData.loc[len(logData)] = newLog
-
     logData.to_csv(logPath, index=False)
 
-    return {"status": "success", "message": f"Mortgage loan account {accountID} created with an interest rate of {interestRate}% for {termYears} years."}
+    # Calculate monthly payment (principal + interest)
+    monthly_interest_rate = Decimal(interestRate) / Decimal(100) / Decimal(12)
+    total_payments = termYears * 12
+    monthly_payment = (
+        Decimal(loanAmount) * 
+        (monthly_interest_rate * (1 + monthly_interest_rate) ** total_payments) / 
+        ((1 + monthly_interest_rate) ** total_payments - 1)
+    ).quantize(Decimal('0.01'))
+    
+    # Schedule the first monthly payment bill
+    first_bill_due_date = (date.today() + timedelta(days=30)).isoformat()
+    
+    bill_result = scheduleBillPayment(
+        customerID=customerID,
+        payeeName="Evergreen Bank Mortgage",
+        payeeAddress="Somewhere In The World",
+        amount=monthly_payment,
+        dueDate=first_bill_due_date,
+        paymentAccID=accountID,
+        minPayment=monthly_payment,  # Minimum payment is the monthly payment
+        billType='Mortgage',
+        isRecurring=1  # Mortgage bills are recurring
+    )
+    
+    # Return success message with account details
+    return {"status": "success", "message": f"Mortgage loan account {accountID} created with an interest rate of {interestRate}% for {termYears} years. Monthly payment: ${monthly_payment}. First payment due on {first_bill_due_date}."}

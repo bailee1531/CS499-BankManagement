@@ -1,1 +1,1 @@
-BillID,CustomerID,PayeeName,PayeeAddress,Amount,DueDate,PaymentAccID
+BillID,CustomerID,PayeeName,PayeeAddress,Amount,DueDate,PaymentAccID,MinPayment,BillType,IsRecurring,Status

@@ -4,83 +4,134 @@
 
 {% block head_extra %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bill_pay.css') }}">
   <script>
     window.accountId = {{ account_id | tojson | safe }};
   </script>
-  <script src="{{ url_for('static', filename='js/update-bill-amountl.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/update-bill-amount.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-<div class="confirmation-page">
-  <div class="thank-you-section">
-    <h2>Bill Payment</h2>
+<main class="accounts-page">
+  <div class="content-wrapper">
+    <div class="confirmation-page">
+      <div class="thank-you-section">
+        <h2>Bill Payment</h2>
 
-    {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
-      {% if min_amount is not none %}
-        <p><strong>Minimum Bill Due:</strong> <span id="min-due-display">${{ "%.2f"|format(min_amount) }}</span></p>
-      {% else %}
-        <p><strong>Minimum Bill Due:</strong> No bills found.</p>
-      {% endif %}
-
-      {% if due_date %}
-        <p><strong>Bill Due Date:</strong> {{ due_date }}</p>
-      {% endif %}
-
-    {% endif %}
-
-    <form class="deposit-form" method="POST" action="{{ url_for('customer.pay_bill', account_id=account_id) }}">
-      {{ form.hidden_tag() }}
-
-      <div class="form-group">
-        {{ form.bill_id.label }}
         {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
-          {{ form.bill_id(class="form-control", readonly=true, style="background-color: #e9ecef") }}
-        {% else %}
-          {{ form.bill_id(class="form-control") }}
+          {% if min_amount is not none %}
+            <p><strong>Minimum Bill Due:</strong> <span id="min-due-display">${{ "%.2f"|format(min_amount) }}</span></p>
+          {% else %}
+            <p><strong>Minimum Bill Due:</strong> No bills found.</p>
+          {% endif %}
+
+          {% if due_date %}
+            <p><strong>Bill Due Date:</strong> {{ due_date }}</p>
+          {% endif %}
+
+          {% if account_type == 'Mortgage Loan' %}
+            <p><strong>Current Mortgage Total:</strong> $<span id="mortgage-total-display">{{ "%.2f"|format(account.CurrBal|abs) }}</span></p>
+          {% endif %}
+
+          {% if account_type == 'Credit Card' %}
+          <p><strong>Credit Card Total:</strong> $<span id="mortgage-total-display">{{ "%.2f"|format(account.CurrBal|float|abs) }}</span></p>
         {% endif %}
-      </div>
-
-      <div class="form-group">
-        {{ form.paymentAccID.label }}
-        {{ form.paymentAccID(class="form-control") }}
-      </div>
-      
-      
-
-      <div class="form-group">
-        {{ form.payee_name.label }}
-        {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
-          {{ form.payee_name(class="form-control", readonly=true, style="background-color: #e9ecef") }}
-        {% else %}
-          {{ form.payee_name(class="form-control") }}
+          
         {% endif %}
+
+        <form class="deposit-form" method="POST" action="{{ url_for('customer.pay_bill', account_id=account_id) }}">
+          {{ form.hidden_tag() }}
+
+          <div class="form-group">
+            {{ form.bill_id.label }}
+            {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+              {{ form.bill_id(class="form-control", readonly=true, style="background-color: #e9ecef") }}
+            {% else %}
+              {{ form.bill_id(class="form-control") }}
+            {% endif %}
+          </div>
+
+          <!-- Row with two columns for paymentAccID and amount -->
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                {{ form.paymentAccID.label }}
+                {{ form.paymentAccID(class="form-control") }}
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                {{ form.amount.label }}
+                {{ form.amount(class="form-control", placeholder="Enter amount") }}
+              </div>
+            </div>
+          </div>
+          
+          <!-- Row with two columns for payee_name and payee_address -->
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                {{ form.payee_name.label }}
+                {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+                  {{ form.payee_name(class="form-control", readonly=true, style="background-color: #e9ecef") }}
+                {% else %}
+                  {{ form.payee_name(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                {{ form.payee_address.label }}
+                {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
+                  {{ form.payee_address(class="form-control", readonly=true, style="background-color: #e9ecef") }}
+                {% else %}
+                  {{ form.payee_address(class="form-control") }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Only show due date field for non-credit card and non-mortgage accounts -->
+          {% if account_type not in ['Credit Card', 'Mortgage Loan'] %}
+          <div class="form-group">
+            {{ form.due_date.label }}
+            {{ form.due_date(class="form-control", type="date") }}
+          </div>
+          {% else %}
+            <!-- Hidden due date field for mortgage/credit card accounts -->
+            {{ form.due_date(style="display: none;") }}
+          {% endif %}
+
+          <!-- Only show recurring payment option for non-Credit Card and non-Mortgage accounts -->
+          {% if account_type not in ['Credit Card', 'Mortgage Loan'] %}
+          <div class="bill-recurring-section">
+            <div class="bill-recurring-container bill-recurring-tooltip">
+              {{ form.is_recurring(class="form-check-input") }}
+              {{ form.is_recurring.label(class="form-check-label") }}
+            </div>
+          </div>
+          {% else %}
+            <!-- Hide the recurring checkbox entirely for Credit Card and Mortgage accounts -->
+            {{ form.is_recurring(style="display: none;") }}
+          {% endif %}
+
+          <!-- Hidden bill_type field -->
+          {{ form.bill_type() }}
+
+          {{ form.submit(class="submit-btn") }}
+        </form>
       </div>
-      
-      
-      <div class="form-group">
-        {{ form.payee_address.label }}
-        {% if account_type in ['Credit Card', 'Mortgage Loan'] %}
-
-          {{ form.payee_address(class="form-control", readonly=true, style="background-color: #e9ecef") }}
-        {% else %}
-          {{ form.payee_address(class="form-control") }}
-        {% endif %}
-      </div>      
-      
-
-      <div class="form-group">
-        {{ form.amount.label }}
-        {{ form.amount(class="form-control", placeholder="Enter amount") }}
-      </div>
-
-      <div class="form-group">
-        {{ form.due_date.label }}
-        {{ form.due_date(class="form-control", type="date") }}
-      </div>
-
-      {{ form.submit(class="submit-btn") }}
-    </form>
+    </div>
   </div>
-</div>
+</main>
+
+<script>
+  // Initialize the form with appropriate values based on account type
+  document.addEventListener('DOMContentLoaded', function() {
+    const accountType = '{{ account_type }}';
+    const billTypeField = document.getElementById('{{ form.bill_type.id }}');
+    const isRecurringField = document.getElementById('{{ form.is_recurring.id }}');
+    
+  });
+</script>
 {% endblock %}

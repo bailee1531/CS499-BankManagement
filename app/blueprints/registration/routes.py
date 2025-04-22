@@ -179,33 +179,8 @@ def register_step3():
         if registration['account_type'] == 'Credit Card':
             try:
                 # Create credit card account
-                createCreditCard.openCreditCardAccount(customer_id)
-
-                # Get the newly created account
-                accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
-                new_card = accounts_df[
-                    (accounts_df["CustomerID"] == customer_id) &
-                    (accounts_df["AccountType"] == "Credit Card")
-                ].iloc[-1]
-
-                # Schedule initial bill payment
-                bill_payment_result = scheduleBillPayment(
-                    customerID=customer_id,
-                    payeeName="Evergreen Bank",
-                    payeeAddress="Somewhere In The World",
-                    amount=Decimal("0"),
-                    dueDate=(date.today() + timedelta(days=30)).isoformat(),
-                    paymentAccID=new_card["AccountID"],
-                    minPayment = 0
-                )
-
-                # Handle result
-                if bill_payment_result.get("status") == "success":
-                    flash_success(bill_payment_result.get("message"))
-                else:
-                    flash_error(bill_payment_result.get("message"))
-
-                flash_success("Visa credit card account opened successfully! Your first bill is due in 30 days.")
+                createCreditCard.openCreditCardAccount(customer_id)           
+                flash_success("Visa credit card account opened successfully!")
                 session.pop('registration', None)
                 return redirect(url_for('customer.customer_dashboard'))
 

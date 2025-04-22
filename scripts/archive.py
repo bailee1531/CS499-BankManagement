@@ -49,7 +49,14 @@ def archive(recordType: str, recordID: int, remove_record: bool = False) -> dict
             archivedBillsData = billRecord.copy()
         else:
             archivedBillsData = pd.concat([archivedBillsData, billRecord], ignore_index=True)
+        
+        # Ensure 'Amount' column is properly formatted
         archivedBillsData['Amount'] = archivedBillsData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        
+        # Update the status to 'Archived' before saving
+        idx = archivedBillsData.index[-1]  # Get the index of the last row (the one we just added)
+        archivedBillsData.at[idx, 'Status'] = 'Archived'
+        
         archivedBillsData.to_csv(archivedBillsPath, index=False)
 
         # If removal is requested (i.e. fully paid), remove the active record.
@@ -57,6 +64,11 @@ def archive(recordType: str, recordID: int, remove_record: bool = False) -> dict
             billsData = billsData[billsData['BillID'] != recordID]
             billsData['Amount'] = billsData['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
             billsData.to_csv(billsPath, index=False)
+        else:
+            # If not removing, update the status to indicate it's been archived
+            billsData.loc[billsData['BillID'] == recordID, 'Status'] = 'Archived'
+            billsData.to_csv(billsPath, index=False)
+            
         return {"status": "success", "message": f"Bill with ID {recordID} archived successfully."}
 
     elif recordType == "loan":
