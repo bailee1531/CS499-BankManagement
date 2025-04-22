@@ -101,8 +101,13 @@
         document.getElementById('modalLastName').textContent)" style="flex-direction: column; width: 60%; background-color: #c2e5a0; color: #333333; align-self: center;">
         View Accounts
       </button>
+      <div class="modal-buttons" style="margin-top: 20px;">
+        <button onclick="openDepositModal()">Deposit</button>
+        <button onclick="openWithdrawModal()">Withdraw</button>
+        <button onclick="openTransferModal()">Transfer</button>
+      </div>
       <hr>
-        
+
       <!-- Open New Account + Transaction Buttons -->
       <select id="accountType" onchange="toggleAccountInputs()">
         <option value="Checking">Checking</option>
@@ -122,12 +127,6 @@
       <input type="text" id="creditNote" placeholder="N/A for credit cards" disabled style="display:none; background-color: #eee; color: #888;">
     
       <button onclick="submitAccountOpen()">Open Account</button>
-    
-      <div class="modal-buttons" style="margin-top: 30px;">
-        <button onclick="openDepositModal()">Deposit</button>
-        <button onclick="openWithdrawModal()">Withdraw</button>
-        <button onclick="openTransferModal()">Transfer</button>
-      </div>
     </div>
 
     <div class="modal-center">

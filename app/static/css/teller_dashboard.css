@@ -192,7 +192,6 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.75rem;
 }
 
 /* --- Text Elements --- */
