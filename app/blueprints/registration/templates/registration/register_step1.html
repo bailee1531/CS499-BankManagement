@@ -10,8 +10,19 @@ Secure account registration for Evergreen Bank.
 Evergreen Bank - Create Account
 {% endblock %}
 
-<!-- Empty header block for additional headers if needed -->
-{% block header_extra %}{% endblock %}
+<!-- Custom header block to show login but hide signup for customers -->
+{% block header_extra %}
+<div class="header__auth">
+    <!-- Only show login button, hide signup -->
+    <a href="{{ url_for('auth.customer_login') }}" class="btn btn--login">Login</a>
+</div>
+{% endblock %}
+
+<!-- Add CSS for registration -->
+{% block head_extra %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}">
+{% endblock %}
 
 {% block content %}
 <!-- Main content of the page -->
@@ -25,30 +36,33 @@ Evergreen Bank - Create Account
         <form action="{{ url_for('registration.register_step1') }}" method="post" novalidate>
             {{ form.hidden_tag() }} <!-- Hidden form tag for CSRF protection -->
             
-            <!-- First Name Field -->
-            <div class="form-group">
-                <label for="first_name">First Name *</label>
-                {{ form.first_name(class="form-control", placeholder="Enter your first name", autocomplete="given-name") }}
-                {% if form.first_name.errors %}
-                <div class="error-message">
-                    {% for error in form.first_name.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
+            <!-- Two-column layout for Name fields -->
+            <div class="form-row">
+                <!-- First Name Field -->
+                <div class="form-group">
+                    <label for="first_name">First Name *</label>
+                    {{ form.first_name(class="form-control", placeholder="Enter your first name", autocomplete="given-name") }}
+                    {% if form.first_name.errors %}
+                    <div class="error-message">
+                        {% for error in form.first_name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            </div>
-            
-            <!-- Last Name Field -->
-            <div class="form-group">
-                <label for="last_name">Last Name *</label>
-                {{ form.last_name(class="form-control", placeholder="Enter your last name", autocomplete="family-name") }}
-                {% if form.last_name.errors %}
-                <div class="error-message">
-                    {% for error in form.last_name.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
+                
+                <!-- Last Name Field -->
+                <div class="form-group">
+                    <label for="last_name">Last Name *</label>
+                    {{ form.last_name(class="form-control", placeholder="Enter your last name", autocomplete="family-name") }}
+                    {% if form.last_name.errors %}
+                    <div class="error-message">
+                        {% for error in form.last_name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
             
             <!-- Address Field -->
@@ -64,33 +78,36 @@ Evergreen Bank - Create Account
                 {% endif %}
             </div>
             
-            <!-- Phone Number Field -->
-            <div class="form-group">
-                <label for="phone_number">Phone Number *</label>
-                {{ form.phone_number(class="form-control", placeholder="Enter your phone number", autocomplete="tel") }}
-                {% if form.phone_number.errors %}
-                <div class="error-message">
-                    {% for error in form.phone_number.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
+            <!-- Two-column layout for Phone and SSN fields -->
+            <div class="form-row">
+                <!-- Phone Number Field -->
+                <div class="form-group">
+                    <label for="phone_number">Phone Number *</label>
+                    {{ form.phone_number(class="form-control", placeholder="Enter your phone number", autocomplete="tel") }}
+                    {% if form.phone_number.errors %}
+                    <div class="error-message">
+                        {% for error in form.phone_number.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
+                
+                <!-- Tax ID Field -->
+                <div class="form-group">
+                    <label for="tax_id">Social Security Number (Tax ID) *</label>
+                    {{ form.tax_id(class="form-control", placeholder="Enter your SSN or Tax ID") }}
+                    {% if form.tax_id.errors %}
+                    <div class="error-message">
+                        {% for error in form.tax_id.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             
-            <!-- Tax ID Field -->
-            <div class="form-group">
-                <label for="tax_id">Social Security Number (Tax ID) *</label>
-                {{ form.tax_id(class="form-control", placeholder="Enter your SSN or Tax ID") }}
-                {% if form.tax_id.errors %}
-                <div class="error-message">
-                    {% for error in form.tax_id.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Birthday Field -->
+            <!-- Birthday Field (keep as single row) -->
             <div class="form-group">
                 <label for="birthday">Birthday *</label>
                 {{ form.birthday(class="form-control", placeholder="Enter your birthday", autocomplete="bday") }}
@@ -103,18 +120,14 @@ Evergreen Bank - Create Account
                 {% endif %}
             </div>
             
-            <!-- Submit button for moving to the next registration step -->
-            <button type="submit" class="btn btn--register" onclick="window.location.href='{{ signup_url or url_for('registration.register_step1') }}';">
-                Next Step
-            </button>
-            
-            <!-- Button for redirecting to the login page -->
-            <button type="button" class="btn btn--login" onclick="window.location.href='{{ url_for('auth.customer_login') }}';">
-                Login
-            </button>
+            <div class="button-container">
+                <!-- Submit button for moving to the next registration step -->
+                <button type="submit" class="btn btn--register">
+                    Next Step
+                </button>
+            </div>
         </form>
     </section>
 
 </main>
 {% endblock %}
-
