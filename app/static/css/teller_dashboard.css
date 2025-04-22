@@ -157,18 +157,6 @@
   max-width: 450px;
 }
 
-
-/* --- Inputs --- */
-.modal-content input {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  margin: 0.4rem 0;
-  font-size: 0.95rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-
 /* --- Buttons --- */
 .modal-content button {
   background-color: #7e7f9a;
@@ -262,7 +250,7 @@
   font-size: 1rem;
   border-radius: 6px;
   border: 1px solid #ccc;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   box-sizing: border-box;
 }
 
