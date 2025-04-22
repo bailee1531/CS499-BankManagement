@@ -1,0 +1,285 @@
+@import "shared.css";
+
+/*-------------------------------------------------
+  Content Wrapper
+  - Ensures the content area has green background
+--------------------------------------------------*/
+.content-wrapper {
+    background-color: var(--primary-bg);
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/*-------------------------------------------------
+  Bill Payment Page Container
+--------------------------------------------------*/
+.confirmation-page {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1.25rem;
+    width: 100%;
+    margin: 2rem 0;
+}
+
+/*-------------------------------------------------
+  Bill Payment Form Section
+  - Dark background container for the bill payment form
+--------------------------------------------------*/
+.thank-you-section {
+    background-color: var(--dark-bg);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.08);
+    max-width: 37.5rem;
+    width: 100%;
+    text-align: center;
+    color: var(--white);
+}
+
+/*-------------------------------------------------
+  Section Heading
+--------------------------------------------------*/
+.thank-you-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.9375rem;
+    color: var(--white);
+}
+
+/*-------------------------------------------------
+  Bill Details Display
+  - Styles for minimum payment, due date, etc.
+--------------------------------------------------*/
+.thank-you-section p {
+    margin-bottom: 0.625rem;
+    text-align: left;
+}
+
+.thank-you-section p strong {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+/*-------------------------------------------------
+  Form Styling (Bill Payment Form)
+--------------------------------------------------*/
+.deposit-form .form-group {
+    margin-bottom: 1.5625rem;
+    text-align: left;
+}
+
+/* Create a row for side-by-side form groups */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5625rem;
+}
+
+/* Column within a form row */
+.form-col {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Reset margin for form groups inside columns */
+.form-col .form-group {
+    margin-bottom: 0;
+}
+
+.deposit-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #f0f0f0;
+}
+
+.deposit-form input.form-control,
+.deposit-form select.form-control {
+    width: 100%;
+    padding: 0.625rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    transition: border-color 0.3s ease;
+    background-color: #fff;
+    color: #333;
+}
+
+.deposit-form input.form-control:focus,
+.deposit-form select.form-control:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+/* Style for readonly inputs */
+.deposit-form input[readonly],
+.deposit-form input[disabled] {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/*-------------------------------------------------
+  Recurring Bill Section
+  - Specific to bill payment form
+--------------------------------------------------*/
+.bill-recurring-section {
+    margin: 1.5rem 0;
+    width: 100%;
+}
+
+/* Styling for the recurring bill checkbox container */
+.bill-recurring-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #535353;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--border-radius);
+    margin: 0 auto 1.5rem;
+    border-left: 3px solid var(--accent);
+    width: 100%;
+}
+
+/* Style for the checkbox itself */
+.bill-recurring-container .form-check-input {
+    margin-right: 0.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--accent);
+    margin-top: 0;
+    vertical-align: middle;
+    position: relative;
+}
+
+/* Style for the label */
+.bill-recurring-container label {
+    margin-bottom: 0;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1.25rem;
+}
+
+/* Add an info icon */
+.bill-recurring-container label::after {
+    content: "ⓘ";
+    margin-left: 0.5rem;
+    color: var(--accent);
+    font-size: 1rem;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+/* Tooltip for more information on hover */
+.bill-recurring-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.bill-recurring-tooltip:hover::before {
+    content: "This bill will be automatically scheduled again next month";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-weight: normal;
+    font-size: 0.875rem;
+    z-index: 1;
+}
+
+/* Checkmark animation */
+.bill-recurring-container .form-check-input:checked {
+    animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* For credit card and mortgage loans where recurring might be auto-checked */
+.bill-recurring-container.always-recurring {
+    background-color: #4a5d4a;
+}
+
+.bill-recurring-container.always-recurring label::before {
+    content: "✓";
+    color: var(--accent);
+    margin-right: 0.5rem;
+}
+
+/*-------------------------------------------------
+  Button Styling
+--------------------------------------------------*/
+.submit-btn {
+    padding: 0.9rem 1.5rem;
+    background-color: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 1.5rem;
+}
+
+.submit-btn:hover {
+    background-color: #c14541; /* Slightly darker than var(--accent) */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/*-------------------------------------------------
+  Form Errors
+--------------------------------------------------*/
+.form-errors {
+    list-style-type: none;
+    padding-left: 0;
+    color: var(--danger);
+    margin-top: 1rem;
+}
+
+/*-------------------------------------------------
+  Responsive Styles
+--------------------------------------------------*/
+@media (max-width: 37.5rem) {
+    .thank-you-section {
+        padding: 1.5625rem;
+    }
+    
+    .bill-recurring-container {
+        width: 100%;
+        padding: 0.75rem;
+    }
+    
+    /* Stack form rows into columns on smaller screens */
+    .form-row {
+        flex-direction: column;
+        gap: 1.5625rem;
+    }
+    
+    .form-col {
+        width: 100%;
+    }
+}

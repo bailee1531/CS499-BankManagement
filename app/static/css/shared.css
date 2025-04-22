@@ -20,6 +20,8 @@
     /* Dark background color for footer or other sections */
     --accent: #d9534f;
     /* Accent color for highlights and interactive elements */
+    --accent-hover: #fa4343;
+    /* Accent hover color for highlights and interactive elements */
     --light-accent: #7e7f9a;
     /* Less vibrant accent */
     --white: #ffffff;
@@ -48,8 +50,8 @@ body {
     /* Set full height for the page */
     font-family: Arial, sans-serif;
     /* Use Arial or a sans-serif font as fallback */
-    background-color: var(--dark-bg);
-    /* Changed to dark background color */
+    background-color: var(--primary-bg);
+    /* Set the primary background color */
     line-height: 1.6;
     /* Set line height for better readability */
     display: flex;
@@ -150,6 +152,12 @@ header {
     text-align: center;
 }
 
+/* Global: Underline text for all buttons on hover */
+button:hover,
+.btn:hover {
+  text-decoration: underline;
+}
+
 /* Header Buttons */
 /* Adjust header authentication buttons for proper sizing */
 header .header__auth .btn {
@@ -183,26 +191,6 @@ header .header__auth .btn {
     background: var(--accent);
     color: var(--white);
     border: none;
-}
-
-/* Content Wrapper */
-/* Add a wrapper with green background for the main content */
-main, .content-wrapper {
-    background-color: var(--primary-bg);
-    color: var(--black);
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: var(--spacing);
-    width: 100%;
-}
-
-/* Add this to handle content that might be inside the block content section */
-.content {
-    background-color: var(--primary-bg);
-    min-height: 300px; /* Ensure minimal content height */
-    width: 100%;
 }
 
 /* Footer Styles */
@@ -330,12 +318,18 @@ footer {
 }
 
 /* Flash Messages */
+.flash-messages {
+    position: relative;
+    z-index: 9999;       /* Ensure it's above modals, overlays, etc. */
+}
 /* Flash Messages: Generic alert styling remains */
 .flash-messages .alert {
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
     color: var(--white);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
 }
 
 /* Success messages (flash green) */
@@ -350,6 +344,11 @@ footer {
     border: 1px solid var(--danger);
 }
 
+/* When fade-out is triggered */
+.flash-messages .alert.fade-out {
+    opacity: 0;
+}
+
 /* Main Content Area */
 /* Center the main content using flexbox */
 main {
@@ -358,7 +357,6 @@ main {
     justify-content: center;
     align-items: center;
     padding: var(--spacing);
-    background-color: var(--primary-bg); /* Keep main content green */
 }
 
 /* Login Container */
@@ -440,6 +438,14 @@ main {
     color: var(--white);
 }
 
+/* Disabled button styling */
+button.disabled,
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* Accessibility - Visually Hidden Content */
 /* Utility class for content that should be available for screen readers but hidden visually */
 .visually-hidden {
@@ -461,9 +467,4 @@ input[disabled] {
     opacity: 1;
     cursor: not-allowed;
     font-style: italic;
-}
-
-/* Override for any template-specific content areas that might be green */
-{% block content %}{% endblock %} {
-    background-color: var(--primary-bg);
 }
