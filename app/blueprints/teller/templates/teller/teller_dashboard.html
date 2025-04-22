@@ -87,13 +87,21 @@
           <div id="modalAddress" class="readonly-field"></div>
         </div>
       </div>
+      <hr>
+      <!-- Delete Button Last -->
+      <div class="modal-buttons center-only">
+        <button style="background-color: #f90404;" onclick="submitCustomerDelete()">Delete Customer</button>
+      </div>
     </div>
 
     <div class="modal-right scroll-panel">
       <h3>Account Information</h3>
       <!-- Toggle Button -->
       <button onclick="openAccountsModal(currentCustomerID, document.getElementById('modalFirstName').textContent,
-        document.getElementById('modalLastName').textContent)">View Accounts</button>
+        document.getElementById('modalLastName').textContent)" style="flex-direction: column; width: 60%; background-color: #c2e5a0; color: #333333; align-self: center;">
+        View Accounts
+      </button>
+      <hr>
         
       <!-- Open New Account + Transaction Buttons -->
       <select id="accountType" onchange="toggleAccountInputs()">
@@ -114,8 +122,15 @@
       <input type="text" id="creditNote" placeholder="N/A for credit cards" disabled style="display:none; background-color: #eee; color: #888;">
     
       <button onclick="submitAccountOpen()">Open Account</button>
-      <hr>
+    
+      <div class="modal-buttons" style="margin-top: 30px;">
+        <button onclick="openDepositModal()">Deposit</button>
+        <button onclick="openWithdrawModal()">Withdraw</button>
+        <button onclick="openTransferModal()">Transfer</button>
+      </div>
+    </div>
 
+    <div class="modal-center">
       <h3>Edit Login</h3>
       <!-- Edit Username -->
       <input type="text" id="editUsernameInput" placeholder="New Username">
@@ -124,19 +139,6 @@
       <input type="password" id="oldPasswordInput" placeholder="Old Password">
       <input type="password" id="newPasswordInput" placeholder="New Password">
       <button onclick="resetCustomerPassword()">Reset Password</button>
-      <hr>
-    
-      <div class="modal-buttons" style="margin-top: 30px;">
-        <button onclick="openDepositModal()">Deposit</button>
-        <button onclick="openWithdrawModal()">Withdraw</button>
-        <button onclick="openTransferModal()">Transfer</button>
-      </div>
-    
-      <hr>
-      <!-- Delete Button Last -->
-      <div class="modal-buttons center-only">
-        <button onclick="submitCustomerDelete()">Delete Customer</button>
-      </div>
     </div>
   </div>
 </div>
