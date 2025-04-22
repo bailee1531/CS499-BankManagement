@@ -28,6 +28,23 @@
     margin-top: 1.5rem;
 }
 
+/* Make security question dropdowns the same width as inputs */
+.security-questions select,
+.security-questions input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure all form controls have consistent styling */
+.form-control, 
+select.form-control {
+    width: 100%;
+    padding: 0.625rem;
+    border: none;
+    border-radius: var(--border-radius);
+    transition: outline var(--transition);
+}
+
 /* Button container for side-by-side buttons */
 .button-container {
     display: flex;

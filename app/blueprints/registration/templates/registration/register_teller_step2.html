@@ -114,62 +114,56 @@ Evergreen Bank - Create Account
             <div class="security-questions">
                 <h3>Security Questions</h3>
                 
-                <!-- Security Question 1 and Answer 1 side by side -->
-                <div class="form-row">
-                    <!-- Security Question 1 -->
-                    <div class="form-group">
-                        <label for="security_question_1">Security Question 1 *</label>
-                        {{ form.security_question_1(class="form-control") }}
-                        {% if form.security_question_1.errors %}
-                        <div class="error-message">
-                            {% for error in form.security_question_1.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                <!-- Security Question 1 -->
+                <div class="form-group">
+                    <label for="security_question_1">Security Question 1 *</label>
+                    {{ form.security_question_1(class="form-control") }}
+                    {% if form.security_question_1.errors %}
+                    <div class="error-message">
+                        {% for error in form.security_question_1.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
                     </div>
-                    
-                    <!-- Security Answer 1 -->
-                    <div class="form-group">
-                        <label for="security_answer_1">Answer to Question 1 *</label>
-                        {{ form.security_answer_1(class="form-control", placeholder="Enter your answer") }}
-                        {% if form.security_answer_1.errors %}
-                        <div class="error-message">
-                            {% for error in form.security_answer_1.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
                 
-                <!-- Security Question 2 and Answer 2 side by side -->
-                <div class="form-row">
-                    <!-- Security Question 2 -->
-                    <div class="form-group">
-                        <label for="security_question_2">Security Question 2 *</label>
-                        {{ form.security_question_2(class="form-control") }}
-                        {% if form.security_question_2.errors %}
-                        <div class="error-message">
-                            {% for error in form.security_question_2.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                <!-- Security Answer 1 -->
+                <div class="form-group">
+                    <label for="security_answer_1">Answer to Question 1 *</label>
+                    {{ form.security_answer_1(class="form-control", placeholder="Enter your answer") }}
+                    {% if form.security_answer_1.errors %}
+                    <div class="error-message">
+                        {% for error in form.security_answer_1.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
                     </div>
-                    
-                    <!-- Security Answer 2 -->
-                    <div class="form-group">
-                        <label for="security_answer_2">Answer to Question 2 *</label>
-                        {{ form.security_answer_2(class="form-control", placeholder="Enter your answer") }}
-                        {% if form.security_answer_2.errors %}
-                        <div class="error-message">
-                            {% for error in form.security_answer_2.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <!-- Security Question 2 -->
+                <div class="form-group">
+                    <label for="security_question_2">Security Question 2 *</label>
+                    {{ form.security_question_2(class="form-control") }}
+                    {% if form.security_question_2.errors %}
+                    <div class="error-message">
+                        {% for error in form.security_question_2.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
                     </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Security Answer 2 -->
+                <div class="form-group">
+                    <label for="security_answer_2">Answer to Question 2 *</label>
+                    {{ form.security_answer_2(class="form-control", placeholder="Enter your answer") }}
+                    {% if form.security_answer_2.errors %}
+                    <div class="error-message">
+                        {% for error in form.security_answer_2.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             
