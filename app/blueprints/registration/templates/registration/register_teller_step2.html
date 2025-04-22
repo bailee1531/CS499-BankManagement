@@ -10,8 +10,10 @@ Secure account registration for Evergreen Bank.
 Evergreen Bank - Create Account
 {% endblock %}
 
-<!-- Empty header block for additional headers if needed -->
-{% block header_extra %}{% endblock %}
+<!-- Header extra block with CSS link -->
+{% block header_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registration.css') }}">
+{% endblock %}
 
 {% block content %}
 <!-- Main content of the page -->
@@ -36,30 +38,33 @@ Evergreen Bank - Create Account
             <div class="account-credentials">
                 <h3>Account Credentials</h3>
                 
-                <!-- Email Field -->
-                <div class="form-group">
-                    <label for="email">Email Address *</label>
-                    {{ form.email(class="form-control", placeholder="Enter your email address", autocomplete="email", readonly=disable_email) }}
-                    {% if form.email.errors %}
-                    <div class="error-message">
-                        {% for error in form.email.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                <!-- Two-column layout for Email fields -->
+                <div class="form-row">
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        {{ form.email(class="form-control", placeholder="Enter your email address", autocomplete="email", readonly=disable_email) }}
+                        {% if form.email.errors %}
+                        <div class="error-message">
+                            {% for error in form.email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Confirm Email Field -->
-                <div class="form-group">
-                    <label for="confirm_email">Confirm Email Address *</label>
-                    {{ form.confirm_email(class="form-control", placeholder="Confirm your email address", autocomplete="email", readonly=disable_email) }}
-                    {% if form.confirm_email.errors %}
-                    <div class="error-message">
-                        {% for error in form.confirm_email.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                    
+                    <!-- Confirm Email Field -->
+                    <div class="form-group">
+                        <label for="confirm_email">Confirm Email Address *</label>
+                        {{ form.confirm_email(class="form-control", placeholder="Confirm your email address", autocomplete="email", readonly=disable_email) }}
+                        {% if form.confirm_email.errors %}
+                        <div class="error-message">
+                            {% for error in form.confirm_email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
                 
                 <!-- Username Field -->
@@ -75,30 +80,33 @@ Evergreen Bank - Create Account
                     {% endif %}
                 </div>
                 
-                <!-- Password Field -->
-                <div class="form-group">
-                    <label for="password">Password *</label>
-                    {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="new-password") }}
-                    {% if form.password.errors %}
-                    <div class="error-message">
-                        {% for error in form.password.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                <!-- Two-column layout for Password fields -->
+                <div class="form-row">
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        {{ form.password(class="form-control", placeholder="Enter your password", autocomplete="new-password") }}
+                        {% if form.password.errors %}
+                        <div class="error-message">
+                            {% for error in form.password.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Confirm Password Field -->
-                <div class="form-group">
-                    <label for="confirm_password">Confirm Password *</label>
-                    {{ form.confirm_password(class="form-control", placeholder="Re-enter your password", autocomplete="new-password") }}
-                    {% if form.confirm_password.errors %}
-                    <div class="error-message">
-                        {% for error in form.confirm_password.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                    
+                    <!-- Confirm Password Field -->
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password *</label>
+                        {{ form.confirm_password(class="form-control", placeholder="Re-enter your password", autocomplete="new-password") }}
+                        {% if form.confirm_password.errors %}
+                        <div class="error-message">
+                            {% for error in form.confirm_password.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
             
@@ -106,56 +114,62 @@ Evergreen Bank - Create Account
             <div class="security-questions">
                 <h3>Security Questions</h3>
                 
-                <!-- Security Question 1 -->
-                <div class="form-group">
-                    <label for="security_question_1">Security Question 1 *</label>
-                    {{ form.security_question_1(class="form-control") }}
-                    {% if form.security_question_1.errors %}
-                    <div class="error-message">
-                        {% for error in form.security_question_1.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                <!-- Security Question 1 and Answer 1 side by side -->
+                <div class="form-row">
+                    <!-- Security Question 1 -->
+                    <div class="form-group">
+                        <label for="security_question_1">Security Question 1 *</label>
+                        {{ form.security_question_1(class="form-control") }}
+                        {% if form.security_question_1.errors %}
+                        <div class="error-message">
+                            {% for error in form.security_question_1.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
+                    
+                    <!-- Security Answer 1 -->
+                    <div class="form-group">
+                        <label for="security_answer_1">Answer to Question 1 *</label>
+                        {{ form.security_answer_1(class="form-control", placeholder="Enter your answer") }}
+                        {% if form.security_answer_1.errors %}
+                        <div class="error-message">
+                            {% for error in form.security_answer_1.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
                 
-                <!-- Security Answer 1 -->
-                <div class="form-group">
-                    <label for="security_answer_1">Answer to Security Question 1 *</label>
-                    {{ form.security_answer_1(class="form-control", placeholder="Enter your answer") }}
-                    {% if form.security_answer_1.errors %}
-                    <div class="error-message">
-                        {% for error in form.security_answer_1.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                <!-- Security Question 2 and Answer 2 side by side -->
+                <div class="form-row">
+                    <!-- Security Question 2 -->
+                    <div class="form-group">
+                        <label for="security_question_2">Security Question 2 *</label>
+                        {{ form.security_question_2(class="form-control") }}
+                        {% if form.security_question_2.errors %}
+                        <div class="error-message">
+                            {% for error in form.security_question_2.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Security Question 2 -->
-                <div class="form-group">
-                    <label for="security_question_2">Security Question 2 *</label>
-                    {{ form.security_question_2(class="form-control") }}
-                    {% if form.security_question_2.errors %}
-                    <div class="error-message">
-                        {% for error in form.security_question_2.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                    
+                    <!-- Security Answer 2 -->
+                    <div class="form-group">
+                        <label for="security_answer_2">Answer to Question 2 *</label>
+                        {{ form.security_answer_2(class="form-control", placeholder="Enter your answer") }}
+                        {% if form.security_answer_2.errors %}
+                        <div class="error-message">
+                            {% for error in form.security_answer_2.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Security Answer 2 -->
-                <div class="form-group">
-                    <label for="security_answer_2">Answer to Security Question 2 *</label>
-                    {{ form.security_answer_2(class="form-control", placeholder="Enter your answer") }}
-                    {% if form.security_answer_2.errors %}
-                    <div class="error-message">
-                        {% for error in form.security_answer_2.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
                 </div>
             </div>
             
