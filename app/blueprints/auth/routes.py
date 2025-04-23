@@ -73,7 +73,6 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
 
     username: str = form.username.data
     password: str = form.password.data
-    username = username.lower()
 
     # Look up CustomerID if customer login
     if session_key == "customer":
@@ -159,7 +158,7 @@ def get_customer_id_by_username(username: str) -> int:
     if 'Username' not in user_info.columns or 'CustomerID' not in user_info.columns:
         raise ValueError("Malformed customer CSV: missing required columns.")
 
-    customer_row = user_info[user_info['Username'].str.lower() == username.lower()]
+    customer_row = user_info[user_info['Username'] == username]
     if customer_row.empty:
         raise IndexError("Username not found in customer CSV.")
 
