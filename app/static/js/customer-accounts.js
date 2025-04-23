@@ -129,7 +129,7 @@ function closeAccountModal() {
 
 function submitAccountOpen() {
   const type = document.getElementById("accountType").value;
-  const actOpenBtn = document.querySelector('#customerModal .modal-right button[onclick="submitAccountOpen()"]');
+  const actOpenBtn = document.getElementById("openAccountBtn");
   
   let payload = {
   customerID: currentCustomerID,
@@ -168,6 +168,11 @@ function submitAccountOpen() {
   }).then(res => res.json()).then(data => {
     if (data.success) {
       injectFlashMessage("success", data.message);
+      // Clear account type & inputs
+      document.getElementById("accountType").selectedIndex = 0;
+      document.getElementById("initialDeposit").value = "";
+      document.getElementById("loanAmount").value = "";
+      document.getElementById("loanTerm").value = "";
     } else {
       injectFlashMessage("danger", "Failed to open account: " + data.message);
     }
@@ -181,33 +186,33 @@ function submitAccountOpen() {
         actOpenBtn.disabled = false;
         actOpenBtn.classList.remove("disabled");
       }
-    }, 4000);
+    }, 2000);
   });
 }
 
 function toggleAccountInputs() {
-const type = document.getElementById("accountType").value;
+  const type = document.getElementById("accountType").value;
 
-const deposit = document.getElementById("initialDeposit");
-const loanAmount = document.getElementById("loanAmount");
-const loanTerm = document.getElementById("loanTerm");
-const creditNote = document.getElementById("creditNote");
+  const deposit = document.getElementById("initialDeposit");
+  const loanAmount = document.getElementById("loanAmount");
+  const loanTerm = document.getElementById("loanTerm");
+  const creditNote = document.getElementById("creditNote");
 
-// Hide all by default
-deposit.style.display = "none";
-loanAmount.style.display = "none";
-loanTerm.style.display = "none";
-creditNote.style.display = "none";
+  // Hide all by default
+  deposit.style.display = "none";
+  loanAmount.style.display = "none";
+  loanTerm.style.display = "none";
+  creditNote.style.display = "none";
 
-if (["Checking", "Savings", "Money Market"].includes(type)) {
-  deposit.placeholder = "Initial Deposit";
-  deposit.style.display = "block";
-} else if (type === "Home Mortgage Loan") {
-  loanAmount.style.display = "block";
-  loanTerm.style.display = "block";
-} else if (type === "Travel Visa") {
-  creditNote.style.display = "block";
-}
+  if (["Checking", "Savings", "Money Market"].includes(type)) {
+    deposit.placeholder = "Initial Deposit";
+    deposit.style.display = "block";
+  } else if (type === "Home Mortgage Loan") {
+    loanAmount.style.display = "block";
+    loanTerm.style.display = "block";
+  } else if (type === "Travel Visa") {
+    creditNote.style.display = "block";
+  }
 }
 
 function goToAccountInfoPage() {
@@ -348,8 +353,8 @@ function deleteAccountFromModal(accountID) {
         injectFlashMessage("success", data.message);
         // Wait for a tiny delay
         setTimeout(() => {
-          location.reload();
-        }, 3000);
+          refreshAccountsInModal(currentCustomerID);
+        }, 300);
       } else {
         injectFlashMessage("danger", "Error: " + data.message);
       }
@@ -376,4 +381,46 @@ function filterCustomers() {
     card.classList.toggle("hidden", !name.includes(input) && !account.includes(input));
   });
 }
-  
+
+function refreshAccountsInModal(customerID) {
+  fetch(`/teller/get-accounts/${customerID}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const list = document.getElementById("accountList");
+        list.innerHTML = ""; // Clear current list
+
+        data.accounts.forEach(account => {
+          const li = document.createElement("li");
+          li.classList.add("account-box");
+
+          const isDeletable = parseFloat(account.CurrBal) === 0;
+          const balanceFormatted = parseFloat(account.CurrBal).toFixed(2);
+          
+          li.innerHTML = `
+            <h3>${account.AccountType}</h3>
+            <p>ID: ${account.AccountID}</p>
+            <p>$${balanceFormatted}</p>
+            <button class="delete-account-btn" 
+              ${!isDeletable ? "disabled title='Balance must be $0.00 to delete'" : ""}
+              onclick="deleteAccountFromModal(${account.AccountID})">
+              Delete
+            </button>
+          `;
+
+          list.appendChild(li);
+        });
+
+        // clear any visible transaction state
+        document.getElementById("transactionSection").classList.add("hidden");
+        document.getElementById("selectedAccountLabel").textContent = "";
+        document.getElementById("transactionList").innerHTML = "";
+
+      } else {
+        injectFlashMessage("danger", "Failed to refresh account list.");
+      }
+    })
+    .catch(() => {
+      injectFlashMessage("danger", "Error refreshing modal account list.");
+    });
+}

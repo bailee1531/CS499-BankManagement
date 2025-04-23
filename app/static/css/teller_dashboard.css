@@ -148,6 +148,14 @@
   position: relative;
 }
 
+/* Open Customer Account Modal change */
+#openAccountModal .modal-content {
+  max-width: 600px;
+  width: 90%;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Single-column modals like deposit/withdraw/transfer */
 #depositModal .modal-content,
 #withdrawModal .modal-content,

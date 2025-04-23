@@ -91,7 +91,7 @@
       <hr>
       <!-- Delete Button Last -->
       <div class="modal-buttons center-only">
-        <button style="background-color: #f90404;" onclick="submitCustomerDelete()">Delete Customer</button>
+        <button class="btn btn--modal btn--confirm" style="min-width: unset; max-width: unset; width: auto;" onclick="submitCustomerDelete()">Delete Customer</button>
       </div>
     </div>
 
@@ -127,7 +127,7 @@
       <!-- Credit card note -->
       <input type="text" id="creditNote" placeholder="N/A for credit cards" disabled style="display:none; background-color: #eee; color: #888;">
     
-      <button onclick="submitAccountOpen()">Open Account</button>
+      <button id="openAccountBtn" onclick="submitAccountOpen()">Open Account</button>
     </div>
 
     <div class="modal-right">
@@ -271,23 +271,6 @@
           <button onclick="closeTransferModal()">Cancel</button>
           <button class="action-btn" onclick="submitTransfer()">Transfer</button>
       </div>
-  </div>
-</div>
-
-<!-- Open Account Modal -->
-<div id="openAccountModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeAccountModal()">&times;</span>
-    <h2>Open New Account</h2>
-    <select id="accountType">
-      <option value="Checking">Checking</option>
-      <option value="Savings">Savings</option>
-      <option value="Money Market">Money Market</option>
-      <option value="Home Mortgage Loan">Home Mortgage Loan</option>
-      <option value="Travel Visa">Travel Visa</option>
-    </select>
-    <input type="number" id="initialDeposit" placeholder="Initial Deposit">
-    <button onclick="submitAccountOpen()">Open</button>
   </div>
 </div>
 
