@@ -38,7 +38,9 @@ def personal_accounts() -> Response:
     Returns:
         Response: Rendered personal accounts page or redirection to deposit form.
     """
+    from scripts.customer import openAcc
     account_type: str = request.args.get("account_type")
+    customer_id = session.get("customer_id")
 
     if account_type:
         if "customer_id" not in session:
@@ -55,10 +57,11 @@ def personal_accounts() -> Response:
             flash_error("Invalid account type selected.")
             return redirect(url_for("accounts.personal_accounts"))
 
-        # Set pending account info in session and redirect to deposit form
+        # Set pending account info in session and redirect to customer dashboard
         session['pending_account_type'] = account_type
-        session['pending_account_name'] = valid_types[account_type]
-        return redirect(url_for("registration.deposit_form"))
+        openAcc.open_account(customer_id, account_type, 0.00)   # Customers can't deposit money, so start with 0 account balance
+        session.pop('pending_account_type', None)
+        return redirect(url_for("customer.customer_dashboard"))
 
     return render_template('accounts/personal_accounts.html')
 
