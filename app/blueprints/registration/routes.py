@@ -11,9 +11,7 @@ import logging
 from app.blueprints.registration.forms import (
     TellerUsernameForm,
     RegistrationStep1Form, 
-    RegistrationStep2Form, 
-    RegistrationStep3Form, 
-    DepositForm
+    RegistrationStep2Form
 )
 
 # Import customer operations and utilities for account creation
@@ -99,7 +97,7 @@ def register_step2():
     Checks for username availability and stores login/security details.
 
     Returns:
-        Response: Redirect to step 3 on success, otherwise renders the registration form.
+        Response: Redirect to customer dashboard on success, otherwise renders the registration form.
     """
     form = RegistrationStep2Form()
     if form.validate_on_submit():
@@ -121,31 +119,7 @@ def register_step2():
             'security_answer_2': form.security_answer_2.data.lower(),
         })
         session['registration'] = registration
-        return redirect(url_for('registration.register_step3'))
-    return render_template('registration/register_step2.html', form=form)
-
-@register_bp.route('/customer/register/step3', methods=['GET', 'POST'])
-def register_step3():
-    """
-    Final registration step.
-    Completes registration, creates the new account, and opens additional account types if needed.
-
-    Returns:
-        Response: Redirects to deposit form or dashboard on success, otherwise renders registration form.
-    """
-    form = RegistrationStep3Form()
-
-    if form.validate_on_submit():
-        registration = session.get('registration')
-        if not registration:
-            flash_error("Your session has expired. Please complete the registration again.")
-            return redirect(url_for('registration.register_step1'))
-
-        # Update session with account type selection
-        registration['account_type'] = form.account_type.data
-        session['registration'] = registration
-
-        # Attempt to create a new customer account
+                # Attempt to create a new customer account
         login_result = webLogin.login_page_button_pressed(
             NEW_ACCOUNT,
             "Customer",
@@ -161,88 +135,17 @@ def register_step3():
             registration['security_answer_2'],
         )
 
-        if login_result.get("status") == "error":
-            flash_error(login_result.get("message", "Registration failed"))
+        if login_result.get("status") != "success":
+            flash_error(login_result.get("message", "Registration failed."))
             return redirect(url_for('registration.register_step1'))
 
-        # Retrieve the new customer's ID
-        try:
-            customer_id = get_customer_id_by_username(registration['username'])
-        except Exception as e:
-            flash_error(f"Error retrieving customer ID: {str(e)}")
-            return redirect(url_for('registration.register_step1'))
-
-        # Set session data
-        session["customer_id"] = customer_id
-        session["customer"] = registration["username"]
-
-        if registration['account_type'] == 'Credit Card':
-            try:
-                # Create credit card account
-                createCreditCard.openCreditCardAccount(customer_id)           
-                flash_success("Visa credit card account opened successfully!")
-                session.pop('registration', None)
-                return redirect(url_for('customer.customer_dashboard'))
-
-            except Exception as e:
-                flash_error(f"Unable to open Visa credit account: {str(e)}")
-                return redirect(url_for('registration.register_step1'))
-
-        elif registration['account_type'] == 'Mortgage Loan':
-            # Redirect to mortgage application page to initiate loan
-            return redirect(url_for('accounts.mortgage_application'))
-
-        else:
-            # For other account types, go to deposit form
-            session['pending_account_type'] = registration['account_type']
-            session['pending_account_name'] = registration['account_type']
-            session.pop('registration', None)
-            flash_success("Registration complete! Please proceed with your initial deposit to open your account.")
-            return redirect(url_for('registration.deposit_form'))
-
-    return render_template('registration/register_step3.html', form=form)
-
-
-@register_bp.route('/deposit', methods=['GET', 'POST'])
-def deposit_form():
-    """
-    Route to handle deposit form submission for opening an account.
-
-    Returns:
-        Response: Redirect to user dashboard on success, otherwise renders deposit form.
-    """
-    form = DepositForm()
-    customer_id = session.get("customer_id")
-    pending_account_type = session.get("pending_account_type")
-    pending_account_name = session.get("pending_account_name")
-
-    # Ensure session has required data
-    if not customer_id or not pending_account_type:
-        flash_error("Session expired or incomplete. Please try again.")
-        return redirect(url_for("accounts.personal_accounts"))
-
-    # Check if user already has an account of this type
-    if user_has_account_type(customer_id, pending_account_type):
-        flash_error("You already have an account of this type. Only one account of each type is allowed per user.")
+        # Registration success
+        session.clear()
+        session['customer'] = registration['username']
+        session['customer_id'] = get_customer_id_by_username(registration['username'])
+        flash_success("Welcome to your dashboard!")
         return redirect(url_for("customer.customer_dashboard"))
-
-    if form.validate_on_submit():
-        deposit_amount = form.deposit_amount.data
-        try:
-            openAcc.open_account(customer_id, pending_account_type, deposit_amount)
-            flash_success(f"{pending_account_name} opened successfully with an initial deposit of {deposit_amount}!")
-            session.pop('pending_account_type', None)
-            session.pop('pending_account_name', None)
-            return redirect(url_for("customer.customer_dashboard"))
-        except Exception as e:
-            flash_error(f"Error opening account: {str(e)}")
-
-    return render_template(
-        'registration/deposit_form.html', 
-        account_type=pending_account_name,
-        form=form,
-        form_action=url_for('registration.deposit_form')
-    )
+    return render_template('registration/register_step2.html', form=form)
 
 @register_bp.route("/register/teller-username", methods=["GET", "POST"])
 def register_teller_username():

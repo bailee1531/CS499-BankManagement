@@ -1,40 +1,65 @@
 let currentCustomerID = null;
 
 function submitUsernameEdit() {
-    const newUsername = document.getElementById("editUsernameInput").value.trim();
-  
-    if (!newUsername) return injectFlashMessage("danger", "Please enter a new username.");
-  
-    fetch("/teller/edit-username", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        customerId: currentCustomerID,
-        newUsername: newUsername
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        injectFlashMessage("success", "Username successfully updated.");
-        // Wait for a tiny delay
-        setTimeout(() => {
-          location.reload();
-        }, 3000);
-      } else {
-        injectFlashMessage("danger", "Failed to edit username: " + data.message);
-      }
-    });
+  const newUsername = document.getElementById("editUsernameInput").value.trim();
+  const editBtn = document.querySelector('button[onclick="submitUsernameEdit()"]');
+
+  if (!newUsername) return injectFlashMessage("danger", "Please enter a new username.");
+
+  // Disable the button temporarily
+  if (editBtn) {
+    editBtn.disabled = true;
+    editBtn.classList.add("disabled");
   }
+
+  fetch("/teller/edit-username", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      customerId: currentCustomerID,
+      newUsername: newUsername
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      injectFlashMessage("success", "Username successfully updated.");
+      // Wait for a tiny delay
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    } else {
+      injectFlashMessage("danger", "Failed to edit username: " + data.message);
+    }
+  })
+  .catch(() => {
+    injectFlashMessage("danger", "Error during username update.");
+  })
+  .finally(() => {
+    setTimeout(() => {
+      if (editBtn) {
+        editBtn.disabled = false;
+        editBtn.classList.remove("disabled");
+      }
+    }, 2000);
+  });
+}
   
 function resetCustomerPassword() {
   const oldPassword = document.getElementById("oldPasswordInput").value.trim();
   const newPassword = document.getElementById("newPasswordInput").value.trim();
+  const resetBtn = document.querySelector('button[onclick="resetCustomerPassword()"]');
 
   if (!oldPassword || !newPassword) {
     return injectFlashMessage("danger", "Please enter both the old and new passwords.");
+  }
+
+  // Disable the button temporarily
+  if (resetBtn) {
+    resetBtn.disabled = true;
+    resetBtn.classList.add("disabled");
   }
 
   fetch("/teller/reset-password", {
@@ -48,8 +73,21 @@ function resetCustomerPassword() {
   }).then(res => res.json()).then(data => {
     if (data.success) {
       injectFlashMessage("success", "Password reset successfully.");
+      document.getElementById("newPasswordInput").value = "";
+      document.getElementById("oldPasswordInput").value = "";
     }
     else injectFlashMessage("danger", "Failed to reset password: " + data.message);
+  })
+  .catch(() => {
+    injectFlashMessage("danger", "Error during password reset.");
+  })
+  .finally(() => {
+    setTimeout(() => {
+      if (resetBtn) {
+        resetBtn.disabled = false;
+        resetBtn.classList.remove("disabled");
+      }
+    }, 3000);
   });
 }
   

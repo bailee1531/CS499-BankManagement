@@ -31,8 +31,6 @@ def login_page_button_pressed(new_or_returning, type, username: str, password, *
     employeePath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/employees.csv'))
     logsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../csvFiles/logs.csv'))
 
-    username = username.lower()
-
     def new_account(userID) -> dict:
         """
         Creates a new private key for each new user, then saves private key to file associated with userID.
