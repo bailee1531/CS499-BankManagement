@@ -7,10 +7,19 @@
   padding: 2rem;
 }
 
+main {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
 .teller-dashboard h1 {
   color: #434343;
   margin-bottom: 1.5rem;
   text-align: center;
+  margin-top: 0;
+  padding-top: 1rem;
 }
 
 .teller-controls {

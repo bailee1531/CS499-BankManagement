@@ -18,36 +18,38 @@
 {% block title %}Teller Dashboard{% endblock %}
 
 {% block content %}
-<div class="teller-dashboard">
-  <h1>Customer Management</h1>
+<main>
+  <div class="teller-dashboard">
+    <h1>Customer Management</h1>
 
-  <div class="teller-controls">
-    <input type="text" id="searchBar" placeholder="Search Customer Name or ID..." onkeyup="filterCustomers()">
-    <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
-  </div>
-
-  <!-- Grid of customer cards -->
-  <div class="customer-grid" id="customerGrid">
-    {% for customer in customers %}
-    <div class="customer-card" onclick="openCustomerModal(
-      '{{ customer.CustomerID }}',
-      '{{ customer.Username }}',
-      '{{ customer.FirstName }}',
-      '{{ customer.LastName }}',
-      '{{ customer.PhoneNum }}',
-      '{{ customer.Email }}',
-      '{{ customer.Address }}')">
-      <div class="avatar">
-              <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
-            </div>
-      <div class="customer-info">
-        <strong>{{ customer.Username }}</strong>
-        <p>Customer ID: {{ customer.CustomerID }}</p>
-      </div>
+    <div class="teller-controls">
+      <input type="text" id="searchBar" placeholder="Search Customer Name or ID..." onkeyup="filterCustomers()">
+      <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
     </div>
-    {% endfor %}
+
+    <!-- Grid of customer cards -->
+    <div class="customer-grid" id="customerGrid">
+      {% for customer in customers %}
+      <div class="customer-card" onclick="openCustomerModal(
+        '{{ customer.CustomerID }}',
+        '{{ customer.Username }}',
+        '{{ customer.FirstName }}',
+        '{{ customer.LastName }}',
+        '{{ customer.PhoneNum }}',
+        '{{ customer.Email }}',
+        '{{ customer.Address }}')">
+        <div class="avatar">
+                <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
+              </div>
+        <div class="customer-info">
+          <strong>{{ customer.Username }}</strong>
+          <p>Customer ID: {{ customer.CustomerID }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
-</div>
+</main>
 
 <!-- Customer Modal -->
 <div id="customerModal" class="modal">
