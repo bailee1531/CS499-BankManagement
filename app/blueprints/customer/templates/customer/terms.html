@@ -2,6 +2,7 @@
 {% block title %}Terms of Service - Evergreen Bank{% endblock %}
 {% block meta_description %}Read the terms and conditions for using Evergreen Bank's services.{% endblock %}
 {% block head_extra %}
+{{ super() }} 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/terms.css') }}">
 {% endblock %}

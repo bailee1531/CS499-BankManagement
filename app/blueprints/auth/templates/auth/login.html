@@ -10,6 +10,10 @@
   {{ title or "Evergreen Bank - Login" }}
 {% endblock %}
 
+{% block head_extra %}
+{{ super() }} 
+{% endblock %}
+
 {# Main content block containing the login form #}
 {% block content %}
 <main>

@@ -320,11 +320,10 @@ footer {
 /* Flash Messages */
 .flash-messages {
     position: fixed;
-    z-index: 9999;
+    z-index: 10000; /* Increased z-index to appear above modal overlays */
     left: 0;
     width: 100%;
     pointer-events: none; /* Allow clicks to pass through the container */
-    background-color: var(--primary-bg);
 }
 
 /* Flash Messages: Individual alerts */
@@ -339,7 +338,6 @@ footer {
     max-width: 80%;
     pointer-events: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: var(--danger);
 }
 
 /* Success messages (flash green) */
@@ -357,6 +355,24 @@ footer {
 /* When fade-out is triggered */
 .flash-messages .alert.fade-out {
     opacity: 0;
+}
+
+.flash-messages .alert.modal-active {
+    position: relative;
+}
+
+/* Add a semi-transparent overlay to match the modal backdrop */
+.flash-messages .alert.modal-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: var(--border-radius);
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* Main Content Area */

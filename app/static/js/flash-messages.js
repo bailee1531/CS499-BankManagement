@@ -20,6 +20,17 @@ function injectFlashMessage(category, message) {
   const alert = document.createElement("div");
   alert.className = `alert alert-${category}`;
   alert.textContent = message;
+  
+  // Check if a modal is currently open
+  const isModalOpen = document.querySelector('.modal[style*="display: flex"]') || 
+                     document.querySelector('.modal.show') ||
+                     document.querySelector('.modal[style*="display: block"]');
+  
+  if (isModalOpen) {
+    // Add a special class when a modal is open to ensure it matches the overlay
+    alert.classList.add('modal-active');
+  }
+  
   container.appendChild(alert);
 
   // Auto-dismiss with fade-out

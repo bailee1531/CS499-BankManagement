@@ -92,7 +92,7 @@ def credit_cards() -> Response:
                 credit_cards = accounts_df[accounts_df["AccountType"] == "Credit Card"]
 
                 if len(credit_cards) >= 1:
-                    flash_error("You can only have up to 2 credit cards.")
+                    flash_error("You can only have up to 1 credit cards.")
                     return redirect(url_for("accounts.credit_cards"))
 
                 # Create the credit card account
