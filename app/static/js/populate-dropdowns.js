@@ -9,7 +9,8 @@ function populateAccountDropdown(customerID, dropdownId) {
             data.accounts.forEach(acc => {
                 const option = document.createElement("option");
                 option.value = acc.AccountID;
-                option.textContent = `${acc.AccountType} - ${acc.AccountID}`;
+                const bal = parseFloat(acc.CurrBal).toFixed(2);
+                option.textContent = `${acc.AccountType} - $${bal} (ID: ${acc.AccountID})`;
                 dropdown.appendChild(option);
             });
         } else {
