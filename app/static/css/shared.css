@@ -339,6 +339,7 @@ footer {
     max-width: 80%;
     pointer-events: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: var(--danger);
 }
 
 /* Success messages (flash green) */

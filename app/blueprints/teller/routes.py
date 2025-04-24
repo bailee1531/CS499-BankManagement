@@ -44,7 +44,7 @@ def teller_login():
             session['role'] = 'teller'
             return redirect(url_for("teller.teller_dashboard"))
         else:
-            flash("Invalid Teller credentials", "danger")
+            flash_error("Invalid Teller credentials", "danger")
 
     return render_template("auth/teller_login.html")
 
