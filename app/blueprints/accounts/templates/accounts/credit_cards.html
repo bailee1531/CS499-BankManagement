@@ -12,6 +12,7 @@ Evergreen Bank - Credit Cards
 
 {# Include page-specific CSS stylesheet #}
 {% block head_extra %}
+{{ super() }} 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
 {% endblock %}
 

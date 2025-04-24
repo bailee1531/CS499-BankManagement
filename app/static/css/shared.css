@@ -50,7 +50,7 @@ body {
     /* Set full height for the page */
     font-family: Arial, sans-serif;
     /* Use Arial or a sans-serif font as fallback */
-    background-color: var(--primary-bg);
+    background-color: var(--dark-bg); 
     /* Set the primary background color */
     line-height: 1.6;
     /* Set line height for better readability */
@@ -319,17 +319,25 @@ footer {
 
 /* Flash Messages */
 .flash-messages {
-    position: relative;
-    z-index: 9999;       /* Ensure it's above modals, overlays, etc. */
+    position: fixed;
+    z-index: 10000; /* Increased z-index to appear above modal overlays */
+    left: 0;
+    width: 100%;
+    pointer-events: none; /* Allow clicks to pass through the container */
 }
-/* Flash Messages: Generic alert styling remains */
+
+/* Flash Messages: Individual alerts */
 .flash-messages .alert {
+    margin: 0 auto;
+    margin-top: 10px;
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
-    margin-bottom: 1rem;
     color: var(--white);
     opacity: 1;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+    max-width: 80%;
+    pointer-events: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Success messages (flash green) */
@@ -349,6 +357,24 @@ footer {
     opacity: 0;
 }
 
+.flash-messages .alert.modal-active {
+    position: relative;
+}
+
+/* Add a semi-transparent overlay to match the modal backdrop */
+.flash-messages .alert.modal-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: var(--border-radius);
+    z-index: -1;
+    pointer-events: none;
+}
+
 /* Main Content Area */
 /* Center the main content using flexbox */
 main {
@@ -357,6 +383,8 @@ main {
     justify-content: center;
     align-items: center;
     padding: var(--spacing);
+    background-color: var(--primary-bg);
+    width: 100%; 
 }
 
 /* Login Container */

@@ -5,6 +5,15 @@
     padding: 2rem;
 }
 
+main {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
 .admin-dashboard h1 {
     color: #434343;
     margin-bottom: 1.5rem;
@@ -184,45 +193,52 @@
 }
 
 .main-dashboard-title {
+    padding-top: 1.5rem;
     text-align: center;
     color: #434343;
     margin-top: 2rem;
-}
+  }
 
 /* Styles for side-by-side top columns */
 .dashboard-container {
-    display: flex; /* Enable flexbox */
-    justify-content: space-between; /* Distribute space */
-    gap: 20px; /* Add space between the columns */
-}
+    display: flex; 
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+  }
 
 .admin-dashboard-column,
 .teller-dashboard-column {
-    flex: 1; /* Allow columns to grow and shrink equally */
-    min-width: 0; /* Prevent overflow issues with flex items */
-}
+    flex: 1;
+    min-width: 0;
+  }
 
-  /* Styles for the Logs section */
+/* Styles for the Logs section */
 .logs-section-wrapper {
-    padding: 0 20px 20px 20px; /* Match side padding of container */
+    width: 100%;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 0 20px;
 }
 
 .logs-section-wrapper h1 {
     color: #434343;
-    text-align: center; /* Center the "Logs" heading */
-    margin-bottom: 20px; /* Space below heading */
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .log-content {
-    display: flex;           /* Enable Flexbox */
-    justify-content: center; /* Center child horizontally */
+    display: flex;
+    justify-content: center;
 }
 
 /* Style the log container itself */
 #logsTableContainer {
     overflow-y: auto;
     max-height: 750px;
-    width: 60%;
+    max-width: 1200px;
+    width: 90%;
     box-sizing: border-box;
     white-space: normal;
 }
@@ -235,3 +251,15 @@
 .teller-grid, .customer-grid {
   width: 100%;
 }
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 992px) {
+    .dashboard-container {
+      flex-direction: column;
+    }
+    
+    .admin-dashboard-column,
+    .teller-dashboard-column {
+      width: 100%;
+    }
+  }

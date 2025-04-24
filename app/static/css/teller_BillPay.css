@@ -1,0 +1,176 @@
+/* teller_BillPay.css */
+/* Match the dark “thank-you-section” look from bill_pay.css */
+@import "shared.css";
+
+/* 1. Modal container — dark background, white text */
+#billPayModal .modal-content {
+  background-color: var(--dark-bg);
+  color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.08);
+  padding: 2.5rem 1.25rem;
+  max-width: 37.5rem;
+  width: 100%;
+  display: block !important;
+  text-align: left;
+}
+
+/* 2. Heading — same as .thank-you-section h2 */
+#billPayModal h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.9375rem;
+  color: var(--white);
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: var(--spacing) 0 1.5rem;
+}
+
+/* 3. Bill details (green card) */
+#billPayModal #billDetailsSection {
+  display: none; /* toggled via JS */
+  background-color: var(--light-accent);
+  padding: 1.25rem;
+  border-radius: var(--border-radius);
+  margin: 1.5rem 0;
+  text-align: left;
+}
+#billPayModal .bill-details p {
+  margin-bottom: 0.625rem;
+}
+#billPayModal .bill-details p strong {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+/* 4. Form groups — mirror .deposit-form styles */
+#billPayModal .form-group {
+  margin-bottom: 1.5625rem;
+  text-align: left;
+}
+#billPayModal label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--white);
+}
+
+/* 5. Inputs & selects */
+#billPayModal input[type="number"],
+#billPayModal input[type="text"],
+#billPayModal select {
+  width: 100%;
+  padding: 0.625rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+#billPayModal input:focus,
+#billPayModal select:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* readonly look */
+#billPayModal input[readonly],
+#billPayModal input[disabled] {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* 6. Two-column rows */
+#billPayModal .form-row,
+#billPayModal .billpay-form-row {
+  display: block !important;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+#billPayModal .form-col,
+#billPayModal .billpay-form-col {
+    display: block !important;
+    width: 100%;
+    margin-bottom: var(--spacing);
+}
+
+/* 7. Recurring option — copy .bill-recurring-section */
+#billPayModal .billpay-recurring-section {
+  display: none; /* toggled via JS */
+  margin: 1.5rem 0;
+}
+#billPayModal .billpay-recurring-container {
+  display: flex;
+  align-items: center;
+  background-color: #535353;
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--border-radius);
+  margin: 0 auto 1.5rem;
+  border-left: 3px solid var(--accent);
+  width: 100%;
+}
+#billPayModal .billpay-checkbox {
+  margin-right: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+#billPayModal .billpay-recurring-container label {
+  margin: 0;
+  font-weight: 500;
+  color: var(--white);
+}
+#billPayModal .billpay-recurring-container label::after {
+  content: "ⓘ";
+  margin-left: 0.5rem;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+#billPayModal .billpay-recurring-container .billpay-checkbox:checked {
+  animation: pulse 0.3s ease-in-out;
+}
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+#billPayModal .modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+#billPayModal .modal-buttons button {
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+#billPayModal .modal-buttons button:first-of-type {
+  background-color: #555;
+  color: #fff;
+}
+#billPayModal .billpay-action-btn {
+  background-color: var(--accent);
+  color: var(--white);
+}
+#billPayModal .billpay-action-btn:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+/* 10. Responsive stack */
+@media (max-width: 600px) {
+  #billPayModal .form-row,
+  #billPayModal .billpay-form-row {
+    flex-direction: column;
+  }
+}

@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/teller_dashboard.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/deposit.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teller_BillPay.css') }}">
 
 <script src="{{ url_for('static', filename='js/modal-context.js') }}"></script>
 <script src="{{ url_for('static', filename='js/edit-customer.js') }}"></script>
@@ -13,41 +14,44 @@
 <script src="{{ url_for('static', filename='js/customer-accounts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/populate-dropdowns.js') }}"></script>
 <script src="{{ url_for('static', filename='js/flash-messages.js') }}"></script>
+<script src="{{ url_for('static', filename='js/teller_BillPay.js') }}"></script>
 {% endblock %}
 
 {% block title %}Teller Dashboard{% endblock %}
 
 {% block content %}
-<div class="teller-dashboard">
-  <h1>Customer Management</h1>
+<main>
+  <div class="teller-dashboard">
+    <h1>Customer Management</h1>
 
-  <div class="teller-controls">
-    <input type="text" id="searchBar" placeholder="Search Customer Name or ID..." onkeyup="filterCustomers()">
-    <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
-  </div>
-
-  <!-- Grid of customer cards -->
-  <div class="customer-grid" id="customerGrid">
-    {% for customer in customers %}
-    <div class="customer-card" onclick="openCustomerModal(
-      '{{ customer.CustomerID }}',
-      '{{ customer.Username }}',
-      '{{ customer.FirstName }}',
-      '{{ customer.LastName }}',
-      '{{ customer.PhoneNum }}',
-      '{{ customer.Email }}',
-      '{{ customer.Address }}')">
-      <div class="avatar">
-              <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
-            </div>
-      <div class="customer-info">
-        <strong>{{ customer.Username }}</strong>
-        <p>Customer ID: {{ customer.CustomerID }}</p>
-      </div>
+    <div class="teller-controls">
+      <input type="text" id="searchBar" placeholder="Search Customer Name or ID..." onkeyup="filterCustomers()">
+      <button class="create-btn" onclick="openAccountModal()">Open Customer Account</button>
     </div>
-    {% endfor %}
+
+    <!-- Grid of customer cards -->
+    <div class="customer-grid" id="customerGrid">
+      {% for customer in customers %}
+      <div class="customer-card" onclick="openCustomerModal(
+        '{{ customer.CustomerID }}',
+        '{{ customer.Username }}',
+        '{{ customer.FirstName }}',
+        '{{ customer.LastName }}',
+        '{{ customer.PhoneNum }}',
+        '{{ customer.Email }}',
+        '{{ customer.Address }}')">
+        <div class="avatar">
+                <img src="{{ customer.avatar_url }}" alt="{{ customer.Username }}'s Avatar" class="avatar-image">
+              </div>
+        <div class="customer-info">
+          <strong>{{ customer.Username }}</strong>
+          <p>Customer ID: {{ customer.CustomerID }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
-</div>
+</main>
 
 <!-- Customer Modal -->
 <div id="customerModal" class="modal">
@@ -106,6 +110,7 @@
         <button onclick="openDepositModal()">Deposit</button>
         <button onclick="openWithdrawModal()">Withdraw</button>
         <button onclick="openTransferModal()">Transfer</button>
+        <button onclick="openBillPayModal()">Bill Pay</button>
       </div>
       <hr>
 
@@ -271,6 +276,69 @@
           <button onclick="closeTransferModal()">Cancel</button>
           <button class="action-btn" onclick="submitTransfer()">Transfer</button>
       </div>
+  </div>
+</div>
+
+<!-- Bill Pay Modal -->
+<div id="billPayModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeBillPayModal()">&times;</span>
+    <h2>Pay Customer Bill</h2>
+
+    <!-- Bill Details Section -->
+    <div id="billDetailsSection" style="display: none;">
+      <h3>Bill Details</h3>
+      <div id="billDetailsContent" class="bill-details">
+        <p><strong>Bill Amount:</strong>$<span id="billAmount">0.00</span></p>
+        <p><strong>Minimum Payment:</strong> $<span id="minPaymentAmount">0.00</span></p>
+        <p><strong>Due Date:</strong> <span id="billDueDate">N/A</span></p>
+        <p><strong>Payee Name:</strong> <span id="billPayeeName">N/A</span></p>
+        <p><strong>Account Balance:</strong> $<span id="currentBalance">0.00</span></p>
+      </div>
+    </div>
+
+    <div class="billpay-form-row">
+      <div class="billpay-form-col">
+        <div class="form-group">
+          <label for="billPaymentAccountId">Select Bill Account:</label>
+          <select id="billPaymentAccountId" name="billAccountId" required></select>
+        </div>
+      </div>
+      <div class="billpay-form-col">
+        <div class="form-group">
+          <label for="paymentSourceAccountId">Payment Source Account:</label>
+          <select id="paymentSourceAccountId" name="paymentSourceAccountId" required></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- payment amount -->
+    <div class="form-group">
+      <label for="billPaymentAmount">Payment Amount:</label>
+      <input
+        type="number"
+        step="0.01"
+        id="billPaymentAmount"
+        name="amount"
+        placeholder="Enter Amount (e.g., 100.00)"
+        required>
+    </div>
+
+  
+
+    <!-- Recurring Payment Option -->
+    <div id="recurringPaymentSection" class="billpay-recurring-section" style="display: none;">
+      <div class="billpay-recurring-container">
+        <input type="checkbox" id="isRecurringPayment" class="billpay-checkbox">
+        <label for="isRecurringPayment">Make this a recurring monthly payment</label>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="modal-buttons">
+      <button onclick="closeBillPayModal()">Cancel</button>
+      <button class="billpay-action-btn" id="billpayButton" onclick="submitBillPayment()">Pay Bill</button>
+    </div>
   </div>
 </div>
 

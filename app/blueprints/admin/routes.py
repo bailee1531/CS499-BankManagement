@@ -43,7 +43,7 @@ def admin_login():
             session['role'] = 'admin'
             return redirect(url_for("admin.admin_dashboard"))
         else:
-            flash("Invalid Admin credentials", "danger")
+            flash_error("Invalid Admin credentials", "danger")
 
     return render_template("auth/admin_login.html")
 
@@ -92,14 +92,14 @@ def admin_dashboard():
                 for teller in tellers:
                     teller["avatar_url"] = get_unique_identicon_url(teller["Username"])
             else:
-                flash("CSV file missing required columns.", "danger")
+                flash_error("CSV file missing required columns.", "danger")
                 tellers = []
         else:
             flash("CSV file is empty or not found.", "warning")
             tellers = []
 
     except Exception as e:
-        flash(f"Error reading CSV: {e}", "danger")
+        flash_error(f"Error reading CSV: {e}", "danger")
         tellers = []
         customers = []
         logs = []

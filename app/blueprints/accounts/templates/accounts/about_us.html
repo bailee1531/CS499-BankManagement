@@ -6,6 +6,7 @@ Welcome to Evergreen Bank. Your trusted partner in financial solutions.
 Evergreen Bank - About Us
 {% endblock %}
 {% block head_extra %}
+{{ super() }} 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
 {% endblock %}
 {% block content %}

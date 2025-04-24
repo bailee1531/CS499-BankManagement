@@ -57,7 +57,7 @@ def process_login(form: LoginForm, session_key: str, login_type: int) -> Tuple[O
     """
     # Prevent user from logging in again if already logged in
     if session.get(session_key):
-        flash("Already Logged In", "warning")
+        flash_error("Already Logged In", "warning")
         if session_key == "customer":
             return url_for('customer.customer_dashboard'), None
         elif session_key == "teller":

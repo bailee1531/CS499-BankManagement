@@ -12,6 +12,7 @@ Evergreen Bank - Personal Accounts
 
 {# Include page-specific CSS file #}
 {% block head_extra %}
+{{ super() }} 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/accounts.css') }}">
 {% endblock %}
 
