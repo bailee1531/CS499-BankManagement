@@ -36,7 +36,7 @@ function openBillPayModal() {
 function resetBillPayModalState() {
     const details = document.getElementById('billDetailsSection');
     if (details) details.style.display = 'none';
-
+    document.getElementById('billAmount').textContent = 'N/A';
     document.getElementById('minPaymentAmount').textContent = '0.00';
     document.getElementById('billDueDate').textContent      = 'N/A';
     document.getElementById('billPayeeName').textContent    = 'N/A';
@@ -101,6 +101,7 @@ function fetchBillInfo(accountId) {
     // Show loading state
     const details = document.getElementById('billDetailsSection');
     details.style.display = 'block';
+    document.getElementById('billAmount').textContent = 'Loading...';
     document.getElementById('minPaymentAmount').textContent = 'Loading...';
     document.getElementById('billDueDate').textContent      = 'Loading...';
     document.getElementById('billPayeeName').textContent    = 'Loading...';
