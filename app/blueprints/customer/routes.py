@@ -458,7 +458,6 @@ def withdraw_money(account_id=None) -> Response:
 # =============================================================================
 # Transfer Route
 # =============================================================================
-
 @customer_bp.route('/account/transfer', methods=['GET', 'POST'])
 @login_required('customer')
 def transfer_funds() -> Response:

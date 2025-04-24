@@ -718,7 +718,6 @@ def transfer():
 # -----------------------
 # Bill Payment API Routes
 # -----------------------
-
 @teller_bp.route('/api/bill-info/<int:account_id>', methods=['GET'])
 @login_required("teller")
 def teller_get_bill_info(account_id):
@@ -761,7 +760,6 @@ def get_account_balance(account_id):
 # ------------------------------
 # Bill Payment Helper Functions
 # ------------------------------
-
 def find_active_bill(account_id):
     """
     Finds the active bill for an account.

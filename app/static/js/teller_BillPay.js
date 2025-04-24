@@ -124,6 +124,7 @@ function fetchBillInfo(accountId) {
 
             // Display details
             if (data.bill_id) {
+                document.getElementById('billAmount').textContent = Math.abs(data.amount.toFixed(2));
                 document.getElementById('minPaymentAmount').textContent = data.min_payment.toFixed(2);
                 document.getElementById('billDueDate').textContent      = data.due_date || 'N/A';
                 document.getElementById('billPayeeName').textContent    = data.payee_name || 'Evergreen Bank';
@@ -145,6 +146,7 @@ function fetchBillInfo(accountId) {
  * Fallback display when no active bill is found
  */
 function handleNoBillScenario(accountId, accountType) {
+    const amtElem = document.getElementById('billAmount');
     const minElem  = document.getElementById('minPaymentAmount');
     const dateElem = document.getElementById('billDueDate');
     const nameElem = document.getElementById('billPayeeName');
@@ -153,16 +155,19 @@ function handleNoBillScenario(accountId, accountType) {
     if (['Credit Card','Travel Visa'].includes(accountType)) {
         const bal = Math.abs(parseFloat(billAccountData[accountId]?.CurrBal || 0));
         const min = bal >= 100 ? 100 : bal;
+        amtElem.textContent = 'Not scheduled';
         minElem.textContent  = min.toFixed(2);
         dateElem.textContent = 'Not scheduled';
         nameElem.textContent = 'Evergreen Bank';
         if (balElem) balElem.textContent = bal.toFixed(2);
     } else if (accountType === 'Mortgage Loan') {
+        amtElem.textContent = 'No active mortgage bill';
         minElem.textContent  = '0.00';
         dateElem.textContent = 'No active mortgage bill';
         nameElem.textContent = 'Evergreen Bank';
         if (balElem) balElem.textContent = Math.abs(parseFloat(billAccountData[accountId]?.CurrBal || 0)).toFixed(2);
     } else {
+        amtElem.textContent = 'No active bills';
         minElem.textContent  = '0.00';
         dateElem.textContent = 'No active bills';
         nameElem.textContent = 'N/A';
