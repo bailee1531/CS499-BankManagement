@@ -24,7 +24,7 @@ function loadTransactions(accountId, accountType) {
         } else {
           data.transactions.forEach(txn => {
             const li = document.createElement("li");
-            li.textContent = `${txn.TransDate} | ${txn.TransType} | $${txn.Amount}`;
+            li.textContent = `${txn.TransDate} | ${txn.TransactionType} | $${txn.Amount}`;
             list.appendChild(li);
           });
         }
