@@ -114,7 +114,7 @@ def deposit(accID, amount) -> dict:
         else:
             transaction_type = 'Payment to Mortgage Loan'
     else:
-        transaction_type = 'Deposit to account'
+        transaction_type = 'Deposit'
     
     currentBal += Decimal(amount).quantize(Decimal('0.00'))
     accInfo['CreditLimit'] = accInfo['CreditLimit'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
