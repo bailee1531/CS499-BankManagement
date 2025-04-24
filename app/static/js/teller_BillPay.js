@@ -36,7 +36,7 @@ function openBillPayModal() {
 function resetBillPayModalState() {
     const details = document.getElementById('billDetailsSection');
     if (details) details.style.display = 'none';
-    document.getElementById('billAmount').textContent = 'N/A';
+    document.getElementById('billAmount').textContent = '0.00';
     document.getElementById('minPaymentAmount').textContent = '0.00';
     document.getElementById('billDueDate').textContent      = 'N/A';
     document.getElementById('billPayeeName').textContent    = 'N/A';
@@ -156,19 +156,19 @@ function handleNoBillScenario(accountId, accountType) {
     if (['Credit Card','Travel Visa'].includes(accountType)) {
         const bal = Math.abs(parseFloat(billAccountData[accountId]?.CurrBal || 0));
         const min = bal >= 100 ? 100 : bal;
-        amtElem.textContent = 'Not scheduled';
+        amtElem.textContent = '0.00';
         minElem.textContent  = min.toFixed(2);
         dateElem.textContent = 'Not scheduled';
         nameElem.textContent = 'Evergreen Bank';
         if (balElem) balElem.textContent = bal.toFixed(2);
     } else if (accountType === 'Mortgage Loan') {
-        amtElem.textContent = 'No active mortgage bill';
+        amtElem.textContent = '0.00';
         minElem.textContent  = '0.00';
         dateElem.textContent = 'No active mortgage bill';
         nameElem.textContent = 'Evergreen Bank';
         if (balElem) balElem.textContent = Math.abs(parseFloat(billAccountData[accountId]?.CurrBal || 0)).toFixed(2);
     } else {
-        amtElem.textContent = 'No active bills';
+        amtElem.textContent = '0.00';
         minElem.textContent  = '0.00';
         dateElem.textContent = 'No active bills';
         nameElem.textContent = 'N/A';
