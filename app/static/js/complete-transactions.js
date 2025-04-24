@@ -10,51 +10,68 @@ function closeDepositModal() {
 
 function submitDeposit() {
     const accountId = document.getElementById("depositAccountId").value;
-    const amount = document.getElementById("depositAmount").value;
+    const amountStr = document.getElementById("depositAmount").value;
     const depositBtn = document.querySelector('#depositModal .modal-buttons .action-btn');
-
-    if (!accountId || !amount) {
-        injectFlashMessage("danger", "Please enter both Account ID and the deposit amount.");
-        return;
+  
+    if (!accountId || !amountStr) {
+      injectFlashMessage("danger", "Please enter both Account ID and the deposit amount.");
+      return;
     }
-    
-    // Disable button temporarily
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount) || amount <= 0) {
+      injectFlashMessage("danger", "Deposit amount must be a positive number.");
+      return;
+    }
+  
     depositBtn.disabled = true;
     depositBtn.classList.add("disabled");
-
-    const payload = {
-        accountId: accountId,
-        amount: amount
-    };
-
-    fetch("/teller/deposit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            injectFlashMessage("success", data.message);
-            // Wait for a tiny delay
-            setTimeout(() => {
-              location.reload();
-            }, 3000);
-        } else {
-            injectFlashMessage("danger", "Error: " + data.message);
+  
+    // Fetch current balance & type
+    fetch(`/teller/api/account-balance/${accountId}`)
+      .then(r => r.json())
+      .then(info => {
+        const type    = info.account_type;   
+        const balance = parseFloat(info.balance);
+  
+        // Block over‐payment on Credit Card or Mortgage
+        if ((type === "Credit Card" || type === "Mortgage Loan")
+            && amount > Math.abs(balance)) {
+          injectFlashMessage(
+            "danger",
+            `Cannot deposit more than remaining balance ($${Math.abs(balance).toFixed(2)}).`
+          );
+          throw "overpayment";
         }
-    })
-    .catch(err => {
-        injectFlashMessage("danger", "Failed to process deposit.");
-        console.error(err);
-    })
-    .finally(() => {
+  
+        // Proceed with deposit
+        return fetch("/teller/deposit", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ accountId, amount: amountStr })
+        });
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          injectFlashMessage("success", data.message);
+          setTimeout(() => location.reload(), 3000);
+        } else {
+          injectFlashMessage("danger", "Error: " + data.message);
+        }
+      })
+      .catch(err => {
+        if (err !== "overpayment") {
+          injectFlashMessage("danger", "Failed to process deposit.");
+          console.error(err);
+        }
+      })
+      .finally(() => {
         setTimeout(() => {
-            depositBtn.disabled = false;
-            depositBtn.classList.remove("disabled");
+          depositBtn.disabled = false;
+          depositBtn.classList.remove("disabled");
         }, 4000);
-    });
-}
+      });
+  }  
 
 function openWithdrawModal() {
     populateAccountDropdown(currentCustomerID, "withdrawAccountId");

@@ -2,7 +2,7 @@ from flask import Blueprint, Response, request, session, current_app, render_tem
 from app.blueprints.sharedUtilities import (
     get_csv_path, login_required, flash_error, flash_success, get_account_transactions, get_customer_accounts
 )
-from .forms import TellerSettingsForm
+from .forms import TellerSettingsForm, BillPaymentForm
 from Crypto.PublicKey import ECC
 from decimal import Decimal
 import pandas as pd
@@ -10,6 +10,12 @@ import hashlib
 import json
 import csv
 import os
+import logging
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Blueprint for teller routes
 teller_bp = Blueprint('teller', __name__, template_folder='templates')
@@ -573,6 +579,7 @@ def deposit():
         accIndex = df.loc[df['AccountID'] == accountID].index[0]
 
         bal = Decimal(df.at[accIndex, 'CurrBal'])
+        account_type = df.at[accIndex, 'AccountType']
 
         if not accountID or not amount:
             return jsonify(success=False, message="Account ID and deposit amount are required.")
@@ -581,6 +588,12 @@ def deposit():
             amount = Decimal(amount)
             if amount <= Decimal("0.00"):
                 return jsonify(success=False, message="Deposit amount must be positive.")
+            if account_type in ["Mortgage Loan", "Credit Card"]:
+                if amount > abs(bal):
+                    return jsonify(
+                        success=False,
+                        message=f"Cannot deposit more than remaining balance (${abs(bal):.2f})."
+                    )
             result = deposit(accountID, amount)
         except ValueError:
             return jsonify(success=False, message="Invalid account ID or deposit amount format.")
@@ -589,6 +602,11 @@ def deposit():
             bal += Decimal(amount)
             df.at[accIndex, 'CurrBal'] = Decimal(bal)
             df['CurrBal'] = df['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+            if account_type in ["Mortgage Loan", "Credit Card"] and bal == Decimal("0.00"):
+                bills_path = get_csv_path("bills.csv")
+                bills_df = pd.read_csv(bills_path)
+                bills_df = bills_df[bills_df['AccountID'] != accountID]
+                bills_df.to_csv(bills_path, index=False)
             df.to_csv(accPath, index=False)
             return jsonify(success=True, message="Deposit completed.")
         else:
@@ -696,3 +714,123 @@ def transfer():
     except Exception as e:
         print(f"Transfer failed: {e}")
         return jsonify(success=False, message="Transfer failed.")
+
+# -----------------------
+# Bill Payment API Routes
+# -----------------------
+
+@teller_bp.route('/api/bill-info/<int:account_id>', methods=['GET'])
+@login_required("teller")
+def teller_get_bill_info(account_id):
+    """
+    Retrieve bill information for an account (teller access).
+    Returns:
+    JSON: Bill information or status message
+    """
+    try:
+        # Find active bill for the account
+        bill_data = find_active_bill(account_id)
+        if bill_data:
+            return jsonify(bill_data)
+        else:
+            return jsonify({
+                "message": "No active bill found for this account."
+            })
+    except Exception as e:
+        logger.error(f"Error retrieving bill for account {account_id}: {e}")
+        return jsonify({"error": f"Failed to get bill information: {str(e)}"}), 500
+
+@teller_bp.route('/api/account-balance/<int:account_id>', methods=['GET'])
+@login_required("teller")
+def get_account_balance(account_id):
+    """
+    Retrieve the current balance and type of an account.
+    
+    Returns:
+        JSON: Account balance information or error message
+    """
+    try:
+        # Load account data
+        account_data = load_account_data(account_id)
+        
+        return jsonify(account_data)
+    except Exception as e:
+        logger.error(f"Error retrieving balance for account {account_id}: {e}")
+        return jsonify({"error": f"Failed to get balance: {str(e)}"}), 500
+
+# ------------------------------
+# Bill Payment Helper Functions
+# ------------------------------
+
+def find_active_bill(account_id):
+    """
+    Finds the active bill for an account.
+    
+    Returns:
+        dict or None: Bill information if found, None otherwise
+    """
+    # Load bills data
+    try:
+        bills_df = pd.read_csv(get_csv_path("bills.csv"))
+        bills_df["PaymentAccID"] = bills_df["PaymentAccID"].astype(int)
+        
+        # Filter for active bills for this account
+        matching = bills_df[
+            (bills_df["PaymentAccID"] == account_id) & 
+            (bills_df["Status"].isin(["Pending", "PartiallyPaid", "Late"]))
+        ]
+        
+        if not matching.empty:
+            # Convert dates and find earliest due bill
+            matching.loc[:, "DueDate"] = pd.to_datetime(matching["DueDate"], errors="coerce")
+            earliest_bill = matching.sort_values("DueDate").iloc[0]
+            
+            # Format bill data
+            return {
+                "bill_id": int(earliest_bill["BillID"]),
+                "amount": float(earliest_bill["Amount"]),
+                "min_payment": float(earliest_bill["MinPayment"]),
+                "due_date": earliest_bill["DueDate"].strftime("%Y-%m-%d"),
+                "payee_name": earliest_bill["PayeeName"],
+                "status": earliest_bill["Status"]
+            }
+    except Exception as e:
+        logger.error(f"Error finding active bill: {e}")
+    
+    return None
+
+def load_account_data(account_id):
+    """
+    Loads account information including balance and account type.
+    For credit cards, also calculates the minimum payment.
+    
+    Returns:
+        dict: Account information
+    """
+    # Retrieve account information
+    accounts_df = pd.read_csv(get_csv_path("accounts.csv"))
+    account_row = accounts_df[accounts_df["AccountID"] == account_id]
+    
+    if account_row.empty:
+        raise ValueError("Account not found")
+        
+    account = account_row.iloc[0]
+    account_type = account["AccountType"].upper()
+    balance = Decimal(str(account["CurrBal"])).quantize(Decimal("0.00"))
+    
+    # Build response data
+    account_data = {
+        "balance": float(balance),
+        "account_type": account_type,
+        "amount_due": None
+    }
+    
+    # For credit cards, calculate minimum payment
+    if account_type in ["CREDIT CARD", "TRAVEL VISA"]:
+        # Credit cards have negative balances when money is owed
+        if balance < Decimal("0.00"):
+            # Calculate minimum payment (2% of balance or $25, whichever is greater)
+            min_payment = max(Decimal("25.00"), abs(balance) * Decimal("0.02")).quantize(Decimal("0.00"))
+            account_data["amount_due"] = float(min_payment)
+    
+    return account_data

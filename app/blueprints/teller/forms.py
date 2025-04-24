@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask import request
-from wtforms import StringField, PasswordField, DecimalField, SelectField, SubmitField
+from wtforms import StringField, PasswordField, DecimalField, SelectField, SubmitField, HiddenField, DateField, BooleanField
 from wtforms.validators import Regexp, Optional, Length, Email, NumberRange, DataRequired
 from app.blueprints.sharedUtilities import get_customer_accounts, flash_error
 
@@ -67,6 +67,60 @@ class TransferForm(FlaskForm):
         'Transfer Amount ($)',
         validators=[DataRequired(), NumberRange(min=0, message="Amount must be positive.")]
     )
+
+# -----------------
+# Bill Payment Form
+# -----------------
+class BillPaymentForm(FlaskForm):
+    """
+    Form for processing bill payments by tellers.
+    """
+    bill_id = HiddenField('Bill ID')
+    bill_type = HiddenField('Bill Type', default='Regular')
+    
+    billAccountId = SelectField(
+        'Bill Account',
+        validators=[DataRequired()],
+        coerce=int
+    )
+    
+    paymentSourceId = SelectField(
+        'Payment Source Account',
+        validators=[DataRequired()],
+        coerce=int
+    )
+    
+    amount = DecimalField(
+        'Payment Amount ($)',
+        places=2,
+        validators=[
+            DataRequired(),
+            NumberRange(min=0.01, message="Payment amount must be greater than zero.")
+        ]
+    )
+    
+    payee_name = StringField(
+        'Payee Name',
+        validators=[Optional(), Length(max=100)]
+    )
+    
+    payee_address = StringField(
+        'Payee Address',
+        validators=[Optional(), Length(max=200)]
+    )
+    
+    due_date = DateField(
+        'Due Date',
+        format='%Y-%m-%d',
+        validators=[Optional()]
+    )
+    
+    is_recurring = BooleanField(
+        'Make Recurring Payment',
+        default=False
+    )
+    
+    submit = SubmitField('Process Payment')
 
 # --------------------------------
 # Dropdown for Choosing an Account
