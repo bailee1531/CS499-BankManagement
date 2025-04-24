@@ -68,12 +68,12 @@ function populateBillPaymentAccounts(accounts) {
     }
 
     billable.forEach(addOption);
-    if (billable.length && others.length) {
-        const sep = document.createElement('option'); sep.disabled = true;
-        sep.textContent = '──────────────';
-        select.appendChild(sep);
+    if (billable.length === 0) {
+        select.innerHTML = '<option value="" disabled selected>No bill accounts available</option>';
+        select.disabled = true;
+    } else {
+        select.disabled = false; // Ensure dropdown is enabled if accounts are present
     }
-    others.forEach(addOption);
 }
 
 function populatePaymentSourceAccounts(accounts) {
@@ -191,6 +191,64 @@ function handleBillAccountChange() {
 function closeBillPayModal() {
     document.getElementById('billPayModal').style.display = 'none';
     resetBillPayModalState();
+}
+
+function submitBillPayment() {
+    const accountIdSelect = document.getElementById('billPaymentAccountId');
+    const accountId = accountIdSelect.value; // Get the selected account ID
+
+    const amountInput = document.getElementById('billPaymentAmount');
+    const amount = amountInput.value.trim(); // Get the entered amount and remove whitespace
+
+    const submitButton = document.getElementById('billpayButton');
+
+    if (!amount) {
+        if (submitButton) submitButton.disabled = false;
+        return; // Stop if amount is empty
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+        if (submitButton) submitButton.disabled = false;
+        return; // Stop if amount is not a positive number
+    }
+
+    const dataToSend = {
+        billAmount: amount
+    };
+
+    fetch(`/teller/pay-bill/${accountId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend) // Convert JS object to JSON string
+    })
+    .then(response => {
+        if (!response.ok) {
+             return response.json().then(errData => {
+                 throw new Error(errData.message || `Server error: ${response.status}`);
+             }).catch(() => {
+                 throw new Error(`Server error: ${response.status}`);
+             });
+        }
+         const contentType = response.headers.get('content-type');
+         if (!contentType || !contentType.includes('application/json')) {
+             throw new Error('Received non-JSON response from server.');
+         }
+        return response.json();
+    })
+    .then(result => {
+        if (result.success) {
+            amountInput.value = '';
+            fetchBillInfo(accountId);
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting bill payment:', error);
+    })
+    .finally(() => {
+        if (submitButton) submitButton.disabled = false;
+    });
 }
 
 // Attach event listener for account selection

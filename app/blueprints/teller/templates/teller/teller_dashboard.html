@@ -293,7 +293,7 @@
         <p><strong>Minimum Payment:</strong> $<span id="minPaymentAmount">0.00</span></p>
         <p><strong>Due Date:</strong> <span id="billDueDate">N/A</span></p>
         <p><strong>Payee Name:</strong> <span id="billPayeeName">N/A</span></p>
-        <p><strong>Current Balance:</strong> $<span id="currentBalance">0.00</span></p>
+        <p><strong>Account Balance:</strong> $<span id="currentBalance">0.00</span></p>
       </div>
     </div>
 
@@ -337,7 +337,7 @@
     <!-- Action Buttons -->
     <div class="modal-buttons">
       <button onclick="closeBillPayModal()">Cancel</button>
-      <button class="billpay-action-btn" onclick="submitBillPayment()">Pay Bill</button>
+      <button class="billpay-action-btn" id="billpayButton" onclick="submitBillPayment()">Pay Bill</button>
     </div>
   </div>
 </div>

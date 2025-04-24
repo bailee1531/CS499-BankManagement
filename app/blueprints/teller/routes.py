@@ -718,6 +718,82 @@ def transfer():
 # -----------------------
 # Bill Payment API Routes
 # -----------------------
+@teller_bp.route('/pay-bill/<int:account_id>', methods=['GET', 'POST'])
+@login_required("teller")
+def pay_bill(account_id: int):
+    """
+    Handles bill payment for a specified account.
+    - For credit cards: Allows partial payment (if >= minimum payment)
+    - For mortgages: Requires full payment of monthly amount
+    - For recurring bills: Allows payment and maintains recurrence
+    """
+    import random
+    data = request.get_json()
+
+    try:
+        billPath = get_csv_path("bills.csv")
+        df = pd.read_csv(billPath)
+        df['Amount'] = df['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+
+        transactionPath = get_csv_path("transactions.csv")
+        transactionDF = pd.read_csv(transactionPath)
+
+        accPath = get_csv_path("accounts.csv")
+        accDF = pd.read_csv(accPath)
+
+        accIndex = accDF.loc[accDF['AccountID'] == account_id].index[0]
+        accDF['CurrBal'] = accDF['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        currBal = accDF.at[accIndex, 'CurrBal']
+
+        payAmount = data.get("billAmount").strip()
+        billIndex = df.loc[df['PaymentAccID'] == account_id].index[0]
+        billType = df.at[billIndex, 'BillType']
+        billAmount = df.at[billIndex, 'Amount']
+        
+        if not account_id or not payAmount:
+            return jsonify(success=False, message="Account ID and amount are required.")
+
+        if billType in ['CreditCard', 'Mortgage']:
+            if payAmount:
+                payAmount = payAmount.strip()
+                currBal += Decimal(payAmount)
+                billAmount += Decimal(payAmount)
+        else:
+            if payAmount:
+                payAmount = payAmount.strip()
+                currBal -= Decimal(payAmount)
+                billAmount -= Decimal(payAmount)
+
+        df.at[billIndex, 'Amount'] = Decimal(billAmount)
+        df['Amount'] = df['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        if billAmount == Decimal('0.00'):
+            df.at[billIndex, 'Status'] = 'Paid'
+        else:
+            df.at[billIndex, 'Status'] = 'PartiallyPaid'
+
+        transactionID = random.randint(999, 9999)
+        while transactionID in transactionDF['TransactionID']:
+            transactionID = random.randint(999, 9999)
+        newTransactionRow = {'TransactionID': transactionID,
+                             'AccountID': account_id,
+                             'TransactionType': 'Bill Payment',
+                             'Amount': Decimal(payAmount),
+                             'TransDate': datetime.today()
+                            }
+        transactionDF.loc[len(transactionDF)] = newTransactionRow
+        accDF.at[accIndex, 'CurrBal'] = Decimal(currBal)
+
+        accDF.to_csv(accPath, index=False)
+        transactionDF.to_csv(transactionPath, index=False)
+        df.to_csv(billPath, index=False)
+        teller_get_bill_info(account_id)
+        flash_success("Bill payment completed.")
+        return jsonify(success=True, message="Bill payment completed.")
+    except Exception as e:
+        print(f"Bill payment failed: {e}")
+        flash_error("Bill payment failed")
+        return jsonify(success=False, message="Bill payment failed.")
+
 @teller_bp.route('/api/bill-info/<int:account_id>', methods=['GET'])
 @login_required("teller")
 def teller_get_bill_info(account_id):
