@@ -745,10 +745,16 @@ def pay_bill(account_id: int):
         accDF['CurrBal'] = accDF['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
         currBal = accDF.at[accIndex, 'CurrBal']
 
-        payAmount = data.get("billAmount").strip()
+        payAmount = data.get('billAmount').strip()
         billIndex = df.loc[df['PaymentAccID'] == account_id].index[0]
         billType = df.at[billIndex, 'BillType']
         billAmount = df.at[billIndex, 'Amount']
+
+        payAccountId = data.get('payAccount').strip()
+        payAccountId = int(payAccountId)
+        payAccIndex = accDF.loc[accDF['AccountID'] == payAccountId].index[0]
+        accDF['CurrBal'] = accDF['CurrBal'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
+        payAccBal = accDF.at[payAccIndex, 'CurrBal']
         
         if not account_id or not payAmount:
             return jsonify(success=False, message="Account ID and amount are required.")
@@ -758,11 +764,7 @@ def pay_bill(account_id: int):
                 payAmount = payAmount.strip()
                 currBal += Decimal(payAmount)
                 billAmount += Decimal(payAmount)
-        else:
-            if payAmount:
-                payAmount = payAmount.strip()
-                currBal -= Decimal(payAmount)
-                billAmount -= Decimal(payAmount)
+                payAccBal -= Decimal(payAmount)
 
         df.at[billIndex, 'Amount'] = Decimal(billAmount)
         df['Amount'] = df['Amount'].apply(lambda x: Decimal(str(x)).quantize(Decimal('0.00')))
@@ -781,12 +783,14 @@ def pay_bill(account_id: int):
                              'TransDate': datetime.today()
                             }
         transactionDF.loc[len(transactionDF)] = newTransactionRow
+
         accDF.at[accIndex, 'CurrBal'] = Decimal(currBal)
+        accDF.at[payAccIndex, 'CurrBal'] = Decimal(payAccBal)
 
         accDF.to_csv(accPath, index=False)
         transactionDF.to_csv(transactionPath, index=False)
         df.to_csv(billPath, index=False)
-        teller_get_bill_info(account_id)
+
         flash_success("Bill payment completed.")
         return jsonify(success=True, message="Bill payment completed.")
     except Exception as e:

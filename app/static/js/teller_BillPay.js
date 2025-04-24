@@ -194,8 +194,11 @@ function closeBillPayModal() {
 }
 
 function submitBillPayment() {
-    const accountIdSelect = document.getElementById('billPaymentAccountId');
-    const accountId = accountIdSelect.value; // Get the selected account ID
+    const billAccountIdSelect = document.getElementById('billPaymentAccountId');
+    const billAccountId = billAccountIdSelect.value;
+
+    const payAccountIdSelect = document.getElementById('paymentSourceAccountId');
+    const payAccountId = payAccountIdSelect.value;
 
     const amountInput = document.getElementById('billPaymentAmount');
     const amount = amountInput.value.trim(); // Get the entered amount and remove whitespace
@@ -213,10 +216,11 @@ function submitBillPayment() {
     }
 
     const dataToSend = {
-        billAmount: amount
+        billAmount: amount,
+        payAccount: payAccountId
     };
 
-    fetch(`/teller/pay-bill/${accountId}`, {
+    fetch(`/teller/pay-bill/${billAccountId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -240,7 +244,11 @@ function submitBillPayment() {
     .then(result => {
         if (result.success) {
             amountInput.value = '';
-            fetchBillInfo(accountId);
+            fetchBillInfo(billAccountId);
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+            injectFlashMessage('success', 'Bill payment successful');
         }
     })
     .catch(error => {
