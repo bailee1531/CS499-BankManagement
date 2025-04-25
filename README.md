@@ -37,43 +37,40 @@
 
 #### Create a virtual environment
 
-\`\`\`bash
+``` bash
 python3 -m venv .venv
-\`\`\`
+```
 
 #### Activate the environment
 
-\`\`\`bash
-. .venv/bin/activate
-\`\`\`
-
-#### Install Flask
-
-\`\`\`bash
-pip install Flask
-\`\`\`
-
----
+```bash
+.venv/bin/activate
+```
 
 ### Windows
 
 #### Create a virtual environment
 
-\`\`\`powershell
+```bash
 py -3 -m venv .venv
-\`\`\`
+```
 
 #### Activate the environment
 
-\`\`\`powershell
+```bash
 .venv\Scripts\activate
-\`\`\`
+```
 
-#### Install Flask
+### Navigate to Project Directory
+```bash
+cd CS499-BankManagement/
+```
 
-\`\`\`bash
-pip install Flask
-\`\`\`
+### Install Necessary Packages
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
@@ -81,6 +78,6 @@ pip install Flask
 
 Once the virtual environment is activated, run:
 
-\`\`\`bash
+```bash
 python3 run.py
-\`\`\`
+```
