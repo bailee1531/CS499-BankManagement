@@ -1,5 +1,4 @@
-# Sierra Yerges
-# In root dir: python -m unittest tests/test_useCreditCard.py
+# Sierra Yerges# Spring 2025 Authors: Sierra Yerges# In root dir: python -m unittest tests/test_useCreditCard.py
 import unittest
 from decimal import Decimal
 import pandas as pd

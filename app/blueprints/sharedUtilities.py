@@ -1,3 +1,4 @@
+# Braden Doty, Bailee Segars, Sierra Yerges
 # ---------------------------
 # Imports
 # ---------------------------

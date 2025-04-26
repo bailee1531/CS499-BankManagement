@@ -1,4 +1,4 @@
-# Bailee Segars
+# Spring 2025 Authors: Bailee Segars, Sierra Yerges
 from datetime import date
 from decimal import Decimal
 import pandas as pd

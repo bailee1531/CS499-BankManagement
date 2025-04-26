@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Braden Doty, Bailee Segars
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.account-btn');
     const hiddenInput = document.querySelector('input[name="account_type"]');

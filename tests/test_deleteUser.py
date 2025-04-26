@@ -1,4 +1,4 @@
-# Sierra Yerges
+# Spring 2025 Authors: Sierra Yerges
 # In root dir: python -m unittest tests/test_deleteUser.py
 import unittest
 from unittest.mock import patch, mock_open

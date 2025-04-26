@@ -1,4 +1,4 @@
-# Bailee Segars
+# Spring 2025 Authors: Bailee Segars, Sierra Yerges, Braden Doty
 from scripts.transactionLog import generate_transaction_ID
 from decimal import Decimal
 from datetime import date

@@ -1,4 +1,4 @@
-# Sierra Yerges
+# Spring 2025 Authors: Sierra Yerges, Bailee Segars, Braden Doty
 import pandas as pd
 import random
 import os
