@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Braden Doty
 function updateArchivedBills() {
     if (typeof archivedBillsApiUrl === "undefined") {
       console.error("archivedBillsApiUrl is not defined");

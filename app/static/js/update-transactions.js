@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Braden Doty
 document.addEventListener("DOMContentLoaded", () => {
   function updateTransactions() {
     console.log("Updating transactions...");

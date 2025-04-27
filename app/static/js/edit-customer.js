@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Sierra Yerges, Bailee Segars
 let currentCustomerID = null;
 
 function submitUsernameEdit() {
