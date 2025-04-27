@@ -1,4 +1,4 @@
-# Spring 2025 Authors: Bailee Segars
+# Spring 2025 Authors: Bailee Segars, Sierra Yerges
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import Optional, Length

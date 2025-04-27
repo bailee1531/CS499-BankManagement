@@ -1,4 +1,4 @@
-# Spring 2025 Authors: Bailee Segars, Braden Doty
+# Spring 2025 Authors: Bailee Segars, Braden Doty, Sierra Yerges
 from flask_wtf import FlaskForm
 from flask import request
 from wtforms import StringField, PasswordField, DecimalField, SelectField, SubmitField, HiddenField, DateField, BooleanField
