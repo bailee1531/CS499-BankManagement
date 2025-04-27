@@ -1,4 +1,4 @@
-# Sierra Yerges
+# Spring 2025 Authors: Sierra Yerges, Bailee Segars
 import pandas as pd
 import os
 from scripts.transactionLog import generate_transaction_ID

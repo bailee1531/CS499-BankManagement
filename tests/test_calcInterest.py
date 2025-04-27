@@ -1,4 +1,4 @@
-# Bailee Segars
+# Spring 2025 Authors: Bailee Segars
 import unittest
 import pandas as pd
 from decimal import Decimal

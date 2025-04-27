@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Bailee Segars, Braden Doty
 // Global data store for account information
 let billAccountData = {};
 

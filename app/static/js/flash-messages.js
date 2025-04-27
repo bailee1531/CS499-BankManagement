@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Braden Doty, Sierra Yerges, Bailee Segars
 function injectFlashMessage(category, message) {
   let container = document.querySelector(".flash-messages");
 

@@ -1,4 +1,4 @@
-# Sierra Yerges
+# Spring 2025 Authors: Sierra Yerges
 # In root dir: python -m unittest tests/test_billPayment.py
 import unittest
 from unittest.mock import patch

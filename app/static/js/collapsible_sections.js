@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Braden Doty
 // Simple toggle functionality for collapsible sections
 document.addEventListener('DOMContentLoaded', function(){
     const toggleButtons = document.querySelectorAll('.toggle-btn');

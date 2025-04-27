@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Bailee Segars
 function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {
     currentCustomerID = customerID;
     selectedCustomerID = customerID;

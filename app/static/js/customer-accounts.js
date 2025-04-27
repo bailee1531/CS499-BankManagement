@@ -1,3 +1,4 @@
+// Spring 2025 Authors: Sierra Yerges, Bailee Segars
 let openAccountCustomerID = null;
 
 function openCustomerModal(customerID, username, firstName, lastName, phone, email, address, account) {

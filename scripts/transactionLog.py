@@ -1,4 +1,4 @@
-# Bailee Segars
+# Spring 2025 Authors: Bailee Segars, Sierra Yerges
 import pandas as pd
 import random
 

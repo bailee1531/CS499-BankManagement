@@ -1,4 +1,4 @@
-# Sierra Yerges
+# Spring 2025 Authors: Sierra Yerges, Braden Doty
 import pandas as pd
 import os
 from decimal import Decimal

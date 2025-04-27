@@ -1,4 +1,4 @@
-# Sierra Yerges
+# Spring 2025 Authors: Sierra Yerges, Braden Doty, Bailee Segars
 from scripts.transactionLog import generate_transaction_ID
 from scripts.archive import archive
 import random

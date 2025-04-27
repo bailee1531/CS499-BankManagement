@@ -1,3 +1,4 @@
+# Spring 2025 Authors: Bailee Segars, Braden Doty, Sierra Yerges
 import pandas as pd
 from decimal import Decimal
 from datetime import date, timedelta

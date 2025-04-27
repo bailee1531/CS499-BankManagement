@@ -1,4 +1,4 @@
-# Bailee Segars
+# Spring 2025 Authors: Bailee Segars, Sierra Yerges, Braden Doty
 from Crypto.PublicKey import ECC
 import pandas as pd
 import hashlib
